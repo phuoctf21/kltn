@@ -1,15 +1,9 @@
-#ifndef INDEX_HTML_H
-#define INDEX_HTML_H
-
-#include <pgmspace.h>
-
-const char index_html[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Há»‡ Thá»‘ng GiÃ¡m SÃ¡t MÃ´i TrÆ°á»ng NhÃ  XÆ°á»Ÿng</title>
+    <title>Hệ Thống Giám Sát Môi Trường Nhà Xưởng</title>
     
     <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -109,10 +103,6 @@ const char index_html[] PROGMEM = R"=====(
         .input-group input, .input-group select { padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius-sub); font-size: 0.85rem; outline: none; background: var(--card-bg); color: var(--text-main); }
         .btn-save { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: var(--radius-sub); font-weight: 700; cursor: pointer; height: 35px; font-size: 0.85rem; }
 
-        .password-wrap { position: relative; display: flex; align-items: center; }
-        .password-wrap input { width: 100%; padding-right: 60px; }
-        .btn-toggle-pwd { position: absolute; right: 6px; background: rgba(0,0,0,0.08); border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.72rem; font-weight: 700; cursor: pointer; color: var(--text-sub); }
-
         .filter-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
         .search-box input { padding: 7px 12px; border: 1px solid var(--border); border-radius: 20px; font-size: 0.82rem; outline: none; width: 240px; background: var(--card-bg); color: var(--text-main); }
         .btn-export { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); padding: 7px 14px; border-radius: 20px; font-weight: 700; font-size: 0.82rem; cursor: pointer; }
@@ -123,24 +113,14 @@ const char index_html[] PROGMEM = R"=====(
         th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
         th { background: rgba(0,0,0,0.03); color: var(--text-sub); font-weight: 700; position: sticky; top: 0; }
 
-        /* KHU Vá»°C NHáº¬T KÃ CA TRá»°C */
         .note-input-row { display: grid; grid-template-columns: 220px 1fr 140px; gap: 10px; align-items: flex-end; }
-        @media (max-width: 768px) {
-            .note-input-row { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 768px) { .note-input-row { grid-template-columns: 1fr; } }
         .note-list-container { max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sub); display: flex; flex-direction: column; }
         .note-item { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
         .note-item:last-child { border-bottom: none; }
         .note-item:nth-child(odd) { background: rgba(0, 0, 0, 0.015); }
         .note-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-sub); font-weight: 700; }
         .note-text { font-size: 0.85rem; color: var(--text-main); line-height: 1.4; word-break: break-word; }
-
-        .wifi-page { display: none; flex-direction: column; gap: 16px; }
-        .wifi-status-card { background: var(--card-bg); border-radius: var(--radius-main); border: 1px solid var(--border); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-        .wifi-scanner-list { display: flex; flex-direction: column; list-style: none; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: var(--radius-sub); overflow: hidden; max-height: 240px; overflow-y: auto; }
-        .wifi-row { padding: 10px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); cursor: pointer; }
-        .wifi-row:hover { background: var(--primary-bg); }
-        .wifi-row:last-child { border-bottom: none; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.7); z-index: 99999; display: none; justify-content: center; align-items: center; padding: 15px; }
         .modal-card { background: var(--card-bg); border-radius: var(--radius-main); padding: 22px; width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 14px; border: 1px solid var(--border); }
@@ -158,63 +138,28 @@ const char index_html[] PROGMEM = R"=====(
     <div id="exportModal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3>ðŸ“¥ Xuáº¥t BÃ¡o CÃ¡o</h3>
-                <button class="btn-close" onclick="closeExportModal()">âœ•</button>
+                <h3>📥 Xuất Báo Cáo</h3>
+                <button class="btn-close" onclick="closeExportModal()">✕</button>
             </div>
             <div class="input-group">
-                <label>Pháº¡m Vi Xuáº¥t Dá»¯ Liá»‡u</label>
+                <label>Phạm Vi Xuất Dữ Liệu</label>
                 <select id="exportScope" onchange="onExportScopeChange()">
-                    <option value="all">ToÃ n bá»™ lá»‹ch sá»­</option>
-                    <option value="date">Theo ngÃ y cá»¥ thá»ƒ</option>
-                    <option value="month">Theo thÃ¡ng / nÄƒm</option>
+                    <option value="all">Toàn bộ lịch sử</option>
+                    <option value="date">Theo ngày cụ thể</option>
+                    <option value="month">Theo tháng / năm</option>
                 </select>
             </div>
             <div class="input-group" id="exportDateGroup" style="display:none;">
-                <label>Chá»n NgÃ y</label>
+                <label>Chọn Ngày</label>
                 <input type="date" id="exportDate">
             </div>
             <div class="input-group" id="exportMonthGroup" style="display:none;">
-                <label>Chá»n ThÃ¡ng</label>
+                <label>Chọn Tháng</label>
                 <input type="month" id="exportMonth">
             </div>
             <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
-                <button class="btn-export" onclick="closeExportModal()">Há»¦Y</button>
-                <button class="btn-save" onclick="processExportCSV()">Táº¢I XUá»NG</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="wifiModal" class="modal-overlay">
-        <div class="modal-card">
-            <div class="modal-header">
-                <h3>ðŸ“¶ Káº¿t Ná»‘i Wi-Fi</h3>
-                <button class="btn-close" onclick="closeWifiModal()">âœ•</button>
-            </div>
-            <div class="input-group">
-                <label>Máº­t Kháº©u Máº¡ng</label>
-                <div class="password-wrap">
-                    <input type="password" id="wifiPassInput" placeholder="Nháº­p máº­t kháº©u Wi-Fi...">
-                    <button type="button" class="btn-toggle-pwd" onclick="togglePwd('wifiPassInput', this)">[HIá»†N]</button>
-                </div>
-            </div>
-            <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                <button class="btn-export" onclick="closeWifiModal()">Há»¦Y</button>
-                <button class="btn-save" onclick="confirmWifiConnect()">Káº¾T Ná»I</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="switchingWifiModal" class="modal-overlay">
-        <div class="modal-card" style="text-align: center;">
-            <div class="modal-header" style="justify-content: center;">
-                <h3 style="color:var(--primary);">ðŸ”„ ÄANG Äá»”I Máº NG WI-FI...</h3>
-            </div>
-            <p style="font-size:0.9rem; line-height: 1.6; margin: 10px 0;">
-                Tráº¡m Ä‘ang chuyá»ƒn sang Wi-Fi má»›i.<br>
-                ðŸ‘‰ <strong>Vui lÃ²ng xem Ä‘á»‹a chá»‰ IP má»›i hiá»ƒn thá»‹ trá»±c tiáº¿p trÃªn mÃ n hÃ¬nh LCD</strong> Ä‘á»ƒ truy cáº­p láº¡i trÃªn trÃ¬nh duyá»‡t!
-            </p>
-            <div style="font-size:0.8rem; color:var(--text-sub); background: rgba(0,0,0,0.05); padding: 8px; border-radius: 8px;">
-                Náº¿u khÃ´ng káº¿t ná»‘i Ä‘Æ°á»£c, tráº¡m sáº½ tá»± Ä‘á»™ng káº¿t ná»‘i láº¡i máº¡ng cÅ© hoáº·c duy trÃ¬ AP cá»©u há»™.
+                <button class="btn-export" onclick="closeExportModal()">HỦY</button>
+                <button class="btn-save" onclick="processExportCSV()">TẢI XUỐNG</button>
             </div>
         </div>
     </div>
@@ -222,21 +167,20 @@ const char index_html[] PROGMEM = R"=====(
     <div class="container">
         <div class="nav-bar">
             <div class="nav-tabs">
-                <button id="tabDash" class="nav-btn active" onclick="switchTab('dash')">ðŸ“Š GiÃ¡m SÃ¡t MÃ´i TrÆ°á»ng</button>
-                <button id="tabWifi" class="nav-btn" onclick="switchTab('wifi')">ðŸ“¶ Quáº£n LÃ½ Wi-Fi</button>
+                <button class="nav-btn active">📊 Giám Sát Môi Trường (Blynk Cloud)</button>
             </div>
-            <button class="btn-theme" onclick="toggleDarkMode()">ðŸŒ“ Giao Diá»‡n ÄÃªm / SÃ¡ng</button>
+            <button class="btn-theme" onclick="toggleDarkMode()">🌓 Giao Diện Đêm / Sáng</button>
         </div>
 
         <div id="pageDash" style="display:flex; flex-direction:column; gap:16px;">
             <header>
                 <div class="header-title">
-                    <h1 id="headerProjectName">TRáº M ÄIá»€U KHIá»‚N & ÄO Äáº C NHÃ€ XÆ¯á»žNG</h1>
+                    <h1 id="headerProjectName">HỆ THỐNG GIÁM SÁT MÔI TRƯỜNG NHÀ XƯỞNG</h1>
                     <div class="manager-info">
-                        <span>ðŸ« TrÆ°á»ng: <strong id="dispUniv">TrÆ°á»ng ÄH CÃ´ng nghiá»‡p TP.HCM (IUH)</strong></span>
-                        <span>ðŸ‘¤ Quáº£n lÃ½: <strong id="dispAuthor">Nguyá»…n Trá»ng PhÆ°á»›c</strong></span>
-                        <span>ðŸ“ Vá»‹ trÃ­: <strong id="dispLocation">Khu NhÃ  XÆ°á»Ÿng - TP.HCM</strong></span>
-                        <span>â±ï¸ Uptime: <strong id="uptimeCounter">--:--:--</strong></span>
+                        <span>🏫 Trường: <strong>Trường ĐH Công nghiệp TP.HCM (IUH)</strong></span>
+                        <span>👤 Quản lý: <strong>Nguyễn Trọng Phước</strong></span>
+                        <span>📍 Vị trí: <strong>Khu Nhà Xưởng - TP.HCM</strong></span>
+                        <span>🌐 Kết nối: <strong id="cloudStatus" style="color:#10b981;">ONLINE</strong></span>
                     </div>
                 </div>
                 <div id="realtimeClock" class="realtime-clock">--/--/---- --:--:--</div>
@@ -244,213 +188,149 @@ const char index_html[] PROGMEM = R"=====(
 
             <div class="incident-banner">
                 <div>
-                    <strong>ðŸ”” Sá»± Cá»‘ Gáº§n Nháº¥t:</strong> <span id="lastIncName" style="color:#d97706; font-weight:700;">KhÃ´ng cÃ³</span>
+                    <strong>🔔 Sự Cố Gần Nhất:</strong> <span id="lastIncName" style="color:#d97706; font-weight:700;">Không có</span>
                 </div>
                 <div>
-                    Tráº¡ng ThÃ¡i: <span id="lastIncStatus" class="badge badge-safe">Tá»T</span>
+                    Trạng Thái: <span id="lastIncStatus" class="badge badge-safe">TỐT</span>
                 </div>
                 <div>
-                    Thá»i Gian: <strong id="lastIncTime" style="font-family:monospace;">--:--:--</strong>
+                    Thời Gian: <strong id="lastIncTime" style="font-family:monospace;">--:--:--</strong>
                 </div>
             </div>
 
             <div class="status-banner">
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <span id="envBadge" class="badge badge-safe">â— Tá»T</span>
-                    <span id="speakerBadge" class="badge badge-spk-on">ðŸ”Š LOA BÃO Äá»˜NG: ÄANG Báº¬T</span>
+                    <span id="envBadge" class="badge badge-safe">● TỐT</span>
+                    <span id="speakerBadge" class="badge badge-spk-on">🔊 LOA BÁO ĐỘNG: ĐANG BẬT</span>
                 </div>
                 <div class="btn-group">
-                    <button class="btn-ack" onclick="ackAlert()">âœ… XÃC NHáº¬N Sá»° Cá»</button>
-                    <button class="btn-emergency" onclick="triggerEmergency()">ðŸš¨ BÃO Äá»˜NG KHáº¨N</button>
-                    <button class="btn-mute" onclick="triggerMute()">ðŸ”• Táº®T LOA Táº M</button>
-                    <button class="btn-unmute" onclick="triggerUnmute()">ðŸ”Š Báº¬T LOA</button>
+                    <button class="btn-ack" onclick="ackAlert()">✅ XÁC NHẬN SỰ CỐ</button>
+                    <button class="btn-emergency" onclick="triggerEmergency()">🚨 BÁO ĐỘNG KHẨN</button>
+                    <button class="btn-mute" onclick="triggerMute()">🔕 TẮT LOA TẠM</button>
+                    <button class="btn-unmute" onclick="triggerUnmute()">🔊 BẬT LOA</button>
                 </div>
             </div>
 
             <div class="kpi-grid">
                 <div class="kpi-card" style="border-left: 4px solid #ef4444;">
-                    <div class="kpi-title">Tá»‰ Lá»‡ Sá»± Cá»‘ / Ca Trá»±c</div>
+                    <div class="kpi-title">Tỉ Lệ Sự Cố / Ca Trực</div>
                     <div class="kpi-value" style="color: #ef4444;"><span id="kpiIncidentRatio">0.00</span> /ca</div>
                 </div>
                 <div class="kpi-card" style="border-left: 4px solid #0284c7;">
-                    <div class="kpi-title">Tá»•ng Sá»‘ Láº§n Sá»± Cá»‘ TÃ­ch LÅ©y</div>
-                    <div class="kpi-value" style="color: #0284c7;"><span id="kpiTotalIncidents">0</span> láº§n</div>
+                    <div class="kpi-title">Tổng Số Lần Sự Cố Tích Lũy</div>
+                    <div class="kpi-value" style="color: #0284c7;"><span id="kpiTotalIncidents">0</span> lần</div>
                 </div>
                 <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
-                    <div class="kpi-title">PhÃ¢n Loáº¡i Sá»± Cá»‘</div>
+                    <div class="kpi-title">Phân Loại Sự Cố</div>
                     <div style="font-size:0.85rem; font-weight:700; margin-top:2px;">
-                        Nhiá»‡t: <span id="incTemp" style="color:#ef4444;">0</span> | Gas: <span id="incGas" style="color:#ef4444;">0</span> | CO2: <span id="incCo2" style="color:#ef4444;">0</span> | Bá»¥i: <span id="incDust" style="color:#ef4444;">0</span>
+                        Nhiệt: <span id="incTemp" style="color:#ef4444;">0</span> | Gas: <span id="incGas" style="color:#ef4444;">0</span> | CO2: <span id="incCo2" style="color:#ef4444;">0</span> | Bụi: <span id="incDust" style="color:#ef4444;">0</span>
                     </div>
                 </div>
             </div>
 
             <div class="grid-layout">
-                <div class="card"><div class="card-title">Nhiá»‡t Äá»™</div><div class="card-value"><span id="temp">0.0</span><span class="unit">Â°C</span></div><div class="card-sub">Min: <span id="minTemp">--</span> | Max: <span id="maxTemp">--</span></div></div>
-                <div class="card"><div class="card-title">Äá»™ áº¨m</div><div class="card-value"><span id="hum">0.0</span><span class="unit">%</span></div><div class="card-sub">Äá»™ áº©m tÆ°Æ¡ng Ä‘á»‘i</div></div>
-                <div class="card"><div class="card-title">KhÃ­ Gas</div><div class="card-value"><span id="gas">0</span><span class="unit">PPM</span></div><div class="card-sub">NgÆ°á»¡ng: &lt;<span id="dispSetGas">180</span></div></div>
-                <div class="card"><div class="card-title">KhÃ­ CO2</div><div class="card-value"><span id="co2">0</span><span class="unit">PPM</span></div><div class="card-sub">NgÆ°á»¡ng: &lt;<span id="dispSetCo2">900</span></div></div>
-                <div class="card"><div class="card-title">Bá»¥i PM2.5</div><div class="card-value"><span id="dust">0</span><span class="unit">Âµg/mÂ³</span></div><div class="card-sub">NgÆ°á»¡ng: &lt;<span id="dispSetDust">150</span></div></div>
-                <div class="card"><div class="card-title">Chá»‰ Sá»‘ AQI</div><div class="card-value" style="color:var(--primary);"><span id="aqi">0</span></div><div class="card-sub" id="aqiDesc">ÄÃ¡nh giÃ¡: Tá»T</div></div>
+                <div class="card"><div class="card-title">Nhiệt Độ</div><div class="card-value"><span id="temp">0.0</span><span class="unit">°C</span></div><div class="card-sub">Min: <span id="minTemp">--</span> | Max: <span id="maxTemp">--</span></div></div>
+                <div class="card"><div class="card-title">Độ Ẩm</div><div class="card-value"><span id="hum">0.0</span><span class="unit">%</span></div><div class="card-sub">Độ ẩm tương đối</div></div>
+                <div class="card"><div class="card-title">Khí Gas</div><div class="card-value"><span id="gas">0</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetGas">180</span></div></div>
+                <div class="card"><div class="card-title">Khí CO2</div><div class="card-value"><span id="co2">0</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetCo2">900</span></div></div>
+                <div class="card"><div class="card-title">Bụi PM2.5</div><div class="card-value"><span id="dust">0</span><span class="unit">µg/m³</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetDust">150</span></div></div>
+                <div class="card"><div class="card-title">Chỉ Số AQI</div><div class="card-value" style="color:var(--primary);"><span id="aqi">0</span></div><div class="card-sub" id="aqiDesc">Đánh giá: TỐT</div></div>
             </div>
 
             <div class="module-box">
-                <div class="section-title">âš¡ ÄIá»€U KHIá»‚N & KIá»‚M TRA THIáº¾T Bá»Š</div>
+                <div class="section-title">⚡ ĐIỀU KHIỂN & KIỂM TRA THIẾT BỊ (QUẢN TRỊ CLOUD)</div>
                 <div class="control-grid">
                     <div class="control-item">
                         <div>
-                            <div style="font-weight:700; font-size:0.85rem;">Quáº¡t HÃºt Relay</div>
-                            <div id="fanStatusText" style="font-size:0.75rem; color:var(--text-sub);">Tráº¡ng thÃ¡i: Tá»± Ä‘á»™ng (Táº¯t)</div>
+                            <div style="font-weight:700; font-size:0.85rem;">Quạt Hút Relay</div>
+                            <div id="fanStatusText" style="font-size:0.75rem; color:var(--text-sub);">Trạng thái: Tự động (Tắt)</div>
                         </div>
-                        <button class="btn-action" id="btnFan" onclick="toggleFanOverride()">Báº¬T QUáº T</button>
-                    </div>
-                    <div class="control-item">
-                        <div>
-                            <div style="font-weight:700; font-size:0.85rem;">Kiá»ƒm Tra Loa</div>
-                            <div style="font-size:0.75rem; color:var(--text-sub);">PhÃ¡t Ã¢m thanh máº«u</div>
-                        </div>
-                        <button class="btn-action" style="background:#475569;" onclick="testSpeaker()">TEST LOA</button>
+                        <button class="btn-action" id="btnFan" onclick="toggleFanOverride()">BẬT QUẠT</button>
                     </div>
                 </div>
             </div>
 
             <div class="module-box">
-                <div class="section-title">ðŸ“ˆ BIá»‚U Äá»’ DIá»„N BIáº¾N THá»œI GIAN THá»°C</div>
+                <div class="section-title">📈 BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC (CLOUDFEED)</div>
                 <div style="position: relative; height: 260px; width: 100%;">
                     <canvas id="envChart"></canvas>
                 </div>
             </div>
 
             <div class="module-box">
-                <div class="section-title">âš™ï¸ THIáº¾T Láº¬P NGÆ¯á» NG Cáº¢NH BÃO</div>
+                <div class="section-title">⚙️ THIẾT LẬP NGƯỠNG CẢNH BÁO</div>
                 <div class="settings-grid">
-                    <div class="input-group"><label>NgÆ°á»¡ng Nhiá»‡t Äá»™ (Â°C)</label><input type="number" id="setTemp" step="0.5" value="38.0"></div>
-                    <div class="input-group"><label>NgÆ°á»¡ng KhÃ­ CO2 (PPM)</label><input type="number" id="setCo2" value="900"></div>
-                    <div class="input-group"><label>NgÆ°á»¡ng Bá»¥i PM2.5 (Âµg/mÂ³)</label><input type="number" id="setDust" value="150"></div>
-                    <div class="input-group"><label>NgÆ°á»¡ng KhÃ­ Gas (PPM)</label><input type="number" id="setGas" value="180"></div>
-                    <button class="btn-save" onclick="saveThresholds()">ÃP Dá»¤NG NGÆ¯á» NG</button>
+                    <div class="input-group"><label>Ngưỡng Nhiệt Độ (°C)</label><input type="number" id="setTemp" step="0.5" value="38.0"></div>
+                    <div class="input-group"><label>Ngưỡng Khí CO2 (PPM)</label><input type="number" id="setCo2" value="900"></div>
+                    <div class="input-group"><label>Ngưỡng Bụi PM2.5 (µg/m³)</label><input type="number" id="setDust" value="150"></div>
+                    <div class="input-group"><label>Ngưỡng Khí Gas (PPM)</label><input type="number" id="setGas" value="180"></div>
+                    <button class="btn-save" onclick="saveThresholds()">ÁP DỤNG NGƯỠNG</button>
                 </div>
             </div>
 
             <div class="module-box">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div class="section-title">ðŸ“ Sá»” NHáº¬T KÃ CA TRá»°C</div>
-                    <button class="btn-clear-db" onclick="clearNoteLogs()">ðŸ—‘ï¸ XÃ³a Sá»• Nháº­t KÃ½</button>
+                    <div class="section-title">📝 SỔ NHẬT KÝ CA TRỰC</div>
+                    <button class="btn-clear-db" onclick="clearNoteLogs()">🗑️ Xóa Sổ Nhật Ký</button>
                 </div>
-                
                 <div class="note-input-row">
                     <div class="input-group">
-                        <label>NgÆ°á»i Ghi ChÃº</label>
-                        <input type="text" id="noteAuthor" maxlength="30" value="Nguyá»…n Trá»ng PhÆ°á»›c" placeholder="TÃªn ká»¹ sÆ° / ngÆ°á»i trá»±c...">
+                        <label>Người Ghi Chú</label>
+                        <input type="text" id="noteAuthor" maxlength="30" value="Nguyễn Trọng Phước">
                     </div>
                     <div class="input-group">
-                        <label>Ná»™i Dung Ghi ChÃº</label>
-                        <input type="text" id="noteContent" maxlength="120" placeholder="Nháº­p diá»…n biáº¿n ca trá»±c, kiá»ƒm tra thiáº¿t bá»‹...">
+                        <label>Nội Dung Ghi Chú</label>
+                        <input type="text" id="noteContent" maxlength="120" placeholder="Nhập diễn biến ca trực, kiểm tra thiết bị...">
                     </div>
-                    <button class="btn-save" onclick="submitNewNote()">THÃŠM GHI CHÃš</button>
+                    <button class="btn-save" onclick="submitNewNote()">THÊM GHI CHÚ</button>
                 </div>
-
-                <div class="note-list-container" id="noteListContainer">
-                    <div style="padding:15px; text-align:center; color:var(--text-sub);">Äang táº£i nháº­t kÃ½...</div>
-                </div>
+                <div class="note-list-container" id="noteListContainer"></div>
             </div>
 
             <div class="module-box">
-                <div class="section-title">ðŸ—„ï¸ Lá»ŠCH Sá»¬ ÄO Äáº C</div>
+                <div class="section-title">🗄️ LỊCH SỬ ĐO ĐẠC</div>
                 <div class="filter-controls">
                     <select id="timeRangeFilter" onchange="onTimeFilterChange()">
-                        <option value="all">Táº¥t cáº£ lá»‹ch sá»­</option>
-                        <option value="5m">5 phÃºt gáº§n nháº¥t</option>
-                        <option value="15m">15 phÃºt gáº§n nháº¥t</option>
-                        <option value="1h">1 giá» gáº§n nháº¥t</option>
-                        <option value="custom">Chá»n ngÃ y cá»¥ thá»ƒ...</option>
+                        <option value="all">Tất cả lịch sử</option>
+                        <option value="5m">5 phút gần nhất</option>
+                        <option value="15m">15 phút gần nhất</option>
+                        <option value="1h">1 giờ gần nhất</option>
+                        <option value="custom">Chọn ngày cụ thể...</option>
                     </select>
                     <input type="date" id="datePicker" onchange="smartFilterTable()" style="display: none;">
-                    <div class="search-box"><input type="text" id="tableSearch" placeholder="TÃ¬m kiáº¿m má»‘c giá», loáº¡i khÃ­..." onkeyup="smartFilterTable()"></div>
-                    <button class="btn-export" onclick="openExportModal()">ðŸ“¥ Xuáº¥t BÃ¡o CÃ¡o</button>
-                    <button class="btn-clear-db" onclick="clearDatabase()">ðŸ—‘ï¸ XÃ³a Bá»™ Nhá»› Äo</button>
+                    <div class="search-box"><input type="text" id="tableSearch" placeholder="Tìm kiếm mốc giờ, loại khí..." onkeyup="smartFilterTable()"></div>
+                    <button class="btn-export" onclick="openExportModal()">📥 Xuất Báo Cáo</button>
+                    <button class="btn-clear-db" onclick="clearDatabase()">🗑️ Xóa Bộ Nhớ Đo</button>
                 </div>
                 <div class="table-responsive">
                     <table id="logTable">
                         <thead>
-                            <tr><th>Thá»i Gian</th><th>Nhiá»‡t Äá»™ (Â°C)</th><th>Äá»™ áº¨m (%)</th><th>KhÃ­ Gas (PPM)</th><th>KhÃ­ CO2 (PPM)</th><th>Bá»¥i PM2.5 (Âµg/mÂ³)</th><th>AQI</th><th>Tráº¡ng ThÃ¡i</th></tr>
+                            <tr><th>Thời Gian</th><th>Nhiệt Độ (°C)</th><th>Độ Ẩm (%)</th><th>Khí Gas (PPM)</th><th>Khí CO2 (PPM)</th><th>Bụi PM2.5 (µg/m³)</th><th>AQI</th><th>Trạng Thái</th></tr>
                         </thead>
                         <tbody id="logTableBody"></tbody>
                     </table>
                 </div>
             </div>
         </div>
-
-        <div id="pageWifi" class="wifi-page">
-            <div class="wifi-status-card">
-                <div>
-                    <div style="font-size:0.75rem; color:var(--text-sub); text-transform:uppercase; font-weight:700;">Máº¡ng Äang Káº¿t Ná»‘i</div>
-                    <div id="activeSsid" style="font-size:1.1rem; font-weight:800; color:var(--primary);">Äang kiá»ƒm tra...</div>
-                    <div style="font-size:0.8rem; color:var(--text-sub); margin-top:2px;">TÃ­n hiá»‡u sÃ³ng: <strong id="dispRssi">-- dBm</strong></div>
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:0.75rem; color:var(--text-sub); text-transform:uppercase; font-weight:700;">Äá»‹a Chá»‰ IP</div>
-                    <div id="currentIp" style="font-family:monospace; font-weight:800; font-size:1.05rem; color:#0369a1;">...</div>
-                </div>
-            </div>
-
-            <div class="module-box">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div class="section-title">ðŸ” QUÃ‰T TÃŒM WI-FI XUNG QUANH</div>
-                    <button class="btn-action" onclick="scanWifiNetworks()">ðŸ”„ QuÃ©t Máº¡ng</button>
-                </div>
-                <ul id="wifiScannedList" class="wifi-scanner-list">
-                    <li style="padding:15px; text-align:center; color:var(--text-sub);">Báº¥m nÃºt [QuÃ©t Máº¡ng] Ä‘á»ƒ tÃ¬m kiáº¿m danh sÃ¡ch WiFi.</li>
-                </ul>
-            </div>
-
-            <div class="module-box">
-                <div class="section-title">âœï¸ Káº¾T Ná»I WI-FI THá»¦ CÃ”NG</div>
-                <div class="settings-grid">
-                    <div class="input-group">
-                        <label>TÃªn Máº¡ng (SSID)</label>
-                        <input type="text" id="manualSsid" placeholder="Nháº­p tÃªn WiFi...">
-                    </div>
-                    <div class="input-group">
-                        <label>Máº­t Kháº©u</label>
-                        <div class="password-wrap">
-                            <input type="password" id="manualPass" placeholder="Nháº­p máº­t kháº©u...">
-                            <button type="button" class="btn-toggle-pwd" onclick="togglePwd('manualPass', this)">[HIá»†N]</button>
-                        </div>
-                    </div>
-                    <button class="btn-save" onclick="connectManualWifi()">Káº¾T Ná»I Máº NG</button>
-                </div>
-            </div>
-
-            <div class="module-box">
-                <div class="section-title">ðŸ“¡ PHÃT SÃ“NG WI-FI</div>
-                <div class="settings-grid">
-                    <div class="input-group"><label>TÃªn Wi-Fi PhÃ¡t (SSID)</label><input type="text" id="apSsid" value="ESP32_TRAM_MOITRUONG"></div>
-                    <div class="input-group">
-                        <label>Máº­t Kháº©u PhÃ¡t</label>
-                        <div class="password-wrap">
-                            <input type="password" id="apPass" value="12345678">
-                            <button type="button" class="btn-toggle-pwd" onclick="togglePwd('apPass', this)">[HIá»†N]</button>
-                        </div>
-                    </div>
-                    <button class="btn-save" style="background:#0284c7;" onclick="startApMode()">KÃCH HOáº T PHÃT SÃ“NG</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
+        // =========================================================
+        // CẤU HÌNH BLYNK CLOUD REST API
+        // =========================================================
+        const BLYNK_AUTH_TOKEN = "Your_Auth_Token_Here"; // Thay token Blynk tại đây
+        const BLYNK_BASE_URL   = "https://blynk.cloud/external/api";
+
         let cfgTemp = 38.0, cfgCo2 = 900, cfgDust = 150, cfgGas = 180;
         let isSpeakerMuted = false, isFanForced = false;
         let minT = 99.0, maxT = 0.0;
-        let selectedSsid = "";
-        let scanPollingTimer = null;
-        let hasInitializedThresholdInputs = false;
+        let curSimTemp = 0.0, curSimHum = 0.0, curSimGas = 0, curSimCo2 = 0, curSimDust = 0;
 
         let projHeader = {
-            university: "TrÆ°á»ng Äáº¡i há»c CÃ´ng nghiá»‡p TP.HCM (IUH)",
-            projectName: "Há»‡ Thá»‘ng GiÃ¡m SÃ¡t MÃ´i TrÆ°á»ng NhÃ  XÆ°á»Ÿng",
-            author: "Nguyá»…n Trá»ng PhÆ°á»›c",
-            location: "Khu NhÃ  XÆ°á»Ÿng - TP.HCM",
+            university: "Trường Đại học Công nghiệp TP.HCM (IUH)",
+            projectName: "Hệ Thống Giám Sát Môi Trường Nhà Xưởng",
+            author: "Nguyễn Trọng Phước",
+            location: "Khu Nhà Xưởng - TP.HCM",
             systemTime: "--/--/---- --:--:--"
         };
 
@@ -459,9 +339,9 @@ const char index_html[] PROGMEM = R"=====(
         try {
             const savedLogs = localStorage.getItem('env_station_logs');
             if (savedLogs) logData = JSON.parse(savedLogs);
-        } catch(e) {
-            logData = [];
-        }
+            const savedNotes = localStorage.getItem('env_station_notes');
+            if (savedNotes) cachedNoteList = JSON.parse(savedNotes);
+        } catch(e) { logData = []; cachedNoteList = []; }
 
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
 
@@ -475,80 +355,84 @@ const char index_html[] PROGMEM = R"=====(
             setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
-        function togglePwd(inputId, btn) {
-            const inp = document.getElementById(inputId);
-            if (inp.type === "password") {
-                inp.type = "text";
-                btn.innerText = "[áº¨N]";
-            } else {
-                inp.type = "password";
-                btn.innerText = "[HIá»†N]";
-            }
-        }
-
-        function switchTab(tab) {
-            document.getElementById('pageDash').style.display = (tab === 'dash') ? 'flex' : 'none';
-            document.getElementById('pageWifi').style.display = (tab === 'wifi') ? 'flex' : 'none';
-            document.getElementById('tabDash').className = `nav-btn ${tab === 'dash' ? 'active' : ''}`;
-            document.getElementById('tabWifi').className = `nav-btn ${tab === 'wifi' ? 'active' : ''}`;
+        // =========================================================
+        // ĐIỀU KHIỂN CLOUD BLYNK QUA REST API
+        // =========================================================
+        function toggleFanOverride() {
+            isFanForced = !isFanForced;
+            const targetVal = isFanForced ? 1 : 0;
+            fetch(`${BLYNK_BASE_URL}/update?token=${BLYNK_AUTH_TOKEN}&v6=${targetVal}`)
+                .then(res => {
+                    if (res.ok) {
+                        showTopToast(isFanForced ? "Đã gửi lệnh BẬT quạt lên Cloud!" : "Đã chuyển quạt về TỰ ĐỘNG!");
+                        updateFanUI(targetVal);
+                    }
+                })
+                .catch(() => showTopToast("Lỗi kết nối tới Blynk Cloud!"));
         }
 
         function triggerMute() {
-            fetch('/mute?state=1').then(() => {
-                isSpeakerMuted = true;
-                document.getElementById('speakerBadge').className = "badge badge-spk-off";
-                document.getElementById('speakerBadge').innerText = "ðŸ”‡ LOA BÃO Äá»˜NG: ÄÃƒ Táº®T";
-                showTopToast("ÄÃ£ táº¯t loa cáº£nh bÃ¡o táº¡m thá»i!");
-            });
+            fetch(`${BLYNK_BASE_URL}/update?token=${BLYNK_AUTH_TOKEN}&v7=1`)
+                .then(res => {
+                    if (res.ok) {
+                        updateSpeakerUI(1);
+                        showTopToast("Đã gửi lệnh TẮT loa cảnh báo!");
+                    }
+                });
         }
 
         function triggerUnmute() {
-            fetch('/mute?state=0').then(() => {
-                isSpeakerMuted = false;
-                document.getElementById('speakerBadge').className = "badge badge-spk-on";
-                document.getElementById('speakerBadge').innerText = "ðŸ”Š LOA BÃO Äá»˜NG: ÄANG Báº¬T";
-                showTopToast("ÄÃ£ báº­t láº¡i loa cáº£nh bÃ¡o!");
-            });
+            fetch(`${BLYNK_BASE_URL}/update?token=${BLYNK_AUTH_TOKEN}&v7=0`)
+                .then(res => {
+                    if (res.ok) {
+                        updateSpeakerUI(0);
+                        showTopToast("Đã gửi lệnh BẬT loa cảnh báo!");
+                    }
+                });
         }
 
         function triggerEmergency() {
-            fetch('/emergency').then(() => {
-                isSpeakerMuted = false;
-                document.getElementById('speakerBadge').className = "badge badge-spk-on";
-                document.getElementById('speakerBadge').innerText = "ðŸ”Š LOA BÃO Äá»˜NG: Báº¬T KHáº¨N Cáº¤P";
-                showTopToast("ÄÃƒ KÃCH HOáº T BÃO Äá»˜NG KHáº¨N Cáº¤P!");
-            });
+            fetch(`${BLYNK_BASE_URL}/update?token=${BLYNK_AUTH_TOKEN}&v6=1&v7=0`)
+                .then(() => {
+                    showTopToast("ĐÃ KÍCH HOẠT BÁO ĐỘNG KHẨN CẤP!");
+                    updateFanUI(1);
+                    updateSpeakerUI(0);
+                });
         }
 
         function ackAlert() {
-            fetch('/ack').then(() => {
-                isSpeakerMuted = true; isFanForced = false;
-                document.getElementById('speakerBadge').className = "badge badge-spk-off";
-                document.getElementById('speakerBadge').innerText = "ðŸ”‡ LOA BÃO Äá»˜NG: ÄÃƒ Táº®T";
-                document.getElementById('lastIncStatus').className = "badge badge-warn";
-                document.getElementById('lastIncStatus').innerText = "ÄANG Xá»¬ LÃ";
-                showTopToast("ÄÃ£ xÃ¡c nháº­n sá»± cá»‘. Quáº¡t tiáº¿p tá»¥c hÃºt xáº£ Ä‘áº¿n khi an toÃ n!");
-            });
+            triggerMute();
+            document.getElementById('lastIncStatus').className = "badge badge-warn";
+            document.getElementById('lastIncStatus').innerText = "ĐANG XỬ LÝ";
+            showTopToast("Đã xác nhận sự cố!");
         }
 
-        function toggleFanOverride() {
-            isFanForced = !isFanForced;
-            fetch(`/fan?override=${isFanForced ? 1 : 0}`).then(() => {
-                const btn = document.getElementById('btnFan');
-                const text = document.getElementById('fanStatusText');
-                if (isFanForced) {
-                    btn.innerText = "Dá»ªNG QUáº T"; btn.style.background = "#dc2626";
-                    text.innerText = "Tráº¡ng thÃ¡i: Báº¬T THá»¦ CÃ”NG";
-                    showTopToast("ÄÃ£ báº­t quáº¡t!");
-                } else {
-                    btn.innerText = "Báº¬T QUáº T"; btn.style.background = "var(--primary)";
-                    text.innerText = "Tráº¡ng thÃ¡i: Tá»± Ä‘á»™ng (Táº¯t)";
-                    showTopToast("ÄÃ£ chuyá»ƒn quáº¡t vá» cháº¿ Ä‘á»™ Tá»± Ä‘á»™ng.");
-                }
-            });
+        function updateFanUI(state) {
+            const btn = document.getElementById('btnFan');
+            const text = document.getElementById('fanStatusText');
+            if (state === 1) {
+                btn.innerText = "DỪNG QUẠT"; btn.style.background = "#dc2626";
+                text.innerText = "Trạng thái: BẬT THỦ CÔNG";
+                isFanForced = true;
+            } else {
+                btn.innerText = "BẬT QUẠT"; btn.style.background = "var(--primary)";
+                text.innerText = "Trạng thái: Tự động (Tắt)";
+                isFanForced = false;
+            }
         }
 
-        function testSpeaker() { fetch('/test-speaker').then(() => showTopToast("Äang phÃ¡t thá»­ loa...")); }
+        function updateSpeakerUI(isMuted) {
+            const spkBadge = document.getElementById('speakerBadge');
+            if (isMuted === 1) {
+                spkBadge.className = "badge badge-spk-off";
+                spkBadge.innerText = "🔇 LOA BÁO ĐỘNG: ĐÃ TẮT";
+                isSpeakerMuted = true;
+            } else {
+                spkBadge.className = "badge badge-spk-on";
+                spkBadge.innerText = "🔊 LOA BÁO ĐỘNG: ĐANG BẬT";
+                isSpeakerMuted = false;
+            }
+        }
 
         function saveThresholds() {
             cfgTemp = parseFloat(document.getElementById('setTemp').value);
@@ -556,162 +440,25 @@ const char index_html[] PROGMEM = R"=====(
             cfgDust = parseFloat(document.getElementById('setDust').value);
             cfgGas  = parseFloat(document.getElementById('setGas').value);
 
-            fetch(`/set?temp=${cfgTemp}&co2=${cfgCo2}&dust=${cfgDust}&gas=${cfgGas}`)
-                .then(() => {
-                    document.getElementById('dispSetGas').innerText = cfgGas;
-                    document.getElementById('dispSetCo2').innerText = cfgCo2;
-                    document.getElementById('dispSetDust').innerText = cfgDust;
-                    showTopToast("ÄÃ£ Ã¡p dá»¥ng ngÆ°á»¡ng má»›i thÃ nh cÃ´ng!");
-                });
+            document.getElementById('dispSetGas').innerText = cfgGas;
+            document.getElementById('dispSetCo2').innerText = cfgCo2;
+            document.getElementById('dispSetDust').innerText = cfgDust;
+            showTopToast("Đã áp dụng ngưỡng cảnh báo trên giao diện!");
         }
 
-        function fetchNotes() {
-            fetch('/notes')
-                .then(res => res.json())
-                .then(list => {
-                    cachedNoteList = list;
-                    renderNotesUI(list);
-                })
-                .catch(() => {});
-        }
-
-        function renderNotesUI(list) {
-            const box = document.getElementById('noteListContainer');
-            box.innerHTML = '';
-            if (!list || list.length === 0) {
-                box.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-sub);">ChÆ°a cÃ³ ghi chÃº nÃ o.</div>';
-                return;
-            }
-            list.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'note-item';
-                div.innerHTML = `
-                    <div class="note-meta">
-                        <span>ðŸ‘¤ ${item.author}</span>
-                        <span>â±ï¸ ${item.time}</span>
-                    </div>
-                    <div class="note-text">${item.content}</div>
-                `;
-                box.appendChild(div);
-            });
-        }
-
-        function submitNewNote() {
-            const author = document.getElementById('noteAuthor').value.trim();
-            const content = document.getElementById('noteContent').value.trim();
-            if (!content) {
-                showTopToast("Vui lÃ²ng nháº­p ná»™i dung ghi chÃº!");
-                return;
-            }
-            fetch(`/add-note?author=${encodeURIComponent(author)}&content=${encodeURIComponent(content)}`)
-                .then(res => {
-                    if (res.ok) {
-                        document.getElementById('noteContent').value = '';
-                        showTopToast("ÄÃ£ thÃªm ghi chÃº thÃ nh cÃ´ng!");
-                        fetchNotes();
-                    } else {
-                        showTopToast("Lá»—i khi lÆ°u ghi chÃº!");
-                    }
-                })
-                .catch(() => showTopToast("Lá»—i káº¿t ná»‘i!"));
-        }
-
-        function clearNoteLogs() {
-            if (!confirm("Báº¡n cÃ³ cháº¯c cháº¯n muá»‘n xÃ³a toÃ n bá»™ sá»• nháº­t kÃ½?")) return;
-            fetch('/clear-notes')
-                .then(() => {
-                    cachedNoteList = [];
-                    renderNotesUI([]);
-                    showTopToast("ÄÃ£ xÃ³a sáº¡ch sá»• nháº­t kÃ½!");
-                })
-                .catch(() => showTopToast("Lá»—i xÃ³a nháº­t kÃ½!"));
-        }
-
-        function scanWifiNetworks() {
-            showTopToast("Äang quÃ©t tÃ¬m cÃ¡c máº¡ng Wi-Fi...");
-            document.getElementById('wifiScannedList').innerHTML = '<li style="padding:15px; text-align:center; color:var(--text-sub);">Äang quÃ©t máº¡ng... Vui lÃ²ng chá» vÃ i giÃ¢y...</li>';
-            
-            if (scanPollingTimer) clearInterval(scanPollingTimer);
-            
-            function checkScan() {
-                fetch('/scan')
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status === "SCANNING" || data.status === "SCANNING_STARTED") {
-                        } else if (Array.isArray(data)) {
-                            clearInterval(scanPollingTimer);
-                            const ul = document.getElementById('wifiScannedList');
-                            ul.innerHTML = '';
-                            if (data.length === 0) {
-                                ul.innerHTML = '<li style="padding:12px; text-align:center; color:var(--text-sub);">KhÃ´ng tÃ¬m tháº¥y máº¡ng Wi-Fi nÃ o.</li>';
-                                return;
-                            }
-                            data.forEach(w => {
-                                const li = document.createElement('li');
-                                li.className = 'wifi-row';
-                                li.onclick = () => openWifiModal(w.ssid);
-                                li.innerHTML = `
-                                    <div>
-                                        <span style="font-weight:700;">ðŸ“¶ ${w.ssid}</span>
-                                        <span style="font-size:0.75rem; color:var(--text-sub); margin-left:8px;">${w.rssi} dBm (${w.percent}%)</span>
-                                    </div>
-                                    <button class="btn-action" style="padding:4px 10px; font-size:0.75rem;">Chá»n</button>
-                                `;
-                                ul.appendChild(li);
-                            });
-                            showTopToast(`TÃ¬m tháº¥y ${data.length} máº¡ng Wi-Fi!`);
-                        }
-                    })
-                    .catch(() => {});
-            }
-
-            checkScan();
-            scanPollingTimer = setInterval(checkScan, 1500);
-        }
-
-        function openWifiModal(ssid) {
-            selectedSsid = ssid;
-            document.getElementById('targetSsid').innerText = ssid;
-            document.getElementById('wifiPassInput').value = "";
-            document.getElementById('wifiModal').style.display = 'flex';
-        }
-
-        function closeWifiModal() { document.getElementById('wifiModal').style.display = 'none'; }
-
-        function confirmWifiConnect() {
-            closeWifiModal();
-            const pass = document.getElementById('wifiPassInput').value;
-            document.getElementById('switchingWifiModal').style.display = 'flex';
-            fetch(`/connect-wifi?ssid=${encodeURIComponent(selectedSsid)}&pass=${encodeURIComponent(pass)}`);
-        }
-
-        function connectManualWifi() {
-            const ssid = document.getElementById('manualSsid').value.trim();
-            const pass = document.getElementById('manualPass').value;
-            if (!ssid) { showTopToast("Vui lÃ²ng nháº­p tÃªn SSID!"); return; }
-            document.getElementById('switchingWifiModal').style.display = 'flex';
-            fetch(`/connect-wifi?ssid=${encodeURIComponent(ssid)}&pass=${encodeURIComponent(pass)}`);
-        }
-
-        function startApMode() {
-            const ssid = document.getElementById('apSsid').value;
-            const pass = document.getElementById('apPass').value;
-            fetch(`/ap-mode?ssid=${encodeURIComponent(ssid)}&pass=${encodeURIComponent(pass)}`)
-                .then(() => showTopToast(`ÄÃ£ kÃ­ch hoáº¡t phÃ¡t Wi-Fi: ${ssid}`));
-        }
-
-        let curSimTemp = 0.0, curSimHum = 0.0, curSimGas = 0, curSimCo2 = 0, curSimDust = 0;
-
+        // =========================================================
+        // BIỂU ĐỒ REALTIME CHART.JS
+        // =========================================================
         const ctx = document.getElementById('envChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
             data: {
                 datasets: [
-                    { label: 'Nhiá»‡t Ä‘á»™ (Â°C)', data: [], borderColor: '#0284c7', fill: true, backgroundColor: 'rgba(2,132,199,0.05)', cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
-                    { label: 'Äá»™ áº©m (%)', data: [], borderColor: '#06b6d4', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
-                    { label: 'KhÃ­ Gas (PPM)', data: [], borderColor: '#f59e0b', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
-                    { label: 'KhÃ­ CO2 (PPM)', data: [], borderColor: '#10b981', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
-                    { label: 'Bá»¥i PM2.5 (Âµg/mÂ³)', data: [], borderColor: '#ef4444', borderDash: [4, 4], fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 }
+                    { label: 'Nhiệt độ (°C)', data: [], borderColor: '#0284c7', fill: true, backgroundColor: 'rgba(2,132,199,0.05)', cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
+                    { label: 'Độ ẩm (%)', data: [], borderColor: '#06b6d4', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
+                    { label: 'Khí Gas (PPM)', data: [], borderColor: '#f59e0b', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
+                    { label: 'Khí CO2 (PPM)', data: [], borderColor: '#10b981', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
+                    { label: 'Bụi PM2.5 (µg/m³)', data: [], borderColor: '#ef4444', borderDash: [4, 4], fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 }
                 ]
             },
             options: {
@@ -734,158 +481,93 @@ const char index_html[] PROGMEM = R"=====(
                         grid: { display: false }
                     },
                     yTemp: { type: 'linear', position: 'left', suggestedMin: 20, suggestedMax: 100 },
-                    yGas: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, suggestedMin: 0, suggestedMax: 1200 }
+                    yGas: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, suggestedMin: 0, suggestedMax: 2000 }
                 }
             }
         });
 
-        function fetchRealSensorData() {
-            fetch('/data')
+        // =========================================================
+        // ĐỌC DỮ LIỆU TỪ BLYNK REST API MỖI 1.5S
+        // =========================================================
+        function fetchBlynkData() {
+            const url = `${BLYNK_BASE_URL}/get?token=${BLYNK_AUTH_TOKEN}&v0&v1&v2&v3&v4&v5&v6&v7&v8`;
+            
+            fetch(url)
                 .then(res => res.json())
                 .then(data => {
-                    document.getElementById('realtimeClock').innerText = data.timeStr;
-                    document.getElementById('uptimeCounter').innerText = data.uptimeStr || "--:--:--";
-                    document.getElementById('currentIp').innerText = data.ipStr || "...";
-                    document.getElementById('activeSsid').innerText = data.ssidStr || "...";
-                    document.getElementById('dispRssi').innerText = (data.rssiVal || 0) + " dBm";
-
-                    curSimTemp = parseFloat(data.temp);
-                    curSimHum = parseFloat(data.hum);
-                    curSimGas = parseInt(data.gas);
-                    curSimCo2 = parseInt(data.co2);
-                    curSimDust = parseInt(data.dust);
-                    let curAqi = parseInt(data.aqi);
-
-                    if (data.projUniv) projHeader.university = data.projUniv;
-                    if (data.projName) projHeader.projectName = data.projName;
-                    if (data.projAuth) projHeader.author = data.projAuth;
-                    if (data.projLoc)  projHeader.location = data.projLoc;
-                    projHeader.systemTime = data.timeStr;
-
-                    document.getElementById('headerProjectName').innerText = projHeader.projectName;
-                    document.getElementById('dispUniv').innerText = projHeader.university;
-                    document.getElementById('dispAuthor').innerText = projHeader.author;
-                    document.getElementById('dispLocation').innerText = projHeader.location;
-
-                    if (data.setTemp !== undefined) {
-                        cfgTemp = parseFloat(data.setTemp);
-                        cfgCo2  = parseFloat(data.setCo2);
-                        cfgDust = parseFloat(data.setDust);
-                        cfgGas  = parseFloat(data.setGas);
-
-                        document.getElementById('dispSetGas').innerText = cfgGas;
-                        document.getElementById('dispSetCo2').innerText = cfgCo2;
-                        document.getElementById('dispSetDust').innerText = cfgDust;
-
-                        if (!hasInitializedThresholdInputs) {
-                            document.getElementById('setTemp').value = cfgTemp.toFixed(1);
-                            document.getElementById('setCo2').value  = cfgCo2;
-                            document.getElementById('setDust').value = cfgDust;
-                            document.getElementById('setGas').value  = cfgGas;
-                            hasInitializedThresholdInputs = true;
-                        }
-                    }
+                    curSimTemp = parseFloat(data.v0 || 0);
+                    curSimHum  = parseFloat(data.v1 || 0);
+                    curSimGas  = parseInt(data.v2 || 0);
+                    curSimCo2  = parseInt(data.v3 || 0);
+                    curSimDust = parseInt(data.v4 || 0);
+                    let curAqi = parseInt(data.v5 || 0);
+                    let fanState = parseInt(data.v6 || 0);
+                    let muteState = parseInt(data.v7 || 0);
 
                     document.getElementById('temp').innerText = curSimTemp.toFixed(1);
-                    document.getElementById('hum').innerText = curSimHum.toFixed(1);
-                    document.getElementById('gas').innerText = curSimGas;
-                    document.getElementById('co2').innerText = curSimCo2;
+                    document.getElementById('hum').innerText  = curSimHum.toFixed(1);
+                    document.getElementById('gas').innerText  = curSimGas;
+                    document.getElementById('co2').innerText  = curSimCo2;
                     document.getElementById('dust').innerText = curSimDust;
-                    document.getElementById('aqi').innerText = curAqi;
+                    document.getElementById('aqi').innerText  = curAqi;
 
                     if (minT === 99.0 || curSimTemp < minT) minT = curSimTemp;
                     if (curSimTemp > maxT) maxT = curSimTemp;
                     document.getElementById('minTemp').innerText = minT.toFixed(1);
                     document.getElementById('maxTemp').innerText = maxT.toFixed(1);
 
-                    let isCurrentDanger = (curSimGas >= cfgGas || curSimCo2 >= cfgCo2 || curSimTemp >= cfgTemp || curSimDust >= cfgDust);
+                    updateFanUI(fanState);
+                    updateSpeakerUI(muteState);
+
+                    let isDanger = (curSimGas >= cfgGas || curSimCo2 >= cfgCo2 || curSimTemp >= cfgTemp || curSimDust >= cfgDust);
                     const envBadge = document.getElementById('envBadge');
-                    if (isCurrentDanger) {
+                    if (isDanger) {
                         envBadge.className = "badge badge-danger";
-                        envBadge.innerText = "â— Cáº¢NH BÃO";
-                        document.getElementById('aqiDesc').innerText = "ÄÃ¡nh giÃ¡: Cáº¢NH BÃO";
+                        envBadge.innerText = "● CẢNH BÁO";
+                        document.getElementById('aqiDesc').innerText = "Đánh giá: CẢNH BÁO";
                     } else {
                         envBadge.className = "badge badge-safe";
-                        envBadge.innerText = "â— Tá»T";
-                        document.getElementById('aqiDesc').innerText = "ÄÃ¡nh giÃ¡: Tá»T";
-                    }
-
-                    let totalInc = 0;
-                    if (data.alarmCount !== undefined) {
-                        totalInc = data.alarmCount;
-                        document.getElementById('kpiTotalIncidents').innerText = totalInc;
-                        document.getElementById('incTemp').innerText = data.incTemp || 0;
-                        document.getElementById('incGas').innerText  = data.incGas || 0;
-                        document.getElementById('incCo2').innerText  = data.incCo2 || 0;
-                        document.getElementById('incDust').innerText = data.incDust || 0;
-                        
-                        document.getElementById('lastIncName').innerText = data.lastIncName || "KhÃ´ng cÃ³";
-                        document.getElementById('lastIncTime').innerText = data.lastIncTime || "--:--:--";
-                        
-                        const stBadge = document.getElementById('lastIncStatus');
-                        if (data.lastIncStat === "CANH BAO") {
-                            stBadge.className = "badge badge-danger";
-                            stBadge.innerText = "Cáº¢NH BÃO";
-                        } else {
-                            stBadge.className = "badge badge-safe";
-                            stBadge.innerText = "Tá»T";
-                        }
-                    }
-
-                    const uptimeSeconds = data.uptimeSec || 1;
-                    const shiftSeconds = 28800.0;
-                    const totalShifts = Math.max(1.0, Math.ceil(uptimeSeconds / shiftSeconds));
-                    const incidentPerShift = (totalInc / totalShifts);
-                    document.getElementById('kpiIncidentRatio').innerText = incidentPerShift.toFixed(2);
-
-                    if (data.isMuted) {
-                        document.getElementById('speakerBadge').className = "badge badge-spk-off";
-                        document.getElementById('speakerBadge').innerText = "ðŸ”‡ LOA BÃO Äá»˜NG: ÄÃƒ Táº®T";
-                    } else {
-                        document.getElementById('speakerBadge').className = "badge badge-spk-on";
-                        document.getElementById('speakerBadge').innerText = "ðŸ”Š LOA BÃO Äá»˜NG: ÄANG Báº¬T";
+                        envBadge.innerText = "● TỐT";
+                        document.getElementById('aqiDesc').innerText = "Đánh giá: TỐT";
                     }
 
                     const now = new Date();
+                    document.getElementById('realtimeClock').innerText = now.toLocaleString();
+                    document.getElementById('cloudStatus').innerText = "ONLINE";
+                    document.getElementById('cloudStatus').style.color = "#10b981";
+
                     const newRecord = { 
                         timestamp: now.getTime(),
                         timeStr: now.toLocaleTimeString(),
-                        fullTime: data.timeStr,
+                        fullTime: now.toLocaleString(),
                         dateISO: now.toISOString().slice(0, 10),
                         curTemp: curSimTemp, curHum: curSimHum, curGas: curSimGas, curCo2: curSimCo2, curDust: curSimDust, curAqi: curAqi,
-                        statusText: isCurrentDanger ? "Cáº¢NH BÃO" : "Tá»T",
-                        isDanger: isCurrentDanger
+                        statusText: isDanger ? "CẢNH BÁO" : "TỐT",
+                        isDanger: isDanger
                     };
                     
                     logData.unshift(newRecord);
-                    if (logData.length > 500) logData.pop();
+                    if (logData.length > 300) logData.pop();
 
                     try {
-                        localStorage.setItem('env_station_logs', JSON.stringify(logData.slice(0, 150)));
+                        localStorage.setItem('env_station_logs', JSON.stringify(logData.slice(0, 100)));
                     } catch(e) {}
 
                     smartFilterTable();
                 })
-                .catch(() => {});
+                .catch(err => {
+                    document.getElementById('cloudStatus').innerText = "OFFLINE";
+                    document.getElementById('cloudStatus').style.color = "#ef4444";
+                });
         }
 
+        // =========================================================
+        // XỬ LÝ LỌC BẢNG DỮ LIỆU & GHI CHÚ CA TRỰC
+        // =========================================================
         function onTimeFilterChange() {
             const val = document.getElementById('timeRangeFilter').value;
             document.getElementById('datePicker').style.display = (val === 'custom') ? 'inline-block' : 'none';
             smartFilterTable();
-        }
-
-        function renderTableRows(records) {
-            const tbody = document.getElementById('logTableBody');
-            tbody.innerHTML = '';
-            records.forEach(row => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${row.timeStr}</td><td>${row.curTemp}</td><td>${row.curHum}</td><td>${row.curGas}</td><td>${row.curCo2}</td><td>${row.curDust}</td><td>${row.curAqi}</td>
-                    <td><span class="badge ${row.isDanger ? 'badge-danger' : 'badge-safe'}">${row.statusText}</span></td>
-                `;
-                tbody.appendChild(tr);
-            });
         }
 
         function smartFilterTable() {
@@ -909,33 +591,67 @@ const char index_html[] PROGMEM = R"=====(
                 });
             }
 
-            renderTableRows(filtered.slice(0, 100));
+            renderTableRows(filtered.slice(0, 50));
+        }
+
+        function renderTableRows(records) {
+            const tbody = document.getElementById('logTableBody');
+            tbody.innerHTML = '';
+            records.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.timeStr}</td><td>${row.curTemp}</td><td>${row.curHum}</td><td>${row.curGas}</td><td>${row.curCo2}</td><td>${row.curDust}</td><td>${row.curAqi}</td>
+                    <td><span class="badge ${row.isDanger ? 'badge-danger' : 'badge-safe'}">${row.statusText}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function submitNewNote() {
+            const author = document.getElementById('noteAuthor').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            if (!content) { showTopToast("Vui lòng nhập nội dung!"); return; }
+            const newNote = { time: new Date().toLocaleTimeString(), author: author || "Kỹ sư", content: content };
+            cachedNoteList.unshift(newNote);
+            if (cachedNoteList.length > 10) cachedNoteList.pop();
+            localStorage.setItem('env_station_notes', JSON.stringify(cachedNoteList));
+            document.getElementById('noteContent').value = '';
+            renderNotesUI();
+            showTopToast("Đã lưu nhật ký ca trực!");
+        }
+
+        function renderNotesUI() {
+            const box = document.getElementById('noteListContainer');
+            box.innerHTML = '';
+            if (cachedNoteList.length === 0) {
+                box.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-sub);">Chưa có ghi chú nào.</div>';
+                return;
+            }
+            cachedNoteList.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'note-item';
+                div.innerHTML = `<div class="note-meta"><span>👤 ${item.author}</span><span>⏱️ ${item.time}</span></div><div class="note-text">${item.content}</div>`;
+                box.appendChild(div);
+            });
+        }
+
+        function clearNoteLogs() {
+            cachedNoteList = [];
+            localStorage.removeItem('env_station_notes');
+            renderNotesUI();
+            showTopToast("Đã xóa nhật ký!");
         }
 
         function clearDatabase() {
             logData = [];
-            try {
-                localStorage.removeItem('env_station_logs');
-            } catch(e) {}
-
-            fetch('/clear-counts')
-                .then(() => {
-                    document.getElementById('kpiTotalIncidents').innerText = "0";
-                    document.getElementById('kpiIncidentRatio').innerText = "0.00";
-                    document.getElementById('incTemp').innerText = "0";
-                    document.getElementById('incGas').innerText  = "0";
-                    document.getElementById('incCo2').innerText  = "0";
-                    document.getElementById('incDust').innerText = "0";
-                    document.getElementById('lastIncName').innerText = "KhÃ´ng cÃ³";
-                    document.getElementById('lastIncTime').innerText = "--:--:--";
-                    document.getElementById('lastIncStatus').className = "badge badge-safe";
-                    document.getElementById('lastIncStatus').innerText = "Tá»T";
-                    smartFilterTable();
-                    showTopToast("ÄÃ£ xÃ³a sáº¡ch bá»™ nhá»›!");
-                })
-                .catch(() => showTopToast("Lá»—i káº¿t ná»‘i!"));
+            localStorage.removeItem('env_station_logs');
+            smartFilterTable();
+            showTopToast("Đã xóa bộ nhớ đo!");
         }
 
+        // =========================================================
+        // XUẤT BÁO CÁO CSV
+        // =========================================================
         function openExportModal() { document.getElementById('exportModal').style.display = 'flex'; }
         function closeExportModal() { document.getElementById('exportModal').style.display = 'none'; }
 
@@ -947,7 +663,7 @@ const char index_html[] PROGMEM = R"=====(
 
         function processExportCSV() {
             if (logData.length === 0 && cachedNoteList.length === 0) {
-                showTopToast("ChÆ°a cÃ³ dá»¯ liá»‡u Ä‘á»ƒ xuáº¥t!");
+                showTopToast("Chưa có dữ liệu để xuất!");
                 return;
             }
             const scope = document.getElementById('exportScope').value;
@@ -958,11 +674,11 @@ const char index_html[] PROGMEM = R"=====(
             let fileSuffix = "All";
 
             if (scope === 'date') {
-                if (!targetDate) { showTopToast("Vui lÃ²ng chá»n ngÃ y!"); return; }
+                if (!targetDate) { showTopToast("Vui lòng chọn ngày!"); return; }
                 exportList = logData.filter(r => r.dateISO === targetDate);
                 fileSuffix = targetDate;
             } else if (scope === 'month') {
-                if (!targetMonth) { showTopToast("Vui lÃ²ng chá»n thÃ¡ng!"); return; }
+                if (!targetMonth) { showTopToast("Vui lòng chọn tháng!"); return; }
                 exportList = logData.filter(r => r.dateISO && r.dateISO.startsWith(targetMonth));
                 fileSuffix = targetMonth;
             }
@@ -974,7 +690,7 @@ const char index_html[] PROGMEM = R"=====(
             csv += `DE TAI / DU AN,${REPORT_NAME_FORMAT(projHeader.projectName)}\n`;
             csv += `NGUOI THUC HIEN,${REPORT_NAME_FORMAT(projHeader.author)}\n`;
             csv += `VI TRI LAP DAT,${REPORT_NAME_FORMAT(projHeader.location)}\n`;
-            csv += `THOI GIAN XUAT BAO CAO,${projHeader.systemTime}\n`;
+            csv += `THOI GIAN XUAT BAO CAO,${new Date().toLocaleString()}\n`;
             csv += "====================================================================\n\n";
 
             csv += "--- SO NHAT KY CA TRUC ---\n";
@@ -1000,20 +716,18 @@ const char index_html[] PROGMEM = R"=====(
             link.download = `BaoCao_MoiTruong_${fileSuffix}.csv`;
             link.click();
 
-            showTopToast(`ÄÃ£ xuáº¥t bÃ¡o cÃ¡o thÃ nh cÃ´ng!`);
+            showTopToast("Đã xuất báo cáo CSV thành công!");
         }
 
         function REPORT_NAME_FORMAT(str) {
             return `"${(str || '').replace(/"/g, '""')}"`;
         }
 
+        // Bắt đầu khởi động các luồng
+        renderNotesUI();
         smartFilterTable();
-        fetchNotes();
-        setInterval(fetchRealSensorData, 1000);
-        fetchRealSensorData();
+        setInterval(fetchBlynkData, 1500);
+        fetchBlynkData();
     </script>
 </body>
 </html>
-)=====";
-
-#endif
