@@ -38,6 +38,29 @@
         .toast { background: #0f172a; color: #fff; padding: 10px 22px; border-radius: 25px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.25); transform: translateY(-40px); opacity: 0; transition: all 0.3s; pointer-events: auto; }
         .toast.show { transform: translateY(0); opacity: 1; }
 
+        /* CỬA SỔ BÁO MẤT KẾT NỐI GIỮA MÀN HÌNH */
+        #disconnectOverlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.6); z-index: 999999;
+            display: none; justify-content: center; align-items: center; padding: 20px;
+        }
+        .disconnect-card {
+            background: var(--card-bg); border-radius: var(--radius-main);
+            border: 2px solid var(--danger); padding: 26px 32px; max-width: 440px; width: 100%;
+            box-shadow: 0 20px 40px rgba(239, 68, 68, 0.3); text-align: center;
+            animation: alertPulse 1.4s infinite;
+        }
+        .disconnect-card h2 {
+            font-size: 1.25rem; font-weight: 800; color: var(--danger); margin-bottom: 8px; letter-spacing: 0.5px;
+        }
+        .disconnect-card p {
+            font-size: 0.88rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 18px;
+        }
+        .btn-dismiss {
+            background: var(--danger); color: #fff; border: none; padding: 8px 24px;
+            border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+        }
+
         .nav-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .nav-tabs { display: flex; gap: 6px; background: rgba(0, 0, 0, 0.05); padding: 4px; border-radius: 25px; }
         body.dark-mode .nav-tabs { background: rgba(255, 255, 255, 0.08); }
@@ -86,7 +109,7 @@
 
         .table-responsive { max-height: 350px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sub); }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.82rem; }
-        th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+        th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
         th { background: rgba(0,0,0,0.03); color: var(--text-sub); font-weight: 700; position: sticky; top: 0; }
 
         .note-input-row { display: grid; grid-template-columns: 220px 1fr 140px; gap: 10px; align-items: flex-end; }
@@ -105,23 +128,33 @@
         .btn-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-sub); }
 
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes alertPulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); } 50% { transform: scale(1.02); box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
 </head>
 <body>
 
     <div id="toastContainer"></div>
 
+    <!-- KHUNG THÔNG BÁO MẤT KẾT NỐI GIỮA MÀN HÌNH -->
+    <div id="disconnectOverlay">
+        <div class="disconnect-card">
+            <h2>MẤT KẾT NỐI MÁY CHỦ</h2>
+            <p>Không nhận được dữ liệu từ trạm đo. Hệ thống đang giữ lại lịch sử đo đạc trước đó.</p>
+            <button class="btn-dismiss" onclick="dismissDisconnectAlert()">ĐÓNG</button>
+        </div>
+    </div>
+
     <div id="exportModal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3>📥 Xuất Báo Cáo Sự Cố</h3>
+                <h3>Xuất Báo Cáo Sự Cố</h3>
                 <button class="btn-close" onclick="closeExportModal()">✕</button>
             </div>
             <div class="input-group">
                 <label>Phạm Vi Xuất Dữ Liệu</label>
                 <select id="exportScope" onchange="onExportScopeChange()">
-                    <option value="today">Toàn bộ các ca trong ngày hôm nay</option>
-                    <option value="date">Chọn ngày cụ thể (Tổng hợp ca theo ngày)</option>
+                    <option value="today">Các ca trong ngày hôm nay</option>
+                    <option value="date">Chọn ngày cụ thể</option>
                     <option value="all">Tất cả các ca từ trước đến nay</option>
                 </select>
             </div>
@@ -139,28 +172,28 @@
     <div class="container">
         <div class="nav-bar">
             <div class="nav-tabs">
-                <button class="nav-btn">📊 Giám Sát Môi Trường Nhà Xưởng (Firebase Cloud)</button>
+                <button class="nav-btn">Giám Sát Môi Trường Nhà Xưởng</button>
             </div>
-            <button class="btn-theme" onclick="toggleDarkMode()">🌓 Giao Diện Đêm / Sáng</button>
+            <button class="btn-theme" onclick="toggleDarkMode()">Giao Diện Đêm / Sáng</button>
         </div>
 
         <div id="pageDash" style="display:flex; flex-direction:column; gap:16px;">
             <header>
                 <div class="header-title">
-                    <h1 id="headerProjectName">TRẠM ĐIỀU KHIỂN & ĐO ĐẠC NHÀ XƯỞNG</h1>
+                    <h1 id="headerProjectName">TRẠM ĐIỀU KHIỂN VÀ ĐO ĐẠC NHÀ XƯỞNG</h1>
                     <div class="manager-info">
-                        <span>🏫 Trường: <strong id="dispUniv">Trường ĐH Công nghiệp TP.HCM (IUH)</strong></span>
-                        <span>👤 Quản lý: <strong id="dispAuthor">Nguyễn Trọng Phước</strong></span>
-                        <span>📍 Vị trí: <strong id="dispLocation">Khu Nhà Xưởng - TP.HCM</strong></span>
-                        <span>🌐 Trạng thái: <strong id="cloudStatus" style="color:#64748b;">ĐANG KIỂM TRA...</strong></span>
+                        <span>Trường: <strong id="dispUniv">Trường Đại học Công nghiệp TP.HCM</strong></span>
+                        <span>Quản lý: <strong id="dispAuthor">Nguyễn Trọng Phước</strong></span>
+                        <span>Vị trí: <strong id="dispLocation">Khu Nhà Xưởng - TP.HCM</strong></span>
+                        <span>Trạng thái: <strong id="cloudStatus" style="color:#64748b;">ĐANG KIỂM TRA</strong></span>
                     </div>
                 </div>
-                <div id="realtimeClock" class="realtime-clock">--/--/---- --:--:--</div>
+                <div id="realtimeClock" class="realtime-clock">--:--:-- --/--/----</div>
             </header>
 
             <div class="incident-banner">
                 <div>
-                    <strong>🔔 Sự Cố Gần Nhất:</strong> <span id="lastIncName" style="color:#d97706; font-weight:700;">Không có</span>
+                    <strong>Sự Cố Gần Nhất:</strong> <span id="lastIncName" style="color:#d97706; font-weight:700;">Không có</span>
                 </div>
                 <div>
                     Trạng Thái: <span id="lastIncStatus" class="badge badge-safe">TỐT</span>
@@ -172,20 +205,20 @@
 
             <div class="status-banner">
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <span id="envBadge" class="badge badge-offline">● ĐANG KẾT NỐI</span>
+                    <span id="envBadge" class="badge badge-offline">ĐANG KẾT NỐI</span>
                 </div>
                 <div style="font-size:0.82rem; color:var(--text-sub); font-weight:700;">
-                    📡 Chu kỳ đồng bộ: <strong>5 giây/lần</strong>
+                    Chu kỳ đồng bộ: <strong>5 giây</strong>
                 </div>
             </div>
 
             <div class="kpi-grid">
                 <div class="kpi-card" style="border-left: 4px solid #ef4444;">
-                    <div class="kpi-title">Tổng Số Ca Sự Cố Trong Ngày</div>
+                    <div class="kpi-title">Tổng Số Ca Sự Cố Hôm Nay</div>
                     <div class="kpi-value" style="color: #ef4444;"><span id="kpiTodayIncidents">0</span> ca</div>
                 </div>
                 <div class="kpi-card" style="border-left: 4px solid #0284c7;">
-                    <div class="kpi-title">Tổng Số Ca Tích Lũy Toàn Bộ</div>
+                    <div class="kpi-title">Tổng Số Ca Toàn Thời Gian</div>
                     <div class="kpi-value" style="color: #0284c7;"><span id="kpiTotalIncidents">0</span> ca</div>
                 </div>
                 <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
@@ -202,41 +235,41 @@
                 <div class="card"><div class="card-title">Khí Gas</div><div class="card-value"><span id="gas">--</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetGas">180</span></div></div>
                 <div class="card"><div class="card-title">Khí CO2</div><div class="card-value"><span id="co2">--</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetCo2">900</span></div></div>
                 <div class="card"><div class="card-title">Bụi PM2.5</div><div class="card-value"><span id="dust">--</span><span class="unit">µg/m³</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetDust">150</span></div></div>
-                <div class="card"><div class="card-title">Chỉ Số AQI</div><div class="card-value" style="color:var(--primary);"><span id="aqi">--</span></div><div class="card-sub" id="aqiDesc">Đánh giá: ĐANG KẾT NỐI</div></div>
+                <div class="card"><div class="card-title">Chỉ Số AQI</div><div class="card-value" style="color:var(--primary);"><span id="aqi">--</span></div><div class="card-sub" id="aqiDesc">Đang kết nối</div></div>
             </div>
 
             <div class="module-box">
-                <div class="section-title">📈 BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC (CLOUDFEED)</div>
+                <div class="section-title">BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC</div>
                 <div style="position: relative; height: 260px; width: 100%;">
                     <canvas id="envChart"></canvas>
                 </div>
             </div>
 
             <div class="module-box">
-                <div class="section-title">⚙️ THIẾT LẬP NGƯỠNG CẢNH BÁO</div>
+                <div class="section-title">THIẾT LẬP NGƯỠNG CẢNH BÁO</div>
                 <div class="settings-grid">
-                    <div class="input-group"><label>Ngưỡng Nhiệt Độ (°C)</label><input type="number" id="setTemp" step="0.5" value="38.0"></div>
-                    <div class="input-group"><label>Ngưỡng Khí CO2 (PPM)</label><input type="number" id="setCo2" value="900"></div>
-                    <div class="input-group"><label>Ngưỡng Bụi PM2.5 (µg/m³)</label><input type="number" id="setDust" value="150"></div>
-                    <div class="input-group"><label>Ngưỡng Khí Gas (PPM)</label><input type="number" id="setGas" value="180"></div>
+                    <div class="input-group"><label>Ngưỡng Nhiệt Độ °C</label><input type="number" id="setTemp" step="0.5" value="38.0"></div>
+                    <div class="input-group"><label>Ngưỡng Khí CO2 PPM</label><input type="number" id="setCo2" value="900"></div>
+                    <div class="input-group"><label>Ngưỡng Bụi PM2.5 µg/m³</label><input type="number" id="setDust" value="150"></div>
+                    <div class="input-group"><label>Ngưỡng Khí Gas PPM</label><input type="number" id="setGas" value="180"></div>
                     <button class="btn-save" onclick="saveThresholds()">ÁP DỤNG NGƯỠNG</button>
                 </div>
             </div>
 
             <div class="module-box">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div class="section-title">📝 SỔ NHẬT KÝ CA TRỰC</div>
-                    <button class="btn-clear-db" onclick="clearNoteLogs()">🗑️ Xóa Sổ Nhật Ký</button>
+                    <div class="section-title">SỔ NHẬT KÝ CA TRỰC</div>
+                    <button class="btn-clear-db" onclick="clearNoteLogs()">Xóa Sổ Nhật Ký</button>
                 </div>
                 
                 <div class="note-input-row">
                     <div class="input-group">
                         <label>Người Ghi Chú</label>
-                        <input type="text" id="noteAuthor" maxlength="30" value="Nguyễn Trọng Phước" placeholder="Tên kỹ sư / người trực...">
+                        <input type="text" id="noteAuthor" maxlength="30" value="Nguyễn Trọng Phước" placeholder="Tên kỹ sư">
                     </div>
                     <div class="input-group">
                         <label>Nội Dung Ghi Chú</label>
-                        <input type="text" id="noteContent" maxlength="120" placeholder="Nhập diễn biến ca trực, kiểm tra thiết bị...">
+                        <input type="text" id="noteContent" maxlength="120" placeholder="Nhập diễn biến ca trực">
                     </div>
                     <button class="btn-save" onclick="submitNewNote()">THÊM GHI CHÚ</button>
                 </div>
@@ -247,22 +280,22 @@
             </div>
 
             <div class="module-box">
-                <div class="section-title">🗄️ LỊCH SỬ ĐO ĐẠC ĐƯỢC LƯU TRÊN FIREBASE CLOUD</div>
+                <div class="section-title">LỊCH SỬ ĐO ĐẠC</div>
                 <div class="filter-controls">
                     <select id="timeRangeFilter" onchange="onTimeFilterChange()">
                         <option value="all">Tất cả lịch sử</option>
                         <option value="today">Chỉ xem ngày hôm nay</option>
-                        <option value="custom">Chọn ngày cụ thể...</option>
+                        <option value="custom">Chọn ngày cụ thể</option>
                     </select>
                     <input type="date" id="datePicker" onchange="smartFilterTable()" style="display: none;">
-                    <div class="search-box"><input type="text" id="tableSearch" placeholder="Tìm kiếm mốc giờ, loại khí, ca sự cố..." onkeyup="smartFilterTable()"></div>
-                    <button class="btn-export" onclick="openExportModal()">📥 Xuất Báo Cáo</button>
-                    <button class="btn-clear-db" onclick="clearDatabase()">🗑️ Xóa Lịch Sử Cloud</button>
+                    <div class="search-box"><input type="text" id="tableSearch" placeholder="Tìm kiếm mốc giờ, loại ca..." onkeyup="smartFilterTable()"></div>
+                    <button class="btn-export" onclick="openExportModal()">Xuất Báo Cáo</button>
+                    <button class="btn-clear-db" onclick="clearDatabase()">Xóa Lịch Sử</button>
                 </div>
                 <div class="table-responsive">
                     <table id="logTable">
                         <thead>
-                            <tr><th>Thời Gian</th><th>Nhiệt Độ (°C)</th><th>Độ Ẩm (%)</th><th>Khí Gas (PPM)</th><th>Khí CO2 (PPM)</th><th>Bụi PM2.5 (µg/m³)</th><th>AQI</th><th>Loại Ca Sự Cố</th><th>Trạng Thái</th></tr>
+                            <tr><th>Thời Gian</th><th>Nhiệt Độ °C</th><th>Độ Ẩm %</th><th>Khí Gas PPM</th><th>Khí CO2 PPM</th><th>Bụi PM2.5 µg/m³</th><th>AQI</th><th>Loại Ca Sự Cố</th><th>Trạng Thái</th></tr>
                         </thead>
                         <tbody id="logTableBody"></tbody>
                     </table>
@@ -283,18 +316,20 @@
         let curSimTemp = 0.0, curSimHum = 0.0, curSimGas = 0, curSimCo2 = 0, curSimDust = 0;
         let lastPingEpoch = 0;
         let isDeviceOnline = false;
-
-        let projHeader = {
-            university: "Trường Đại học Công nghiệp TP.HCM (IUH)",
-            projectName: "Hệ Thống Giám Sát Môi Trường Nhà Xưởng",
-            author: "Nguyễn Trọng Phước",
-            location: "Khu Nhà Xưởng - TP.HCM"
-        };
+        let isAlertDismissed = false;
 
         let cachedNoteList = [];
         let logData = [];
 
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+
+        // ĐỒNG HỒ THỜI GIAN THỰC ĐỘC LẬP CHẠY LIÊN TỤC
+        setInterval(() => {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('vi-VN');
+            const dateStr = now.toLocaleDateString('vi-VN');
+            document.getElementById('realtimeClock').innerText = `${timeStr}${dateStr}`;
+        }, 1000);
 
         function showTopToast(message) {
             const container = document.getElementById('toastContainer');
@@ -306,6 +341,11 @@
             setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
+        function dismissDisconnectAlert() {
+            document.getElementById('disconnectOverlay').style.display = 'none';
+            isAlertDismissed = true;
+        }
+
         function saveThresholds() {
             cfgTemp = parseFloat(document.getElementById('setTemp').value);
             cfgCo2  = parseFloat(document.getElementById('setCo2').value);
@@ -315,22 +355,22 @@
             document.getElementById('dispSetGas').innerText = cfgGas;
             document.getElementById('dispSetCo2').innerText = cfgCo2;
             document.getElementById('dispSetDust').innerText = cfgDust;
-            showTopToast("Đã áp dụng ngưỡng mới thành công!");
+            showTopToast("Đã áp dụng ngưỡng mới thành công");
         }
 
         function submitNewNote() {
             const author = document.getElementById('noteAuthor').value.trim();
             const content = document.getElementById('noteContent').value.trim();
-            if (!content) { showTopToast("Vui lòng nhập nội dung!"); return; }
+            if (!content) { showTopToast("Vui lòng nhập nội dung ghi chú"); return; }
             const newNote = {
-                time: new Date().toLocaleString(),
-                author: author || "Kỹ sư ca trực",
+                time: new Date().toLocaleString('vi-VN'),
+                author: author || "Kỹ sư",
                 content: content,
                 timestamp: Date.now()
             };
             database.ref('/notes').push(newNote).then(() => {
                 document.getElementById('noteContent').value = '';
-                showTopToast("Đã lưu ghi chú lên Cloud!");
+                showTopToast("Đã lưu ghi chú thành công");
             });
         }
 
@@ -338,7 +378,7 @@
             const box = document.getElementById('noteListContainer');
             box.innerHTML = '';
             if (!list || list.length === 0) {
-                box.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-sub);">Chưa có ghi chú nào.</div>';
+                box.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-sub);">Chưa có ghi chú nào</div>';
                 return;
             }
             list.forEach(item => {
@@ -346,8 +386,8 @@
                 div.className = 'note-item';
                 div.innerHTML = `
                     <div class="note-meta">
-                        <span>👤 ${item.author}</span>
-                        <span>⏱️ ${item.time}</span>
+                        <span>${item.author}</span>
+                        <span>${item.time}</span>
                     </div>
                     <div class="note-text">${item.content}</div>
                 `;
@@ -356,11 +396,11 @@
         }
 
         function clearNoteLogs() {
-            if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ sổ nhật ký trên Cloud?")) return;
+            if (!confirm("Xác nhận xóa toàn bộ sổ nhật ký?")) return;
             database.ref('/notes').remove().then(() => {
                 cachedNoteList = [];
                 renderNotesUI([]);
-                showTopToast("Đã xóa sạch sổ nhật ký trên Cloud!");
+                showTopToast("Đã xóa sạch sổ nhật ký");
             });
         }
 
@@ -372,19 +412,16 @@
             renderNotesUI(cachedNoteList);
         });
 
-        // =========================================================
-        // KHỞI TẠO BIỂU ĐỒ REALTIME
-        // =========================================================
         const ctx = document.getElementById('envChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
             data: {
                 datasets: [
-                    { label: 'Nhiệt độ (°C)', data: [], borderColor: '#0284c7', fill: true, backgroundColor: 'rgba(2,132,199,0.05)', tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
-                    { label: 'Độ ẩm (%)', data: [], borderColor: '#06b6d4', fill: false, tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
-                    { label: 'Khí Gas (PPM)', data: [], borderColor: '#f59e0b', fill: false, tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
-                    { label: 'Khí CO2 (PPM)', data: [], borderColor: '#10b981', fill: false, tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
-                    { label: 'Bụi PM2.5 (µg/m³)', data: [], borderColor: '#ef4444', borderDash: [4, 4], fill: false, tension: 0.4, yAxisID: 'yGas', pointRadius: 0 }
+                    { label: 'Nhiệt độ °C', data: [], borderColor: '#0284c7', fill: true, backgroundColor: 'rgba(2,132,199,0.05)', tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
+                    { label: 'Độ ẩm %', data: [], borderColor: '#06b6d4', fill: false, tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
+                    { label: 'Khí Gas PPM', data: [], borderColor: '#f59e0b', fill: false, tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
+                    { label: 'Khí CO2 PPM', data: [], borderColor: '#10b981', fill: false, tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
+                    { label: 'Bụi PM2.5 µg/m³', data: [], borderColor: '#ef4444', borderDash: [4, 4], fill: false, tension: 0.4, yAxisID: 'yGas', pointRadius: 0 }
                 ]
             },
             options: {
@@ -414,9 +451,7 @@
             }
         });
 
-        // =========================================================
-        // 1. NHẬN DỮ LIỆU REALTIME & CHỐNG BẬT ONLINE ẢO KHI F5
-        // =========================================================
+        // 1. NHẬN DỮ LIỆU REALTIME
         database.ref('/current').on('value', (snapshot) => {
             const data = snapshot.val();
             if (!data) return;
@@ -424,20 +459,19 @@
             const currentEpoch = Math.floor(Date.now() / 1000);
             const hb = data.heartbeat || 0;
 
-            // KIỂM TRA TÍNH HỢP LỆ: Nếu gói tin trên Cloud đã cũ hơn 15 giây -> TRẠM ĐANG OFFLINE THẬT
             if (currentEpoch - hb > 15) {
                 setStationOffline();
                 return;
             }
 
-            // Nếu dữ liệu hợp lệ trong vòng 15 giây
             lastPingEpoch = hb;
             isDeviceOnline = true;
-            document.getElementById('cloudStatus').innerText = "ONLINE (5s)";
+            isAlertDismissed = false;
+            document.getElementById('disconnectOverlay').style.display = 'none';
+
+            document.getElementById('cloudStatus').innerText = "TRỰC TUYẾN";
             document.getElementById('cloudStatus').style.color = "#10b981";
 
-            document.getElementById('realtimeClock').innerText = data.time || "--/--/---- --:--:--";
-            
             curSimTemp = parseFloat(data.temp || 0);
             curSimHum  = parseFloat(data.hum || 0);
             curSimGas  = parseInt(data.gas || 0);
@@ -461,18 +495,18 @@
             const envBadge = document.getElementById('envBadge');
             if (isCurrentDanger) {
                 envBadge.className = "badge badge-danger";
-                envBadge.innerText = `● CẢNH BÁO: ${data.incType || 'SỰ CỐ'}`;
-                document.getElementById('aqiDesc').innerText = `Đánh giá: CẢNH BÁO (${data.incType || ''})`;
+                envBadge.innerText = `CẢNH BÁO: ${data.incType || 'SỰ CỐ'}`;
+                document.getElementById('aqiDesc').innerText = `Cảnh báo ${data.incType || ''}`;
             } else {
                 envBadge.className = "badge badge-safe";
-                envBadge.innerText = "● TỐT";
-                document.getElementById('aqiDesc').innerText = "Đánh giá: TỐT";
+                envBadge.innerText = "TỐT";
+                document.getElementById('aqiDesc').innerText = "Chất lượng tốt";
             }
         });
 
         function setStationOffline() {
             isDeviceOnline = false;
-            document.getElementById('cloudStatus').innerText = "OFFLINE (MẤT KẾT NỐI)";
+            document.getElementById('cloudStatus').innerText = "MẤT KẾT NỐI";
             document.getElementById('cloudStatus').style.color = "#ef4444";
 
             document.getElementById('temp').innerText = "--";
@@ -481,14 +515,17 @@
             document.getElementById('co2').innerText  = "--";
             document.getElementById('dust').innerText = "--";
             document.getElementById('aqi').innerText  = "--";
-            document.getElementById('aqiDesc').innerText = "Đánh giá: MẤT KẾT NỐI TRẠM";
+            document.getElementById('aqiDesc').innerText = "Mất tín hiệu trạm";
 
             const envBadge = document.getElementById('envBadge');
             envBadge.className = "badge badge-offline";
-            envBadge.innerText = "● MẤT TÍN HIỆU";
+            envBadge.innerText = "MẤT TÍN HIỆU";
+
+            if (!isAlertDismissed) {
+                document.getElementById('disconnectOverlay').style.display = 'flex';
+            }
         }
 
-        // Định kỳ kiểm tra heartbeat mỗi 3 giây
         setInterval(() => {
             const currentEpoch = Math.floor(Date.now() / 1000);
             if (currentEpoch - lastPingEpoch > 15) {
@@ -496,12 +533,10 @@
             }
         }, 3000);
 
-        // =========================================================
-        // 2. LẤY LỊCH SỬ CLOUD & TỰ ĐỘNG RESET SỰ CỐ THEO NGÀY
-        // =========================================================
+        // 2. LẤY LỊCH SỬ CLOUD VÀ TỰ ĐỘNG RESET SỰ CỐ SANG NGÀY MỚI
         database.ref('/history').limitToLast(300).on('value', (snapshot) => {
             logData = [];
-            const todayStr = new Date().toISOString().slice(0, 10); // Lấy ngày hôm nay YYYY-MM-DD
+            const todayStr = new Date().toISOString().slice(0, 10);
 
             let todayAlarms = 0;
             let totalAlarmsAllTime = 0;
@@ -526,7 +561,7 @@
                     curCo2: parseInt(item.co2 || 0),
                     curDust: parseInt(item.dust || 0),
                     curAqi: parseInt(item.aqi || 0),
-                    incType: item.incType || "BINH THUONG",
+                    incType: item.incType || "Bình thường",
                     statusText: item.status || "TOT",
                     isDanger: isDanger
                 };
@@ -537,7 +572,6 @@
                     lastDangerTime = record.timeStr;
                     lastDangerStatus = "CANH BAO";
 
-                    // CHỈ TÍNH VÀ RESET CHO RIÊNG NGÀY HÔM NAY
                     if (record.dateISO === todayStr) {
                         todayAlarms++;
                         if (record.incType.includes("NHIET")) iTempToday++;
@@ -550,7 +584,6 @@
                 logData.unshift(record);
             });
 
-            // Tự động nhảy số theo ngày mới
             document.getElementById('kpiTodayIncidents').innerText = todayAlarms;
             document.getElementById('kpiTotalIncidents').innerText = totalAlarmsAllTime;
             document.getElementById('incTemp').innerText = iTempToday;
@@ -572,9 +605,6 @@
             smartFilterTable();
         });
 
-        // =========================================================
-        // LỌC DỮ LIỆU BẢNG LỊCH SỬ
-        // =========================================================
         function onTimeFilterChange() {
             const val = document.getElementById('timeRangeFilter').value;
             document.getElementById('datePicker').style.display = (val === 'custom') ? 'inline-block' : 'none';
@@ -585,7 +615,7 @@
             const tbody = document.getElementById('logTableBody');
             tbody.innerHTML = '';
             if (!records || records.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-sub);">Không tìm thấy bản ghi phù hợp.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:15px; color:var(--text-sub);">Không có dữ liệu</td></tr>';
                 return;
             }
             records.forEach(row => {
@@ -628,17 +658,14 @@
         }
 
         function clearDatabase() {
-            if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử đo đạc trên Firebase Cloud?")) return;
+            if (!confirm("Xác nhận xóa toàn bộ lịch sử đo đạc?")) return;
             database.ref('/history').remove().then(() => {
                 logData = [];
                 renderTableRows([]);
-                showTopToast("Đã xóa sạch bộ nhớ lịch sử trên Cloud!");
+                showTopToast("Đã xóa sạch bộ nhớ lịch sử");
             });
         }
 
-        // =========================================================
-        // XUẤT BÁO CÁO CSV THỐNG KÊ CHI TIẾT TỪNG CA THEO NGÀY
-        // =========================================================
         function openExportModal() { document.getElementById('exportModal').style.display = 'flex'; }
         function closeExportModal() { document.getElementById('exportModal').style.display = 'none'; }
 
@@ -657,24 +684,23 @@
 
             if (scope === 'today') {
                 exportList = logData.filter(r => r.dateISO === todayStr);
-                reportTitleDate = `NGAY HOM NAY (${todayStr})`;
+                reportTitleDate = `HÔM NAY ${todayStr}`;
             } else if (scope === 'date') {
-                if (!targetDate) { showTopToast("Vui lòng chọn ngày!"); return; }
+                if (!targetDate) { showTopToast("Vui lòng chọn ngày"); return; }
                 exportList = logData.filter(r => r.dateISO === targetDate);
-                reportTitleDate = `NGAY ${targetDate}`;
+                reportTitleDate = `NGÀY ${targetDate}`;
             } else {
                 exportList = logData;
-                reportTitleDate = "TAT CA CAC CA TU TRUOC DEN NAY";
+                reportTitleDate = "TOÀN BỘ LỊCH SỬ";
             }
 
             if (exportList.length === 0) {
-                showTopToast("Không có dữ liệu trong khoảng thời gian đã chọn!");
+                showTopToast("Không có dữ liệu trong khoảng thời gian đã chọn");
                 return;
             }
 
             closeExportModal();
 
-            // Tổng hợp các ca sự cố cụ thể
             let totalIncidents = 0;
             let countTemp = 0, countGas = 0, countCo2 = 0, countDust = 0;
 
@@ -689,24 +715,22 @@
             });
 
             let csv = "====================================================================\n";
-            csv += `BAO CAO GIAM SAT MOI TRUONG NHA XUONG CONG NGHIEP\n`;
-            csv += `Don vi: Truong Dai hoc Cong nghiep TP.HCM (IUH)\n`;
-            csv += `Ky su phu trach: Nguyen Trong Phuoc\n`;
-            csv += `Pham vi bao cao: ${reportTitleDate}\n`;
-            csv += `Thoi gian xuat file: ${new Date().toLocaleString()}\n`;
+            csv += `BÁO CÁO GIÁM SÁT MÔI TRƯỜNG NHÀ XƯỞNG CÔNG NGHIỆP\n`;
+            csv += `Trường Đại học Công nghiệp TP.HCM\n`;
+            csv += `Người phụ trách: Nguyễn Trọng Phước\n`;
+            csv += `Phạm vi: ${reportTitleDate}\n`;
+            csv += `Thời gian xuất: ${new Date().toLocaleString('vi-VN')}\n`;
             csv += "====================================================================\n\n";
 
-            // BẢNG TỔNG HỢP CA SỰ CỐ
-            csv += "--- TONG HOP CAC CA SU CO XAY RA ---\n";
-            csv += `Tong so ca canh bao: ${totalIncidents} ca\n`;
-            csv += `- Ca su co Qua Nhiet: ${countTemp} ca\n`;
-            csv += `- Ca su co Ro Ri Gas: ${countGas} ca\n`;
-            csv += `- Ca su co Khi CO2 Cao: ${countCo2} ca\n`;
-            csv += `- Ca su co Nong Do Bui Cao: ${countDust} ca\n\n";
+            csv += "--- TỔNG HỢP CÁC CA SỰ CỐ ---\n";
+            csv += `Tổng số ca cảnh báo: ${totalIncidents}\n`;
+            csv += `- Quá nhiệt: ${countTemp}\n`;
+            csv += `- Rò rỉ Gas: ${countGas}\n`;
+            csv += `- Khí CO2 cao: ${countCo2}\n`;
+            csv += `- Nồng độ bụi cao: ${countDust}\n\n";
 
-            // CHI TIẾT CÁC MỐC ĐO ĐẠC
-            csv += "--- CHI TIET DU LIEU CAC MOC THOI GIAN ---\n";
-            csv += "Thoi Gian,Nhiet Do (C),Do Am (%),Gas (PPM),CO2 (PPM),Bui PM2.5 (ug/m3),AQI,Loai Ca Su Co,Trang Thai\n";
+            csv += "--- CHI TIẾT CÁC MỐC ĐO ĐẠC ---\n";
+            csv += "Thời Gian,Nhiệt Độ °C,Độ Ẩm %,Khí Gas PPM,Khí CO2 PPM,Bụi PM2.5 µg/m³,AQI,Loại Ca Sự Cố,Trạng Thái\n";
 
             exportList.forEach(r => {
                 csv += `"${r.fullTime}",${r.curTemp},${r.hum},${r.gas},${r.co2},${r.dust},${r.aqi},"${r.incType}","${r.statusText}"\n`;
@@ -717,7 +741,7 @@
             link.href = URL.createObjectURL(blob);
             link.download = `BaoCao_MoiTruong_${reportTitleDate.replace(/\s+/g, '_')}.csv`;
             link.click();
-            showTopToast("Đã tải xuống file báo cáo thành công!");
+            showTopToast("Đã tải xuống file báo cáo thành công");
         }
     </script>
 </body>
