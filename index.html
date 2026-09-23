@@ -34,14 +34,14 @@
         body { background-color: var(--bg); color: var(--text-main); padding: 18px 14px; min-height: 100vh; }
         .container { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
 
-        #toastContainer { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 99999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+        #toastContainer { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
         .toast { background: #0f172a; color: #fff; padding: 10px 22px; border-radius: 25px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.25); transform: translateY(-40px); opacity: 0; transition: all 0.3s; pointer-events: auto; }
         .toast.show { transform: translateY(0); opacity: 1; }
 
-        /* CỬA SỔ BÁO MẤT KẾT NỐI GIỮA MÀN HÌNH */
+        /* KHUNG THÔNG BÁO MẤT KẾT NỐI NỔI BẬT GIỮA MÀN HÌNH */
         #disconnectOverlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(15, 23, 42, 0.6); z-index: 999999;
+            background: rgba(15, 23, 42, 0.65); z-index: 999998;
             display: none; justify-content: center; align-items: center; padding: 20px;
         }
         .disconnect-card {
@@ -57,7 +57,7 @@
             font-size: 0.88rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 18px;
         }
         .btn-dismiss {
-            background: var(--danger); color: #fff; border: none; padding: 8px 24px;
+            background: var(--danger); color: #fff; border: none; padding: 8px 26px;
             border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
         }
 
@@ -135,11 +135,11 @@
 
     <div id="toastContainer"></div>
 
-    <!-- KHUNG THÔNG BÁO MẤT KẾT NỐI GIỮA MÀN HÌNH -->
+    <!-- KHUNG THÔNG BÁO MẤT KẾT NỐI NỔI BẬT -->
     <div id="disconnectOverlay">
         <div class="disconnect-card">
             <h2>MẤT KẾT NỐI MÁY CHỦ</h2>
-            <p>Không nhận được dữ liệu từ trạm đo. Hệ thống đang giữ lại lịch sử đo đạc trước đó.</p>
+            <p>Trạm đo hiện đang mất tín hiệu kết nối. Các tính năng cập nhật tạm thời bị khóa cho đến khi có mạng trở lại.</p>
             <button class="btn-dismiss" onclick="dismissDisconnectAlert()">ĐÓNG</button>
         </div>
     </div>
@@ -323,7 +323,7 @@
 
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
 
-        // ĐỒNG HỒ THỜI GIAN THỰC ĐỘC LẬP CHẠY LIÊN TỤC
+        // ĐỒNG HỒ THỜI GIAN THỰC ĐỘC LẬP LUÔN CHẠY LIÊN TỤC
         setInterval(() => {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('vi-VN');
@@ -346,7 +346,19 @@
             isAlertDismissed = true;
         }
 
+        function triggerDisconnectAlert() {
+            if (!isAlertDismissed) {
+                document.getElementById('disconnectOverlay').style.display = 'flex';
+            }
+        }
+
+        // CHẶN THAO TÁC CÁC CHỨC NĂNG KHI CHƯA CÓ KẾT NỐI
         function saveThresholds() {
+            if (!isDeviceOnline) {
+                showTopToast("Không thể áp dụng. Trạm đo đang mất kết nối máy chủ");
+                triggerDisconnectAlert();
+                return;
+            }
             cfgTemp = parseFloat(document.getElementById('setTemp').value);
             cfgCo2  = parseFloat(document.getElementById('setCo2').value);
             cfgDust = parseFloat(document.getElementById('setDust').value);
@@ -359,6 +371,11 @@
         }
 
         function submitNewNote() {
+            if (!isDeviceOnline) {
+                showTopToast("Không thể thêm ghi chú. Trạm đo đang mất kết nối máy chủ");
+                triggerDisconnectAlert();
+                return;
+            }
             const author = document.getElementById('noteAuthor').value.trim();
             const content = document.getElementById('noteContent').value.trim();
             if (!content) { showTopToast("Vui lòng nhập nội dung ghi chú"); return; }
@@ -396,6 +413,11 @@
         }
 
         function clearNoteLogs() {
+            if (!isDeviceOnline) {
+                showTopToast("Không thể xóa. Trạm đo đang mất kết nối máy chủ");
+                triggerDisconnectAlert();
+                return;
+            }
             if (!confirm("Xác nhận xóa toàn bộ sổ nhật ký?")) return;
             database.ref('/notes').remove().then(() => {
                 cachedNoteList = [];
@@ -454,17 +476,14 @@
         // 1. NHẬN DỮ LIỆU REALTIME
         database.ref('/current').on('value', (snapshot) => {
             const data = snapshot.val();
-            if (!data) return;
-
             const currentEpoch = Math.floor(Date.now() / 1000);
-            const hb = data.heartbeat || 0;
 
-            if (currentEpoch - hb > 15) {
+            if (!data || !data.heartbeat || (currentEpoch - data.heartbeat > 15)) {
                 setStationOffline();
                 return;
             }
 
-            lastPingEpoch = hb;
+            lastPingEpoch = data.heartbeat;
             isDeviceOnline = true;
             isAlertDismissed = false;
             document.getElementById('disconnectOverlay').style.display = 'none';
@@ -521,10 +540,15 @@
             envBadge.className = "badge badge-offline";
             envBadge.innerText = "MẤT TÍN HIỆU";
 
-            if (!isAlertDismissed) {
-                document.getElementById('disconnectOverlay').style.display = 'flex';
-            }
+            triggerDisconnectAlert();
         }
+
+        // KIỂM TRA NGAY KHI VỪA VÀO TRANG VÀ DUY TRÌ MỖI 3 GIÂY
+        setTimeout(() => {
+            if (!isDeviceOnline) {
+                setStationOffline();
+            }
+        }, 3000);
 
         setInterval(() => {
             const currentEpoch = Math.floor(Date.now() / 1000);
@@ -658,6 +682,11 @@
         }
 
         function clearDatabase() {
+            if (!isDeviceOnline) {
+                showTopToast("Không thể xóa lịch sử. Trạm đo đang mất kết nối máy chủ");
+                triggerDisconnectAlert();
+                return;
+            }
             if (!confirm("Xác nhận xóa toàn bộ lịch sử đo đạc?")) return;
             database.ref('/history').remove().then(() => {
                 logData = [];
@@ -666,7 +695,14 @@
             });
         }
 
-        function openExportModal() { document.getElementById('exportModal').style.display = 'flex'; }
+        function openExportModal() {
+            if (!isDeviceOnline && logData.length === 0) {
+                showTopToast("Không thể xuất báo cáo. Chưa có dữ liệu lịch sử");
+                triggerDisconnectAlert();
+                return;
+            }
+            document.getElementById('exportModal').style.display = 'flex';
+        }
         function closeExportModal() { document.getElementById('exportModal').style.display = 'none'; }
 
         function onExportScopeChange() {
