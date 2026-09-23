@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Giám Sát Môi Trường Nhà Xưởng - Firebase Cloud</title>
+    <title>Hệ Thống Giám Sát Môi Trường Nhà Xưởng</title>
     
-    <!-- Các thư viện biểu đồ -->
     <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@2.0.0/dist/chartjs-plugin-streaming.min.js"></script>
 
-    <!-- Thư viện Google Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -47,6 +45,7 @@
         .badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
         .badge-safe { background: var(--safe-bg); color: var(--safe); }
         .badge-danger { background: var(--danger-bg); color: var(--danger); animation: pulse 1.2s infinite; }
+        .badge-offline { background: #f1f5f9; color: #64748b; }
         .badge-spk-on { background: #f0fdf4; color: #166534; }
         .badge-spk-off { background: #fef2f2; color: #991b1b; }
         .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -73,7 +72,7 @@
     <div class="container">
         <div class="nav-bar">
             <div class="nav-tabs">
-                <button class="nav-btn active">📊 Giám Sát Môi Trường (Google Firebase Cloud)</button>
+                <button class="nav-btn active">📊 Giám Sát Môi Trường Nhà Xưởng (Firebase Cloud)</button>
             </div>
             <button class="btn-theme" onclick="toggleDarkMode()">🌓 Giao Diện Đêm / Sáng</button>
         </div>
@@ -82,9 +81,9 @@
             <div class="header-title">
                 <h1>HỆ THỐNG GIÁM SÁT MÔI TRƯỜNG NHÀ XƯỞNG</h1>
                 <div class="manager-info">
-                    <span>🏫 Trường: <strong>Trường ĐH Công nghiệp TP.HCM (IUH)</strong></span>
+                    <span>🏫 Trường: <strong>ĐH Công nghiệp TP.HCM (IUH)</strong></span>
                     <span>👤 Quản lý: <strong>Nguyễn Trọng Phước</strong></span>
-                    <span>🌐 Firebase Cloud: <strong id="cloudStatus" style="color:#10b981;">ĐÃ ĐỒNG BỘ</strong></span>
+                    <span>🌐 Trạng thái trạm: <strong id="stationStatusBadge" style="color:#10b981;">ĐANG KẾT NỐI...</strong></span>
                 </div>
             </div>
             <div id="realtimeClock" class="realtime-clock">--:--:-- --/--/----</div>
@@ -103,16 +102,16 @@
         </div>
 
         <div class="grid-layout">
-            <div class="card"><div class="card-title">Nhiệt Độ</div><div class="card-value"><span id="temp">0.0</span><span class="unit">°C</span></div></div>
-            <div class="card"><div class="card-title">Độ Ẩm</div><div class="card-value"><span id="hum">0.0</span><span class="unit">%</span></div></div>
-            <div class="card"><div class="card-title">Khí Gas</div><div class="card-value"><span id="gas">0</span><span class="unit">PPM</span></div></div>
-            <div class="card"><div class="card-title">Khí CO2</div><div class="card-value"><span id="co2">0</span><span class="unit">PPM</span></div></div>
-            <div class="card"><div class="card-title">Bụi PM2.5</div><div class="card-value"><span id="dust">0</span><span class="unit">µg/m³</span></div></div>
-            <div class="card"><div class="card-title">Chỉ Số AQI</div><div class="card-value" style="color:var(--primary);"><span id="aqi">0</span></div></div>
+            <div class="card"><div class="card-title">Nhiệt Độ</div><div class="card-value"><span id="temp">--</span><span class="unit">°C</span></div></div>
+            <div class="card"><div class="card-title">Độ Ẩm</div><div class="card-value"><span id="hum">--</span><span class="unit">%</span></div></div>
+            <div class="card"><div class="card-title">Khí Gas</div><div class="card-value"><span id="gas">--</span><span class="unit">PPM</span></div></div>
+            <div class="card"><div class="card-title">Khí CO2</div><div class="card-value"><span id="co2">--</span><span class="unit">PPM</span></div></div>
+            <div class="card"><div class="card-title">Bụi PM2.5</div><div class="card-value"><span id="dust">--</span><span class="unit">µg/m³</span></div></div>
+            <div class="card"><div class="card-title">Chỉ Số AQI</div><div class="card-value" style="color:var(--primary);"><span id="aqi">--</span></div></div>
         </div>
 
         <div class="module-box">
-            <div class="section-title">📈 BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC (CLOUDFEED)</div>
+            <div class="section-title">📈 BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC (CẬP NHẬT MỖI 5 GIÂY)</div>
             <div style="position: relative; height: 260px; width: 100%;">
                 <canvas id="envChart"></canvas>
             </div>
@@ -135,9 +134,6 @@
     </div>
 
     <script>
-        // =========================================================
-        // KẾT NỐI TỚI GOOGLE FIREBASE CỦA BẠN
-        // =========================================================
         const firebaseConfig = {
             databaseURL: "https://giam-sat-moi-truong-nha-xuong-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
@@ -148,6 +144,8 @@
         let isFanCloudForced = false;
         let isMuteCloudForced = false;
         let historyRecords = [];
+        let lastReceivedTime = 0;
+        let isDeviceOnline = false;
 
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
 
@@ -161,24 +159,20 @@
             setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
-        // =========================================================
-        // ĐIỀU KHIỂN THIẾT BỊ LÊN CLOUD
-        // =========================================================
         function toggleFanCloud() {
+            if (!isDeviceOnline) { showTopToast("Trạm đang Offline, không thể điều khiển!"); return; }
             isFanCloudForced = !isFanCloudForced;
             database.ref('/controls/fanOverride').set(isFanCloudForced ? 1 : 0);
-            showTopToast(isFanCloudForced ? "Đã gửi lệnh BẬT quạt lên Cloud!" : "Đã chuyển quạt về TỰ ĐỘNG!");
+            showTopToast(isFanCloudForced ? "Đã gửi lệnh BẬT quạt!" : "Đã chuyển quạt về TỰ ĐỘNG!");
         }
 
         function toggleMuteCloud() {
+            if (!isDeviceOnline) { showTopToast("Trạm đang Offline, không thể điều khiển!"); return; }
             isMuteCloudForced = !isMuteCloudForced;
             database.ref('/controls/muteAudio').set(isMuteCloudForced ? 1 : 0);
-            showTopToast(isMuteCloudForced ? "Đã tắt còi cảnh báo trên trạm!" : "Đã mở lại còi cảnh báo!");
+            showTopToast(isMuteCloudForced ? "Đã tắt còi cảnh báo!" : "Đã mở lại còi!");
         }
 
-        // =========================================================
-        // KHỞI TẠO BIỂU ĐỒ REALTIME CHART.JS
-        // =========================================================
         const ctx = document.getElementById('envChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
@@ -198,14 +192,16 @@
                     x: {
                         type: 'realtime',
                         realtime: {
-                            duration: 30000, refresh: 1000, delay: 1000,
+                            duration: 60000, refresh: 5000, delay: 2000,
                             onRefresh: function(chart) {
-                                const now = Date.now();
-                                chart.data.datasets[0].data.push({ x: now, y: curTemp });
-                                chart.data.datasets[1].data.push({ x: now, y: curHum });
-                                chart.data.datasets[2].data.push({ x: now, y: curGas });
-                                chart.data.datasets[3].data.push({ x: now, y: curCo2 });
-                                chart.data.datasets[4].data.push({ x: now, y: curDust });
+                                if (isDeviceOnline) {
+                                    const now = Date.now();
+                                    chart.data.datasets[0].data.push({ x: now, y: curTemp });
+                                    chart.data.datasets[1].data.push({ x: now, y: curHum });
+                                    chart.data.datasets[2].data.push({ x: now, y: curGas });
+                                    chart.data.datasets[3].data.push({ x: now, y: curCo2 });
+                                    chart.data.datasets[4].data.push({ x: now, y: curDust });
+                                }
                             }
                         },
                         grid: { display: false }
@@ -216,12 +212,15 @@
             }
         });
 
-        // =========================================================
-        // 1. LẮNG NGHE SỐ LIỆU THỜI GIAN THỰC TỪ FIREBASE (/current)
-        // =========================================================
+        // 1. Nhận dữ liệu Realtime
         database.ref('/current').on('value', (snapshot) => {
             const data = snapshot.val();
             if (!data) return;
+
+            lastReceivedTime = Date.now();
+            isDeviceOnline = true;
+            document.getElementById('stationStatusBadge').innerText = "ONLINE (5s)";
+            document.getElementById('stationStatusBadge').style.color = "#10b981";
 
             curTemp = parseFloat(data.temp || 0);
             curHum  = parseFloat(data.hum || 0);
@@ -238,7 +237,6 @@
             document.getElementById('aqi').innerText  = curAqi;
             document.getElementById('realtimeClock').innerText = data.time || "--:--:--";
 
-            // Cập nhật trạng thái
             const envBadge = document.getElementById('envBadge');
             if (data.status === "CANH BAO") {
                 envBadge.className = "badge badge-danger";
@@ -247,39 +245,31 @@
                 envBadge.className = "badge badge-safe";
                 envBadge.innerText = "● TỐT";
             }
-
-            // Cập nhật quạt & loa
-            const fanBadge = document.getElementById('fanBadge');
-            const btnFan = document.getElementById('btnFan');
-            if (data.fanState === 1) {
-                fanBadge.innerText = "💨 QUẠT HÚT: ĐANG BẬT";
-                fanBadge.style.background = "#dbeafe";
-                fanBadge.style.color = "#1e40af";
-                btnFan.innerText = "TẮT QUẠT THỦ CÔNG";
-            } else {
-                fanBadge.innerText = "💨 QUẠT HÚT: TỰ ĐỘNG (TẮT)";
-                fanBadge.style.background = "#f1f5f9";
-                fanBadge.style.color = "#475569";
-                btnFan.innerText = "BẬT QUẠT TỪ XA";
-            }
-
-            const spkBadge = document.getElementById('speakerBadge');
-            const btnMute = document.getElementById('btnMute');
-            if (data.muteState === 1) {
-                spkBadge.className = "badge badge-spk-off";
-                spkBadge.innerText = "🔇 LOA BÁO ĐỘNG: ĐÃ TẮT";
-                btnMute.innerText = "BẬT LẠI LOA";
-            } else {
-                spkBadge.className = "badge badge-spk-on";
-                spkBadge.innerText = "🔊 LOA BÁO ĐỘNG: ĐANG BẬT";
-                btnMute.innerText = "TẮT LOA TẠM";
-            }
         });
 
-        // =========================================================
-        // 2. TẢI TOÀN BỘ LỊCH SỬ ĐÃ LƯU TRÊN FIREBASE (/history)
-        // =========================================================
-        database.ref('/history').limitToLast(100).on('value', (snapshot) => {
+        // Giám sát kết nối: Nếu quá 12 giây không có tin mới -> ESP32 bị mất điện hoặc mất WiFi
+        setInterval(() => {
+            if (Date.now() - lastReceivedTime > 12000 && lastReceivedTime !== 0) {
+                isDeviceOnline = false;
+                document.getElementById('stationStatusBadge').innerText = "OFFLINE (MẤT KẾT NỐI)";
+                document.getElementById('stationStatusBadge').style.color = "#ef4444";
+
+                // Đưa các thẻ thông số về trạng thái không có giá trị
+                document.getElementById('temp').innerText = "--";
+                document.getElementById('hum').innerText  = "--";
+                document.getElementById('gas').innerText  = "--";
+                document.getElementById('co2').innerText  = "--";
+                document.getElementById('dust').innerText = "--";
+                document.getElementById('aqi').innerText  = "--";
+
+                const envBadge = document.getElementById('envBadge');
+                envBadge.className = "badge badge-offline";
+                envBadge.innerText = "● MẤT TÍN HIỆU";
+            }
+        }, 3000);
+
+        // 2. Lấy dữ liệu Lịch sử lưu trên Cloud (Không bao giờ bị xóa khi mất điện)
+        database.ref('/history').limitToLast(150).on('value', (snapshot) => {
             historyRecords = [];
             snapshot.forEach((child) => {
                 historyRecords.unshift(child.val());
@@ -303,12 +293,9 @@
             });
         });
 
-        // =========================================================
-        // XUẤT FILE BÁO CÁO CSV
-        // =========================================================
         function exportCsv() {
             if (historyRecords.length === 0) {
-                showTopToast("Chưa có bản ghi lịch sử nào để xuất!");
+                showTopToast("Chưa có bản ghi lịch sử nào!");
                 return;
             }
             let csv = "====================================================================\n";
@@ -325,7 +312,7 @@
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `BaoCao_LichSu_Firebase_${Date.now()}.csv`;
+            link.download = `BaoCao_LichSu_${Date.now()}.csv`;
             link.click();
             showTopToast("Đã tải xuống file báo cáo thành công!");
         }
