@@ -316,7 +316,7 @@
             setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
-        // TỰ ĐỘNG ĐỒNG BỘ NGƯỠNG ĐANG CÓ TRÊN FIREBASE KHI F5 MỞ TRANG
+        // Tự động đồng bộ ngưỡng từ Firebase khi F5
         database.ref('/thresholds').once('value').then((snapshot) => {
             const th = snapshot.val();
             if (th) {
@@ -327,7 +327,7 @@
             }
         });
 
-        // BỘ ĐẾM NHẢY THỜI GIAN 1 GIÂY MƯỢT MÀ
+        // Đồng hồ nhảy mượt 1 giây
         setInterval(() => {
             if (currentClockDate) {
                 currentClockDate.setSeconds(currentClockDate.getSeconds() + 1);
@@ -357,7 +357,6 @@
             showTopToast("Đã gửi lệnh bật lại loa cảnh báo lên Cloud!");
         }
 
-        // BÁO ĐỘNG KHẨN CẤP HOẠT ĐỘNG CHÍNH XÁC KHI MÔI TRƯỜNG ĐANG BÌNH THƯỜNG
         function triggerEmergency() {
             database.ref('/controls').update({
                 emergencyAlarm: 1,
@@ -371,7 +370,6 @@
             showTopToast("ĐÃ KÍCH HOẠT BÁO ĐỘNG KHẨN CẤP LÊN TRẠM!");
         }
 
-        // XÁC NHẬN SỰ CỐ / HỦY BÁO ĐỘNG KHẨN
         function ackAlert() {
             database.ref('/controls').update({
                 emergencyAlarm: 0,
@@ -381,7 +379,7 @@
             document.getElementById('speakerBadge').innerText = "LOA BÁO ĐỘNG: ĐÃ TẮT";
             document.getElementById('lastIncStatus').className = "badge badge-warn";
             document.getElementById('lastIncStatus').innerText = "ĐANG XỬ LÝ";
-            showTopToast("Đã xác nhận sự cố & dừng báo động khẩn!");
+            showTopToast("Đã xác nhận sự cố & dừng báo động!");
         }
 
         function saveThresholds() {
@@ -554,6 +552,7 @@
                 fanBadge.style.color = "#475569";
             }
 
+            // TỰ ĐỘNG CẬP NHẬT TRẠNG THÁI LOA TRÊN WEB KHI ESP32 TỰ BẬT LẠI DO CÓ CẢNH BÁO MỚI
             const spkBadge = document.getElementById('speakerBadge');
             if (data.muteState === 1) {
                 spkBadge.className = "badge badge-spk-off";
