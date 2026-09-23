@@ -15,34 +15,17 @@
 
     <style>
         :root {
-            --primary: #0284c7;
-            --primary-dark: #0369a1;
-            --primary-bg: #e0f2fe;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-sub: #64748b;
-            --border: #e2e8f0;
-            --safe: #10b981;
-            --safe-bg: #ecfdf5;
-            --danger: #ef4444;
-            --danger-bg: #fef2f2;
-            --warn: #f59e0b;
-            --warn-bg: #fef3c7;
-            --radius-main: 14px;
-            --radius-sub: 10px;
+            --primary: #0284c7; --primary-dark: #0369a1; --primary-bg: #e0f2fe;
+            --bg: #f8fafc; --card-bg: #ffffff; --text-main: #0f172a; --text-sub: #64748b;
+            --border: #e2e8f0; --safe: #10b981; --safe-bg: #ecfdf5;
+            --danger: #ef4444; --danger-bg: #fef2f2; --warn: #f59e0b; --warn-bg: #fef3c7;
+            --radius-main: 14px; --radius-sub: 10px;
         }
 
         body.dark-mode {
-            --bg: #0b0f19;
-            --card-bg: #151d2a;
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --border: #263346;
-            --primary-bg: rgba(2, 132, 199, 0.15);
-            --safe-bg: rgba(16, 185, 129, 0.15);
-            --danger-bg: rgba(239, 68, 68, 0.15);
-            --warn-bg: rgba(245, 158, 11, 0.15);
+            --bg: #0b0f19; --card-bg: #151d2a; --text-main: #f8fafc; --text-sub: #94a3b8;
+            --border: #263346; --primary-bg: rgba(2, 132, 199, 0.15);
+            --safe-bg: rgba(16, 185, 129, 0.15); --danger-bg: rgba(239, 68, 68, 0.15); --warn-bg: rgba(245, 158, 11, 0.15);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -54,10 +37,7 @@
         .toast.show { transform: translateY(0); opacity: 1; }
 
         .nav-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .nav-tabs { display: flex; gap: 6px; background: rgba(0, 0, 0, 0.05); padding: 4px; border-radius: 25px; }
-        body.dark-mode .nav-tabs { background: rgba(255, 255, 255, 0.08); }
-        .nav-btn { background: transparent; border: none; padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; color: var(--text-sub); cursor: pointer; transition: all 0.2s; }
-        .nav-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .nav-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .btn-theme { background: var(--card-bg); border: 1px solid var(--border); padding: 7px 15px; border-radius: 20px; font-weight: 700; font-size: 0.82rem; color: var(--text-main); cursor: pointer; }
 
         header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 16px 20px; border-radius: var(--radius-main); border: 1px solid var(--border); border-left: 5px solid var(--primary); flex-wrap: wrap; gap: 12px; }
@@ -96,10 +76,6 @@
         .module-box { background: var(--card-bg); padding: 18px 20px; border-radius: var(--radius-main); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
         .section-title { font-size: 0.92rem; font-weight: 800; }
 
-        .control-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
-        .control-item { border: 1px solid var(--border); padding: 12px; border-radius: var(--radius-sub); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.015); }
-        .btn-action { background: var(--primary); color: #fff; border: none; padding: 7px 14px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
-
         .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; align-items: flex-end; }
         .input-group { display: flex; flex-direction: column; gap: 4px; position: relative; }
         .input-group label { font-size: 0.75rem; color: var(--text-sub); font-weight: 700; }
@@ -113,7 +89,7 @@
 
         .table-responsive { max-height: 350px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sub); }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.82rem; }
-        th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+        th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
         th { background: rgba(0,0,0,0.03); color: var(--text-sub); font-weight: 700; position: sticky; top: 0; }
 
         .note-input-row { display: grid; grid-template-columns: 220px 1fr 140px; gap: 10px; align-items: flex-end; }
@@ -151,7 +127,7 @@
                 <select id="exportScope" onchange="onExportScopeChange()">
                     <option value="all">Toàn bộ lịch sử</option>
                     <option value="date">Theo ngày cụ thể</option>
-                    <option value="month">Theo tháng / năm</option>
+                    <option value="month">Theo tháng và năm</option>
                 </select>
             </div>
             <div class="input-group" id="exportDateGroup" style="display:none;">
@@ -171,9 +147,7 @@
 
     <div class="container">
         <div class="nav-bar">
-            <div class="nav-tabs">
-                <button id="tabDash" class="nav-btn active">Giám Sát Môi Trường Nhà Xưởng</button>
-            </div>
+            <div class="nav-btn">Giám Sát Môi Trường Nhà Xưởng</div>
             <button class="btn-theme" onclick="toggleDarkMode()">Giao Diện Đêm / Sáng</button>
         </div>
 
@@ -195,7 +169,7 @@
                     <strong>Sự Cố Gần Nhất:</strong> <span id="lastIncName" style="color:#d97706; font-weight:700;">Không có</span>
                 </div>
                 <div>
-                    Trạng Thái: <span id="lastIncStatus" class="badge badge-safe">TỐT</span>
+                    Trạng Thái: <span id="lastIncStatus" class="badge badge-safe">AN TOÀN</span>
                 </div>
                 <div>
                     Thời Gian: <strong id="lastIncTime" style="font-family:monospace;">--:--:--</strong>
@@ -204,8 +178,9 @@
 
             <div class="status-banner">
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <span id="envBadge" class="badge badge-safe">TỐT</span>
+                    <span id="envBadge" class="badge badge-safe">AN TOÀN</span>
                     <span id="speakerBadge" class="badge badge-spk-on">LOA BÁO ĐỘNG: ĐANG BẬT</span>
+                    <span id="fanBadge" class="badge" style="background:#f1f5f9; color:#475569;">QUẠT HÚT: TỰ ĐỘNG (TẮT)</span>
                 </div>
                 <div class="btn-group">
                     <button class="btn-ack" onclick="ackAlert()">XÁC NHẬN SỰ CỐ</button>
@@ -239,19 +214,6 @@
                 <div class="card"><div class="card-title">Khí CO2</div><div class="card-value"><span id="co2">0</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetCo2">900</span></div></div>
                 <div class="card"><div class="card-title">Bụi PM2.5</div><div class="card-value"><span id="dust">0</span><span class="unit">µg/m³</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetDust">150</span></div></div>
                 <div class="card"><div class="card-title">Chỉ Số AQI</div><div class="card-value" style="color:var(--primary);"><span id="aqi">0</span></div><div class="card-sub" id="aqiDesc">Đánh giá: TỐT</div></div>
-            </div>
-
-            <div class="module-box">
-                <div class="section-title">ĐIỀU KHIỂN VÀ KIỂM TRA THIẾT BỊ</div>
-                <div class="control-grid">
-                    <div class="control-item">
-                        <div>
-                            <div style="font-weight:700; font-size:0.85rem;">Quạt Hút Relay</div>
-                            <div id="fanStatusText" style="font-size:0.75rem; color:var(--text-sub);">Trạng thái: Tự động (Tắt)</div>
-                        </div>
-                        <button class="btn-action" id="btnFan" onclick="toggleFanOverride()">BẬT QUẠT</button>
-                    </div>
-                </div>
             </div>
 
             <div class="module-box">
@@ -320,9 +282,6 @@
     </div>
 
     <script>
-        // =========================================================
-        // KẾT NỐI GOOGLE FIREBASE
-        // =========================================================
         const firebaseConfig = {
             databaseURL: "https://giam-sat-moi-truong-nha-xuong-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
@@ -330,7 +289,7 @@
         const database = firebase.database();
 
         let cfgTemp = 38.0, cfgCo2 = 900, cfgDust = 150, cfgGas = 180;
-        let isSpeakerMuted = false, isFanForced = false;
+        let isSpeakerMuted = false;
         let minT = 99.0, maxT = 0.0;
         let curSimTemp = 0.0, curSimHum = 0.0, curSimGas = 0, curSimCo2 = 0, curSimDust = 0;
 
@@ -338,8 +297,7 @@
             university: "Trường Đại học Công nghiệp TP.HCM",
             projectName: "Hệ Thống Giám Sát Môi Trường Nhà Xưởng",
             author: "Nguyễn Trọng Phước",
-            location: "Khu Nhà Xưởng - TP.HCM",
-            systemTime: "--/--/---- --:--:--"
+            location: "Khu Nhà Xưởng - TP.HCM"
         };
 
         let cachedNoteList = [];
@@ -358,7 +316,18 @@
             setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
-        // BỘ ĐẾM NHỊP 1 GIÂY CHUẨN XÁC
+        // TỰ ĐỘNG ĐỒNG BỘ NGƯỠNG ĐANG CÓ TRÊN FIREBASE KHI F5 MỞ TRANG
+        database.ref('/thresholds').once('value').then((snapshot) => {
+            const th = snapshot.val();
+            if (th) {
+                if (th.temp) { cfgTemp = parseFloat(th.temp); document.getElementById('setTemp').value = cfgTemp; }
+                if (th.gas)  { cfgGas  = parseFloat(th.gas);  document.getElementById('setGas').value = cfgGas; document.getElementById('dispSetGas').innerText = cfgGas; }
+                if (th.co2)  { cfgCo2  = parseFloat(th.co2);  document.getElementById('setCo2').value = cfgCo2; document.getElementById('dispSetCo2').innerText = cfgCo2; }
+                if (th.dust) { cfgDust = parseFloat(th.dust); document.getElementById('setDust').value = cfgDust; document.getElementById('dispSetDust').innerText = cfgDust; }
+            }
+        });
+
+        // BỘ ĐẾM NHẢY THỜI GIAN 1 GIÂY MƯỢT MÀ
         setInterval(() => {
             if (currentClockDate) {
                 currentClockDate.setSeconds(currentClockDate.getSeconds() + 1);
@@ -372,9 +341,6 @@
             }
         }, 1000);
 
-        // =========================================================
-        // ĐIỀU KHIỂN THIẾT BỊ QUA FIREBASE (/controls)
-        // =========================================================
         function triggerMute() {
             isSpeakerMuted = true;
             database.ref('/controls/muteAudio').set(1);
@@ -391,43 +357,33 @@
             showTopToast("Đã gửi lệnh bật lại loa cảnh báo lên Cloud!");
         }
 
+        // BÁO ĐỘNG KHẨN CẤP HOẠT ĐỘNG CHÍNH XÁC KHI MÔI TRƯỜNG ĐANG BÌNH THƯỜNG
         function triggerEmergency() {
-            database.ref('/controls/fanOverride').set(1);
-            database.ref('/controls/muteAudio').set(0);
+            database.ref('/controls').update({
+                emergencyAlarm: 1,
+                muteAudio: 0
+            });
             document.getElementById('speakerBadge').className = "badge badge-spk-on";
             document.getElementById('speakerBadge').innerText = "LOA BÁO ĐỘNG: BẬT KHẨN CẤP";
-            showTopToast("ĐÃ GỬI LỆNH KÍCH HOẠT BÁO ĐỘNG KHẨN CẤP!");
+            document.getElementById('envBadge').className = "badge badge-danger";
+            document.getElementById('envBadge').innerText = "CẢNH BÁO KHẨN";
+            document.getElementById('aqiDesc').innerText = "Đánh giá: BÁO ĐỘNG KHẨN CẤP TỪ XA";
+            showTopToast("ĐÃ KÍCH HOẠT BÁO ĐỘNG KHẨN CẤP LÊN TRẠM!");
         }
 
+        // XÁC NHẬN SỰ CỐ / HỦY BÁO ĐỘNG KHẨN
         function ackAlert() {
-            database.ref('/controls/muteAudio').set(1);
+            database.ref('/controls').update({
+                emergencyAlarm: 0,
+                muteAudio: 1
+            });
             document.getElementById('speakerBadge').className = "badge badge-spk-off";
             document.getElementById('speakerBadge').innerText = "LOA BÁO ĐỘNG: ĐÃ TẮT";
             document.getElementById('lastIncStatus').className = "badge badge-warn";
             document.getElementById('lastIncStatus').innerText = "ĐANG XỬ LÝ";
-            showTopToast("Đã xác nhận sự cố. Quạt tiếp tục hút xả đến khi an toàn!");
+            showTopToast("Đã xác nhận sự cố & dừng báo động khẩn!");
         }
 
-        function toggleFanOverride() {
-            isFanForced = !isFanForced;
-            const targetVal = isFanForced ? 1 : 0;
-            database.ref('/controls/fanOverride').set(targetVal);
-            const btn = document.getElementById('btnFan');
-            const text = document.getElementById('fanStatusText');
-            if (isFanForced) {
-                btn.innerText = "DỪNG QUẠT"; btn.style.background = "#dc2626";
-                text.innerText = "Trạng thái: BẬT THỦ CÔNG";
-                showTopToast("Đã gửi lệnh BẬT quạt lên Cloud!");
-            } else {
-                btn.innerText = "BẬT QUẠT"; btn.style.background = "var(--primary)";
-                text.innerText = "Trạng thái: Tự động (Tắt)";
-                showTopToast("Đã chuyển quạt về chế độ Tự động.");
-            }
-        }
-
-        // =========================================================
-        // LƯU NGƯỠNG TRỰC TIẾP LÊN FIREBASE (/thresholds)
-        // =========================================================
         function saveThresholds() {
             cfgTemp = parseFloat(document.getElementById('setTemp').value);
             cfgCo2  = parseFloat(document.getElementById('setCo2').value);
@@ -444,20 +400,14 @@
                 co2: cfgCo2,
                 dust: cfgDust
             }).then(() => {
-                showTopToast("Đã cập nhật và đồng bộ ngưỡng xuống ESP32!");
+                showTopToast("Đã lưu và đồng bộ ngưỡng xuống trạm đo!");
             });
         }
 
-        // =========================================================
-        // SỔ NHẬT KÝ CA TRỰC LƯU TRÊN FIREBASE (/notes)
-        // =========================================================
         function submitNewNote() {
             const author = document.getElementById('noteAuthor').value.trim();
             const content = document.getElementById('noteContent').value.trim();
-            if (!content) {
-                showTopToast("Vui lòng nhập nội dung ghi chú!");
-                return;
-            }
+            if (!content) { showTopToast("Vui lòng nhập nội dung ghi chú!"); return; }
             const newNote = {
                 time: new Date().toLocaleString(),
                 author: author || "Kỹ sư ca trực",
@@ -508,9 +458,6 @@
             renderNotesUI(cachedNoteList);
         });
 
-        // =========================================================
-        // BIỂU ĐỒ REALTIME CHART.JS
-        // =========================================================
         const ctx = document.getElementById('envChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
@@ -548,14 +495,11 @@
             }
         });
 
-        // =========================================================
-        // 1. NHẬN DỮ LIỆU TỨC THỜI TỪ FIREBASE (/current)
-        // =========================================================
+        // 1. NHẬN DỮ LIỆU TỨC THỜI TỪ FIREBASE
         database.ref('/current').on('value', (snapshot) => {
             const data = snapshot.val();
             if (!data) return;
 
-            // Đồng bộ mốc thời gian RTC
             if (data.time) {
                 document.getElementById('realtimeClock').innerText = data.time;
                 const parts = data.time.split(' ');
@@ -587,29 +531,27 @@
             document.getElementById('minTemp').innerText = minT.toFixed(1);
             document.getElementById('maxTemp').innerText = maxT.toFixed(1);
 
-            let isCurrentDanger = (data.status === "CANH BAO" || curSimGas >= cfgGas || curSimCo2 >= cfgCo2 || curSimTemp >= cfgTemp || curSimDust >= cfgDust);
+            let isCurrentDanger = (data.status === "CANH BAO" || data.emergencyState === 1 || curSimGas >= cfgGas || curSimCo2 >= cfgCo2 || curSimTemp >= cfgTemp || curSimDust >= cfgDust);
             const envBadge = document.getElementById('envBadge');
             if (isCurrentDanger) {
                 envBadge.className = "badge badge-danger";
-                envBadge.innerText = "CẢNH BÁO";
-                document.getElementById('aqiDesc').innerText = "Đánh giá: CẢNH BÁO";
+                envBadge.innerText = (data.emergencyState === 1) ? "CẢNH BÁO KHẨN" : "CẢNH BÁO";
+                document.getElementById('aqiDesc').innerText = "Đánh giá: " + (data.detailAlarm || "VƯỢT NGƯỠNG AN TOÀN");
             } else {
                 envBadge.className = "badge badge-safe";
-                envBadge.innerText = "TỐT";
-                document.getElementById('aqiDesc').innerText = "Đánh giá: TỐT";
+                envBadge.innerText = "AN TOÀN";
+                document.getElementById('aqiDesc').innerText = "Đánh giá: CHẤT LƯỢNG TỐT";
             }
 
-            // Cập nhật quạt & loa
-            const btnFan = document.getElementById('btnFan');
-            const fanText = document.getElementById('fanStatusText');
+            const fanBadge = document.getElementById('fanBadge');
             if (data.fanState === 1) {
-                btnFan.innerText = "DỪNG QUẠT"; btn.style.background = "#dc2626";
-                fanText.innerText = "Trạng thái: BẬT THỦ CÔNG";
-                isFanForced = true;
+                fanBadge.innerText = "QUẠT HÚT: ĐANG BẬT";
+                fanBadge.style.background = "#dbeafe";
+                fanBadge.style.color = "#1e40af";
             } else {
-                btnFan.innerText = "BẬT QUẠT"; btn.style.background = "var(--primary)";
-                fanText.innerText = "Trạng thái: Tự động (Tắt)";
-                isFanForced = false;
+                fanBadge.innerText = "QUẠT HÚT: TỰ ĐỘNG (TẮT)";
+                fanBadge.style.background = "#f1f5f9";
+                fanBadge.style.color = "#475569";
             }
 
             const spkBadge = document.getElementById('speakerBadge');
@@ -624,19 +566,18 @@
             }
         });
 
-        // =========================================================
-        // 2. NHẬN LỊCH SỬ TỪ FIREBASE (/history)
-        // =========================================================
+        // 2. NHẬN LỊCH SỬ CLOUD
         database.ref('/history').limitToLast(200).on('value', (snapshot) => {
             logData = [];
             let totalAlarm = 0;
             let iTemp = 0, iGas = 0, iCo2 = 0, iDust = 0;
             let lastDangerName = "Không có";
             let lastDangerTime = "--:--:--";
-            let lastDangerStatus = "TOT";
+            let lastDangerStatus = "AN TOAN";
 
             snapshot.forEach((child) => {
                 const item = child.val();
+                const isDanger = (item.status === "CANH BAO");
                 const record = {
                     timestamp: child.key,
                     fullTime: item.time || "",
@@ -648,17 +589,18 @@
                     curCo2: parseInt(item.co2 || 0),
                     curDust: parseInt(item.dust || 0),
                     curAqi: parseInt(item.aqi || 0),
-                    statusText: item.status || "TOT",
-                    isDanger: (item.status === "CANH BAO")
+                    statusText: isDanger ? "CẢNH BÁO" : "AN TOÀN",
+                    detailAlarm: item.detailAlarm || (isDanger ? "Sự cố vượt ngưỡng" : "Bình thường"),
+                    isDanger: isDanger
                 };
 
-                if (record.isDanger) {
+                if (isDanger) {
                     totalAlarm++;
                     if (record.curTemp >= cfgTemp) iTemp++;
                     if (record.curGas >= cfgGas) iGas++;
                     if (record.curCo2 >= cfgCo2) iCo2++;
                     if (record.curDust >= cfgDust) iDust++;
-                    lastDangerName = "CẢNH BÁO MÔI TRƯỜNG";
+                    lastDangerName = record.detailAlarm;
                     lastDangerTime = record.timeStr;
                     lastDangerStatus = "CANH BAO";
                 }
@@ -681,7 +623,7 @@
                 stBadge.innerText = "CẢNH BÁO";
             } else {
                 stBadge.className = "badge badge-safe";
-                stBadge.innerText = "TỐT";
+                stBadge.innerText = "AN TOÀN";
             }
 
             smartFilterTable();
