@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ Thống Giám Sát Môi Trường Nhà Xưởng</title>
     
-    <!-- Các thư viện hiển thị biểu đồ -->
     <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@2.0.0/dist/chartjs-plugin-streaming.min.js"></script>
 
-    <!-- Thư viện kết nối Google Firebase Cloud Database -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
@@ -145,7 +143,7 @@
     <div id="exportModal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3>📥 Xuất Báo Cáo</h3>
+                <h3>Xuất Báo Cáo</h3>
                 <button class="btn-close" onclick="closeExportModal()">✕</button>
             </div>
             <div class="input-group">
@@ -174,27 +172,27 @@
     <div class="container">
         <div class="nav-bar">
             <div class="nav-tabs">
-                <button id="tabDash" class="nav-btn active">📊 Giám Sát Môi Trường (Firebase Cloud)</button>
+                <button id="tabDash" class="nav-btn active">Giám Sát Môi Trường Nhà Xưởng</button>
             </div>
-            <button class="btn-theme" onclick="toggleDarkMode()">🌓 Giao Diện Đêm / Sáng</button>
+            <button class="btn-theme" onclick="toggleDarkMode()">Giao Diện Đêm / Sáng</button>
         </div>
 
         <div id="pageDash" style="display:flex; flex-direction:column; gap:16px;">
             <header>
                 <div class="header-title">
-                    <h1 id="headerProjectName">TRẠM ĐIỀU KHIỂN & ĐO ĐẠC NHÀ XƯỞNG</h1>
+                    <h1 id="headerProjectName">TRẠM ĐIỀU KHIỂN VÀ ĐO ĐẠC NHÀ XƯỞNG</h1>
                     <div class="manager-info">
-                        <span>🏫 Trường: <strong id="dispUniv">Trường ĐH Công nghiệp TP.HCM (IUH)</strong></span>
-                        <span>👤 Quản lý: <strong id="dispAuthor">Nguyễn Trọng Phước</strong></span>
-                        <span>📍 Vị trí: <strong id="dispLocation">Khu Nhà Xưởng - TP.HCM</strong></span>
+                        <span>Trường: <strong id="dispUniv">Trường Đại học Công nghiệp TP.HCM</strong></span>
+                        <span>Quản lý: <strong id="dispAuthor">Nguyễn Trọng Phước</strong></span>
+                        <span>Vị trí: <strong id="dispLocation">Khu Nhà Xưởng - TP.HCM</strong></span>
                     </div>
                 </div>
-                <div id="realtimeClock" class="realtime-clock">--/--/---- --:--:--</div>
+                <div id="realtimeClock" class="realtime-clock">--:--:-- --/--/----</div>
             </header>
 
             <div class="incident-banner">
                 <div>
-                    <strong>🔔 Sự Cố Gần Nhất:</strong> <span id="lastIncName" style="color:#d97706; font-weight:700;">Không có</span>
+                    <strong>Sự Cố Gần Nhất:</strong> <span id="lastIncName" style="color:#d97706; font-weight:700;">Không có</span>
                 </div>
                 <div>
                     Trạng Thái: <span id="lastIncStatus" class="badge badge-safe">TỐT</span>
@@ -206,14 +204,14 @@
 
             <div class="status-banner">
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <span id="envBadge" class="badge badge-safe">● TỐT</span>
-                    <span id="speakerBadge" class="badge badge-spk-on">🔊 LOA BÁO ĐỘNG: ĐANG BẬT</span>
+                    <span id="envBadge" class="badge badge-safe">TỐT</span>
+                    <span id="speakerBadge" class="badge badge-spk-on">LOA BÁO ĐỘNG: ĐANG BẬT</span>
                 </div>
                 <div class="btn-group">
-                    <button class="btn-ack" onclick="ackAlert()">✅ XÁC NHẬN SỰ CỐ</button>
-                    <button class="btn-emergency" onclick="triggerEmergency()">🚨 BÁO ĐỘNG KHẨN</button>
-                    <button class="btn-mute" onclick="triggerMute()">🔕 TẮT LOA TẠM</button>
-                    <button class="btn-unmute" onclick="triggerUnmute()">🔊 BẬT LOA</button>
+                    <button class="btn-ack" onclick="ackAlert()">XÁC NHẬN SỰ CỐ</button>
+                    <button class="btn-emergency" onclick="triggerEmergency()">BÁO ĐỘNG KHẨN</button>
+                    <button class="btn-mute" onclick="triggerMute()">TẮT LOA TẠM</button>
+                    <button class="btn-unmute" onclick="triggerUnmute()">BẬT LOA</button>
                 </div>
             </div>
 
@@ -244,7 +242,7 @@
             </div>
 
             <div class="module-box">
-                <div class="section-title">⚡ ĐIỀU KHIỂN & KIỂM TRA THIẾT BỊ</div>
+                <div class="section-title">ĐIỀU KHIỂN VÀ KIỂM TRA THIẾT BỊ</div>
                 <div class="control-grid">
                     <div class="control-item">
                         <div>
@@ -257,27 +255,27 @@
             </div>
 
             <div class="module-box">
-                <div class="section-title">📈 BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC</div>
+                <div class="section-title">BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC</div>
                 <div style="position: relative; height: 260px; width: 100%;">
                     <canvas id="envChart"></canvas>
                 </div>
             </div>
 
             <div class="module-box">
-                <div class="section-title">⚙️ THIẾT LẬP NGƯỠNG CẢNH BÁO</div>
+                <div class="section-title">THIẾT LẬP NGƯỠNG CẢNH BÁO</div>
                 <div class="settings-grid">
-                    <div class="input-group"><label>Ngưỡng Nhiệt Độ (°C)</label><input type="number" id="setTemp" step="0.5" value="38.0"></div>
-                    <div class="input-group"><label>Ngưỡng Khí CO2 (PPM)</label><input type="number" id="setCo2" value="900"></div>
-                    <div class="input-group"><label>Ngưỡng Bụi PM2.5 (µg/m³)</label><input type="number" id="setDust" value="150"></div>
-                    <div class="input-group"><label>Ngưỡng Khí Gas (PPM)</label><input type="number" id="setGas" value="180"></div>
+                    <div class="input-group"><label>Ngưỡng Nhiệt Độ °C</label><input type="number" id="setTemp" step="0.5" value="38.0"></div>
+                    <div class="input-group"><label>Ngưỡng Khí CO2 PPM</label><input type="number" id="setCo2" value="900"></div>
+                    <div class="input-group"><label>Ngưỡng Bụi PM2.5 µg/m³</label><input type="number" id="setDust" value="150"></div>
+                    <div class="input-group"><label>Ngưỡng Khí Gas PPM</label><input type="number" id="setGas" value="180"></div>
                     <button class="btn-save" onclick="saveThresholds()">ÁP DỤNG NGƯỠNG</button>
                 </div>
             </div>
 
             <div class="module-box">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div class="section-title">📝 SỔ NHẬT KÝ CA TRỰC</div>
-                    <button class="btn-clear-db" onclick="clearNoteLogs()">🗑️ Xóa Sổ Nhật Ký</button>
+                    <div class="section-title">SỔ NHẬT KÝ CA TRỰC</div>
+                    <button class="btn-clear-db" onclick="clearNoteLogs()">Xóa Sổ Nhật Ký</button>
                 </div>
                 
                 <div class="note-input-row">
@@ -298,7 +296,7 @@
             </div>
 
             <div class="module-box">
-                <div class="section-title">🗄️ LỊCH SỬ ĐO ĐẠC LƯU TRÊN FIREBASE CLOUD</div>
+                <div class="section-title">LỊCH SỬ ĐO ĐẠC</div>
                 <div class="filter-controls">
                     <select id="timeRangeFilter" onchange="onTimeFilterChange()">
                         <option value="all">Tất cả lịch sử</option>
@@ -306,13 +304,13 @@
                     </select>
                     <input type="date" id="datePicker" onchange="smartFilterTable()" style="display: none;">
                     <div class="search-box"><input type="text" id="tableSearch" placeholder="Tìm kiếm mốc giờ, loại khí..." onkeyup="smartFilterTable()"></div>
-                    <button class="btn-export" onclick="openExportModal()">📥 Xuất Báo Cáo</button>
-                    <button class="btn-clear-db" onclick="clearDatabase()">🗑️ Xóa Lịch Sử Cloud</button>
+                    <button class="btn-export" onclick="openExportModal()">Xuất Báo Cáo</button>
+                    <button class="btn-clear-db" onclick="clearDatabase()">Xóa Lịch Sử</button>
                 </div>
                 <div class="table-responsive">
                     <table id="logTable">
                         <thead>
-                            <tr><th>Thời Gian</th><th>Nhiệt Độ (°C)</th><th>Độ Ẩm (%)</th><th>Khí Gas (PPM)</th><th>Khí CO2 (PPM)</th><th>Bụi PM2.5 (µg/m³)</th><th>AQI</th><th>Trạng Thái</th></tr>
+                            <tr><th>Thời Gian</th><th>Nhiệt Độ °C</th><th>Độ Ẩm %</th><th>Khí Gas PPM</th><th>Khí CO2 PPM</th><th>Bụi PM2.5 µg/m³</th><th>AQI</th><th>Trạng Thái</th></tr>
                         </thead>
                         <tbody id="logTableBody"></tbody>
                     </table>
@@ -323,7 +321,7 @@
 
     <script>
         // =========================================================
-        // KẾT NỐI TỚI CƠ SỞ DỮ LIỆU GOOGLE FIREBASE CỦA BẠN
+        // KẾT NỐI GOOGLE FIREBASE
         // =========================================================
         const firebaseConfig = {
             databaseURL: "https://giam-sat-moi-truong-nha-xuong-default-rtdb.asia-southeast1.firebasedatabase.app"
@@ -334,9 +332,10 @@
         let cfgTemp = 38.0, cfgCo2 = 900, cfgDust = 150, cfgGas = 180;
         let isSpeakerMuted = false, isFanForced = false;
         let minT = 99.0, maxT = 0.0;
+        let curSimTemp = 0.0, curSimHum = 0.0, curSimGas = 0, curSimCo2 = 0, curSimDust = 0;
 
         let projHeader = {
-            university: "Trường Đại học Công nghiệp TP.HCM (IUH)",
+            university: "Trường Đại học Công nghiệp TP.HCM",
             projectName: "Hệ Thống Giám Sát Môi Trường Nhà Xưởng",
             author: "Nguyễn Trọng Phước",
             location: "Khu Nhà Xưởng - TP.HCM",
@@ -345,6 +344,7 @@
 
         let cachedNoteList = [];
         let logData = [];
+        let currentClockDate = null;
 
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
 
@@ -358,6 +358,20 @@
             setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
+        // BỘ ĐẾM NHỊP 1 GIÂY CHUẨN XÁC
+        setInterval(() => {
+            if (currentClockDate) {
+                currentClockDate.setSeconds(currentClockDate.getSeconds() + 1);
+                const h = String(currentClockDate.getHours()).padStart(2, '0');
+                const m = String(currentClockDate.getMinutes()).padStart(2, '0');
+                const s = String(currentClockDate.getSeconds()).padStart(2, '0');
+                const D = String(currentClockDate.getDate()).padStart(2, '0');
+                const M = String(currentClockDate.getMonth() + 1).padStart(2, '0');
+                const Y = currentClockDate.getFullYear();
+                document.getElementById('realtimeClock').innerText = `${h}:${m}:${s} ${D}/${M}/${Y}`;
+            }
+        }, 1000);
+
         // =========================================================
         // ĐIỀU KHIỂN THIẾT BỊ QUA FIREBASE (/controls)
         // =========================================================
@@ -365,7 +379,7 @@
             isSpeakerMuted = true;
             database.ref('/controls/muteAudio').set(1);
             document.getElementById('speakerBadge').className = "badge badge-spk-off";
-            document.getElementById('speakerBadge').innerText = "🔇 LOA BÁO ĐỘNG: ĐÃ TẮT";
+            document.getElementById('speakerBadge').innerText = "LOA BÁO ĐỘNG: ĐÃ TẮT";
             showTopToast("Đã gửi lệnh tắt loa cảnh báo tạm thời lên Cloud!");
         }
 
@@ -373,7 +387,7 @@
             isSpeakerMuted = false;
             database.ref('/controls/muteAudio').set(0);
             document.getElementById('speakerBadge').className = "badge badge-spk-on";
-            document.getElementById('speakerBadge').innerText = "🔊 LOA BÁO ĐỘNG: ĐANG BẬT";
+            document.getElementById('speakerBadge').innerText = "LOA BÁO ĐỘNG: ĐANG BẬT";
             showTopToast("Đã gửi lệnh bật lại loa cảnh báo lên Cloud!");
         }
 
@@ -381,14 +395,14 @@
             database.ref('/controls/fanOverride').set(1);
             database.ref('/controls/muteAudio').set(0);
             document.getElementById('speakerBadge').className = "badge badge-spk-on";
-            document.getElementById('speakerBadge').innerText = "🔊 LOA BÁO ĐỘNG: BẬT KHẨN CẤP";
+            document.getElementById('speakerBadge').innerText = "LOA BÁO ĐỘNG: BẬT KHẨN CẤP";
             showTopToast("ĐÃ GỬI LỆNH KÍCH HOẠT BÁO ĐỘNG KHẨN CẤP!");
         }
 
         function ackAlert() {
             database.ref('/controls/muteAudio').set(1);
             document.getElementById('speakerBadge').className = "badge badge-spk-off";
-            document.getElementById('speakerBadge').innerText = "🔇 LOA BÁO ĐỘNG: ĐÃ TẮT";
+            document.getElementById('speakerBadge').innerText = "LOA BÁO ĐỘNG: ĐÃ TẮT";
             document.getElementById('lastIncStatus').className = "badge badge-warn";
             document.getElementById('lastIncStatus').innerText = "ĐANG XỬ LÝ";
             showTopToast("Đã xác nhận sự cố. Quạt tiếp tục hút xả đến khi an toàn!");
@@ -411,6 +425,9 @@
             }
         }
 
+        // =========================================================
+        // LƯU NGƯỠNG TRỰC TIẾP LÊN FIREBASE (/thresholds)
+        // =========================================================
         function saveThresholds() {
             cfgTemp = parseFloat(document.getElementById('setTemp').value);
             cfgCo2  = parseFloat(document.getElementById('setCo2').value);
@@ -420,11 +437,19 @@
             document.getElementById('dispSetGas').innerText = cfgGas;
             document.getElementById('dispSetCo2').innerText = cfgCo2;
             document.getElementById('dispSetDust').innerText = cfgDust;
-            showTopToast("Đã áp dụng ngưỡng mới thành công!");
+
+            database.ref('/thresholds').set({
+                temp: cfgTemp,
+                gas: cfgGas,
+                co2: cfgCo2,
+                dust: cfgDust
+            }).then(() => {
+                showTopToast("Đã cập nhật và đồng bộ ngưỡng xuống ESP32!");
+            });
         }
 
         // =========================================================
-        // QUẢN LÝ SỔ NHẬT KÝ CA TRỰC LƯU TRÊN FIREBASE (/notes)
+        // SỔ NHẬT KÝ CA TRỰC LƯU TRÊN FIREBASE (/notes)
         // =========================================================
         function submitNewNote() {
             const author = document.getElementById('noteAuthor').value.trim();
@@ -457,8 +482,8 @@
                 div.className = 'note-item';
                 div.innerHTML = `
                     <div class="note-meta">
-                        <span>👤 ${item.author}</span>
-                        <span>⏱️ ${item.time}</span>
+                        <span>${item.author}</span>
+                        <span>${item.time}</span>
                     </div>
                     <div class="note-text">${item.content}</div>
                 `;
@@ -486,18 +511,16 @@
         // =========================================================
         // BIỂU ĐỒ REALTIME CHART.JS
         // =========================================================
-        let curSimTemp = 0.0, curSimHum = 0.0, curSimGas = 0, curSimCo2 = 0, curSimDust = 0;
-
         const ctx = document.getElementById('envChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
             data: {
                 datasets: [
-                    { label: 'Nhiệt độ (°C)', data: [], borderColor: '#0284c7', fill: true, backgroundColor: 'rgba(2,132,199,0.05)', cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
-                    { label: 'Độ ẩm (%)', data: [], borderColor: '#06b6d4', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
-                    { label: 'Khí Gas (PPM)', data: [], borderColor: '#f59e0b', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
-                    { label: 'Khí CO2 (PPM)', data: [], borderColor: '#10b981', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
-                    { label: 'Bụi PM2.5 (µg/m³)', data: [], borderColor: '#ef4444', borderDash: [4, 4], fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 }
+                    { label: 'Nhiệt độ °C', data: [], borderColor: '#0284c7', fill: true, backgroundColor: 'rgba(2,132,199,0.05)', cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
+                    { label: 'Độ ẩm %', data: [], borderColor: '#06b6d4', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
+                    { label: 'Khí Gas PPM', data: [], borderColor: '#f59e0b', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
+                    { label: 'Khí CO2 PPM', data: [], borderColor: '#10b981', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
+                    { label: 'Bụi PM2.5 µg/m³', data: [], borderColor: '#ef4444', borderDash: [4, 4], fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 }
                 ]
             },
             options: {
@@ -526,14 +549,25 @@
         });
 
         // =========================================================
-        // 1. ĐỒNG BỘ DỮ LIỆU THỜI GIAN THỰC TỪ FIREBASE (/current)
+        // 1. NHẬN DỮ LIỆU TỨC THỜI TỪ FIREBASE (/current)
         // =========================================================
         database.ref('/current').on('value', (snapshot) => {
             const data = snapshot.val();
             if (!data) return;
 
-            document.getElementById('realtimeClock').innerText = data.time || "--/--/---- --:--:--";
-            
+            // Đồng bộ mốc thời gian RTC
+            if (data.time) {
+                document.getElementById('realtimeClock').innerText = data.time;
+                const parts = data.time.split(' ');
+                if (parts.length === 2) {
+                    const timeParts = parts[0].split(':');
+                    const dateParts = parts[1].split('/');
+                    if (timeParts.length === 3 && dateParts.length === 3) {
+                        currentClockDate = new Date(dateParts[2], dateParts[1] - 1, dateParts[0], timeParts[0], timeParts[1], timeParts[2]);
+                    }
+                }
+            }
+
             curSimTemp = parseFloat(data.temp || 0);
             curSimHum  = parseFloat(data.hum || 0);
             curSimGas  = parseInt(data.gas || 0);
@@ -557,15 +591,15 @@
             const envBadge = document.getElementById('envBadge');
             if (isCurrentDanger) {
                 envBadge.className = "badge badge-danger";
-                envBadge.innerText = "● CẢNH BÁO";
+                envBadge.innerText = "CẢNH BÁO";
                 document.getElementById('aqiDesc').innerText = "Đánh giá: CẢNH BÁO";
             } else {
                 envBadge.className = "badge badge-safe";
-                envBadge.innerText = "● TỐT";
+                envBadge.innerText = "TỐT";
                 document.getElementById('aqiDesc').innerText = "Đánh giá: TỐT";
             }
 
-            // Đồng bộ trạng thái quạt & loa từ phần cứng
+            // Cập nhật quạt & loa
             const btnFan = document.getElementById('btnFan');
             const fanText = document.getElementById('fanStatusText');
             if (data.fanState === 1) {
@@ -581,17 +615,17 @@
             const spkBadge = document.getElementById('speakerBadge');
             if (data.muteState === 1) {
                 spkBadge.className = "badge badge-spk-off";
-                spkBadge.innerText = "🔇 LOA BÁO ĐỘNG: ĐÃ TẮT";
+                spkBadge.innerText = "LOA BÁO ĐỘNG: ĐÃ TẮT";
                 isSpeakerMuted = true;
             } else {
                 spkBadge.className = "badge badge-spk-on";
-                spkBadge.innerText = "🔊 LOA BÁO ĐỘNG: ĐANG BẬT";
+                spkBadge.innerText = "LOA BÁO ĐỘNG: ĐANG BẬT";
                 isSpeakerMuted = false;
             }
         });
 
         // =========================================================
-        // 2. TẢI TOÀN BỘ LỊCH SỬ ĐÃ LƯU TRÊN FIREBASE CLOUD (/history)
+        // 2. NHẬN LỊCH SỬ TỪ FIREBASE (/history)
         // =========================================================
         database.ref('/history').limitToLast(200).on('value', (snapshot) => {
             logData = [];
@@ -632,7 +666,6 @@
                 logData.unshift(record);
             });
 
-            // Cập nhật KPI
             document.getElementById('kpiTotalIncidents').innerText = totalAlarm;
             document.getElementById('incTemp').innerText = iTemp;
             document.getElementById('incGas').innerText  = iGas;
@@ -654,9 +687,6 @@
             smartFilterTable();
         });
 
-        // =========================================================
-        // XỬ LÝ LỌC BẢNG LỊCH SỬ
-        // =========================================================
         function onTimeFilterChange() {
             const val = document.getElementById('timeRangeFilter').value;
             document.getElementById('datePicker').style.display = (val === 'custom') ? 'inline-block' : 'none';
@@ -715,9 +745,6 @@
             });
         }
 
-        // =========================================================
-        // XUẤT FILE BÁO CÁO CSV / EXCEL
-        // =========================================================
         function openExportModal() { document.getElementById('exportModal').style.display = 'flex'; }
         function closeExportModal() { document.getElementById('exportModal').style.display = 'none'; }
 
@@ -759,7 +786,7 @@
             csv += `THOI GIAN XUAT BAO CAO,${new Date().toLocaleString()}\n`;
             csv += "====================================================================\n\n";
 
-            csv += "--- SO NHAT KY CA TRUC (CLOUD) ---\n";
+            csv += "--- SO NHAT KY CA TRUC ---\n";
             csv += "STT,Thoi Gian Ghi,Nguoi Ghi Chu,Noi Dung Chi Tiet\n";
             if (cachedNoteList && cachedNoteList.length > 0) {
                 cachedNoteList.forEach((n, idx) => {
@@ -770,8 +797,8 @@
             }
             csv += "\n";
 
-            csv += "--- DU LIEU DO DAC MOI TRUONG (FIREBASE CLOUD) ---\n";
-            csv += "Thoi Gian,Nhiet Do (C),Do Am (%),Gas (PPM),CO2 (PPM),Bui PM2.5 (ug/m3),AQI,Trang Thai\n";
+            csv += "--- DU LIEU DO DAC MOI TRUONG ---\n";
+            csv += "Thoi Gian,Nhiet Do,Do Am,Gas,CO2,Bui PM2.5,AQI,Trang Thai\n";
             exportList.forEach(row => {
                 csv += `"${row.fullTime}",${row.curTemp},${row.curHum},${row.curGas},${row.curCo2},${row.curDust},${row.curAqi},"${row.statusText}"\n`;
             });
@@ -782,7 +809,7 @@
             link.download = `BaoCao_MoiTruong_${fileSuffix}.csv`;
             link.click();
 
-            showTopToast(`Đã xuất báo cáo thành công!`);
+            showTopToast("Đã xuất báo cáo thành công!");
         }
 
         function REPORT_NAME_FORMAT(str) {
