@@ -10,58 +10,122 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@2.0.0/dist/chartjs-plugin-streaming.min.js"></script>
 
+    <!-- Thư viện Google Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
         :root {
-            --primary: #0284c7; --primary-dark: #0369a1; --primary-bg: #e0f2fe;
-            --bg: #f8fafc; --card-bg: #ffffff; --text-main: #0f172a; --text-sub: #64748b;
-            --border: #e2e8f0; --safe: #10b981; --safe-bg: #ecfdf5;
-            --danger: #ef4444; --danger-bg: #fef2f2; --warn: #f59e0b; --warn-bg: #fef3c7;
-            --radius-main: 14px; --radius-sub: 10px;
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --primary-bg: #e0f2fe;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+            --safe: #10b981;
+            --safe-bg: #ecfdf5;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --warn: #f59e0b;
+            --warn-bg: #fef3c7;
+            --offline: #64748b;
+            --offline-bg: #f1f5f9;
+            --radius-main: 14px;
+            --radius-sub: 10px;
         }
+
         body.dark-mode {
-            --bg: #0b0f19; --card-bg: #151d2a; --text-main: #f8fafc; --text-sub: #94a3b8;
-            --border: #263346; --primary-bg: rgba(2, 132, 199, 0.15);
-            --safe-bg: rgba(16, 185, 129, 0.15); --danger-bg: rgba(239, 68, 68, 0.15); --warn-bg: rgba(245, 158, 11, 0.15);
+            --bg: #0b0f19;
+            --card-bg: #151d2a;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --border: #263346;
+            --primary-bg: rgba(2, 132, 199, 0.15);
+            --safe-bg: rgba(16, 185, 129, 0.15);
+            --danger-bg: rgba(239, 68, 68, 0.15);
+            --warn-bg: rgba(245, 158, 11, 0.15);
+            --offline-bg: rgba(148, 163, 184, 0.15);
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: var(--bg); color: var(--text-main); padding: 18px 14px; min-height: 100vh; }
         .container { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
         #toastContainer { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 99999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
         .toast { background: #0f172a; color: #fff; padding: 10px 22px; border-radius: 25px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.25); transform: translateY(-40px); opacity: 0; transition: all 0.3s; pointer-events: auto; }
         .toast.show { transform: translateY(0); opacity: 1; }
+
         .nav-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         .nav-tabs { display: flex; gap: 6px; background: rgba(0, 0, 0, 0.05); padding: 4px; border-radius: 25px; }
-        .nav-btn { background: transparent; border: none; padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; color: var(--text-sub); cursor: pointer; }
-        .nav-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        body.dark-mode .nav-tabs { background: rgba(255, 255, 255, 0.08); }
+        .nav-btn { background: var(--card-bg); border: none; padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; }
         .btn-theme { background: var(--card-bg); border: 1px solid var(--border); padding: 7px 15px; border-radius: 20px; font-weight: 700; font-size: 0.82rem; color: var(--text-main); cursor: pointer; }
+
         header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 16px 20px; border-radius: var(--radius-main); border: 1px solid var(--border); border-left: 5px solid var(--primary); flex-wrap: wrap; gap: 12px; }
         .header-title h1 { font-size: 1.2rem; font-weight: 800; }
         .manager-info { display: flex; gap: 14px; font-size: 0.8rem; color: var(--text-sub); margin-top: 3px; flex-wrap: wrap; }
         .realtime-clock { font-family: monospace; font-size: 0.95rem; font-weight: 700; color: var(--primary); background: var(--primary-bg); padding: 6px 14px; border-radius: 20px; }
+
+        .incident-banner { background: var(--card-bg); border: 1px solid var(--border); border-left: 5px solid #d97706; padding: 12px 18px; border-radius: var(--radius-main); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 0.88rem; }
         .status-banner { background: var(--card-bg); padding: 12px 18px; border-radius: var(--radius-main); border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        
         .badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
         .badge-safe { background: var(--safe-bg); color: var(--safe); }
         .badge-danger { background: var(--danger-bg); color: var(--danger); animation: pulse 1.2s infinite; }
-        .badge-offline { background: #f1f5f9; color: #64748b; }
-        .badge-spk-on { background: #f0fdf4; color: #166534; }
-        .badge-spk-off { background: #fef2f2; color: #991b1b; }
-        .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
-        .btn-action { background: var(--primary); color: #fff; border: none; padding: 7px 14px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
+        .badge-warn { background: var(--warn-bg); color: var(--warn); }
+        .badge-offline { background: var(--offline-bg); color: var(--offline); }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+        .kpi-card { background: var(--card-bg); border-radius: var(--radius-main); padding: 14px 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
+        .kpi-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); font-weight: 700; }
+        .kpi-value { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+
         .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
         .card { background: var(--card-bg); border-radius: var(--radius-main); padding: 14px 12px; text-align: center; border: 1px solid var(--border); }
         .card-title { font-size: 0.72rem; text-transform: uppercase; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; }
         .card-value { font-size: 1.6rem; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
         .unit { font-size: 0.78rem; color: var(--text-sub); font-weight: 500; }
+        .card-sub { font-size: 0.72rem; color: var(--text-sub); margin-top: 3px; }
+
         .module-box { background: var(--card-bg); padding: 18px 20px; border-radius: var(--radius-main); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
         .section-title { font-size: 0.92rem; font-weight: 800; }
+
+        .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; align-items: flex-end; }
+        .input-group { display: flex; flex-direction: column; gap: 4px; position: relative; }
+        .input-group label { font-size: 0.75rem; color: var(--text-sub); font-weight: 700; }
+        .input-group input, .input-group select { padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius-sub); font-size: 0.85rem; outline: none; background: var(--card-bg); color: var(--text-main); }
+        .btn-save { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: var(--radius-sub); font-weight: 700; cursor: pointer; height: 35px; font-size: 0.85rem; }
+
+        .filter-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .search-box input { padding: 7px 12px; border: 1px solid var(--border); border-radius: 20px; font-size: 0.82rem; outline: none; width: 240px; background: var(--card-bg); color: var(--text-main); }
+        .btn-export { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); padding: 7px 14px; border-radius: 20px; font-weight: 700; font-size: 0.82rem; cursor: pointer; }
+        .btn-clear-db { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); padding: 7px 12px; border-radius: 20px; font-weight: 700; font-size: 0.82rem; cursor: pointer; }
+
         .table-responsive { max-height: 350px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sub); }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.82rem; }
-        th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+        th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
         th { background: rgba(0,0,0,0.03); color: var(--text-sub); font-weight: 700; position: sticky; top: 0; }
-        .btn-export { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); padding: 7px 14px; border-radius: 20px; font-weight: 700; font-size: 0.82rem; cursor: pointer; }
+
+        /* KHU VỰC NHẬT KÝ CA TRỰC */
+        .note-input-row { display: grid; grid-template-columns: 220px 1fr 140px; gap: 10px; align-items: flex-end; }
+        @media (max-width: 768px) {
+            .note-input-row { grid-template-columns: 1fr; }
+        }
+        .note-list-container { max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sub); display: flex; flex-direction: column; }
+        .note-item { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
+        .note-item:last-child { border-bottom: none; }
+        .note-item:nth-child(odd) { background: rgba(0, 0, 0, 0.015); }
+        .note-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-sub); font-weight: 700; }
+        .note-text { font-size: 0.85rem; color: var(--text-main); line-height: 1.4; word-break: break-word; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.7); z-index: 99999; display: none; justify-content: center; align-items: center; padding: 15px; }
+        .modal-card { background: var(--card-bg); border-radius: var(--radius-main); padding: 22px; width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 14px; border: 1px solid var(--border); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .modal-header h3 { font-size: 1rem; font-weight: 800; }
+        .btn-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-sub); }
+
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
@@ -69,83 +133,198 @@
 
     <div id="toastContainer"></div>
 
+    <div id="exportModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>📥 Xuất Báo Cáo</h3>
+                <button class="btn-close" onclick="closeExportModal()">✕</button>
+            </div>
+            <div class="input-group">
+                <label>Phạm Vi Xuất Dữ Liệu</label>
+                <select id="exportScope" onchange="onExportScopeChange()">
+                    <option value="all">Toàn bộ lịch sử</option>
+                    <option value="date">Theo ngày cụ thể</option>
+                    <option value="month">Theo tháng / năm</option>
+                </select>
+            </div>
+            <div class="input-group" id="exportDateGroup" style="display:none;">
+                <label>Chọn Ngày</label>
+                <input type="date" id="exportDate">
+            </div>
+            <div class="input-group" id="exportMonthGroup" style="display:none;">
+                <label>Chọn Tháng</label>
+                <input type="month" id="exportMonth">
+            </div>
+            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
+                <button class="btn-export" onclick="closeExportModal()">HỦY</button>
+                <button class="btn-save" onclick="processExportCSV()">TẢI XUỐNG</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="nav-bar">
             <div class="nav-tabs">
-                <button class="nav-btn active">📊 Giám Sát Môi Trường Nhà Xưởng (Firebase Cloud)</button>
+                <button class="nav-btn">📊 Giám Sát Môi Trường Nhà Xưởng (Firebase Cloud)</button>
             </div>
             <button class="btn-theme" onclick="toggleDarkMode()">🌓 Giao Diện Đêm / Sáng</button>
         </div>
 
-        <header>
-            <div class="header-title">
-                <h1>HỆ THỐNG GIÁM SÁT MÔI TRƯỜNG NHÀ XƯỞNG</h1>
-                <div class="manager-info">
-                    <span>🏫 Trường: <strong>ĐH Công nghiệp TP.HCM (IUH)</strong></span>
-                    <span>👤 Quản lý: <strong>Nguyễn Trọng Phước</strong></span>
-                    <span>🌐 Trạng thái trạm: <strong id="stationStatusBadge" style="color:#10b981;">ĐANG KẾT NỐI...</strong></span>
+        <div id="pageDash" style="display:flex; flex-direction:column; gap:16px;">
+            <header>
+                <div class="header-title">
+                    <h1 id="headerProjectName">TRẠM ĐIỀU KHIỂN & ĐO ĐẠC NHÀ XƯỞNG</h1>
+                    <div class="manager-info">
+                        <span>🏫 Trường: <strong id="dispUniv">Trường ĐH Công nghiệp TP.HCM (IUH)</strong></span>
+                        <span>👤 Quản lý: <strong id="dispAuthor">Nguyễn Trọng Phước</strong></span>
+                        <span>📍 Vị trí: <strong id="dispLocation">Khu Nhà Xưởng - TP.HCM</strong></span>
+                        <span>🌐 Kết nối: <strong id="cloudStatus" style="color:#10b981;">ĐANG KẾT NỐI...</strong></span>
+                    </div>
+                </div>
+                <div id="realtimeClock" class="realtime-clock">--/--/---- --:--:--</div>
+            </header>
+
+            <div class="incident-banner">
+                <div>
+                    <strong>🔔 Sự Cố Gần Nhất:</strong> <span id="lastIncName" style="color:#d97706; font-weight:700;">Không có</span>
+                </div>
+                <div>
+                    Trạng Thái: <span id="lastIncStatus" class="badge badge-safe">TỐT</span>
+                </div>
+                <div>
+                    Thời Gian: <strong id="lastIncTime" style="font-family:monospace;">--:--:--</strong>
                 </div>
             </div>
-            <div id="realtimeClock" class="realtime-clock">--:--:-- --/--/----</div>
-        </header>
 
-        <div class="status-banner">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <span id="envBadge" class="badge badge-safe">● TỐT</span>
-                <span id="speakerBadge" class="badge badge-spk-on">🔊 LOA BÁO ĐỘNG: ĐANG BẬT</span>
-                <span id="fanBadge" class="badge" style="background:#f1f5f9; color:#475569;">💨 QUẠT HÚT: TỰ ĐỘNG (TẮT)</span>
+            <div class="status-banner">
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <span id="envBadge" class="badge badge-safe">● TỐT</span>
+                </div>
+                <div style="font-size:0.82rem; color:var(--text-sub); font-weight:700;">
+                    📡 Chu kỳ đồng bộ Cloud: <strong>5 giây/lần</strong>
+                </div>
             </div>
-            <div class="btn-group">
-                <button class="btn-action" id="btnFan" onclick="toggleFanCloud()">BẬT QUẠT TỪ XA</button>
-                <button class="btn-action" style="background:#ef4444;" id="btnMute" onclick="toggleMuteCloud()">TẮT LOA TẠM</button>
+
+            <div class="kpi-grid">
+                <div class="kpi-card" style="border-left: 4px solid #ef4444;">
+                    <div class="kpi-title">Tỉ Lệ Sự Cố / Ca Trực</div>
+                    <div class="kpi-value" style="color: #ef4444;"><span id="kpiIncidentRatio">0.00</span> /ca</div>
+                </div>
+                <div class="kpi-card" style="border-left: 4px solid #0284c7;">
+                    <div class="kpi-title">Tổng Số Lần Sự Cố Tích Lũy</div>
+                    <div class="kpi-value" style="color: #0284c7;"><span id="kpiTotalIncidents">0</span> lần</div>
+                </div>
+                <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
+                    <div class="kpi-title">Phân Loại Sự Cố</div>
+                    <div style="font-size:0.85rem; font-weight:700; margin-top:2px;">
+                        Nhiệt: <span id="incTemp" style="color:#ef4444;">0</span> | Gas: <span id="incGas" style="color:#ef4444;">0</span> | CO2: <span id="incCo2" style="color:#ef4444;">0</span> | Bụi: <span id="incDust" style="color:#ef4444;">0</span>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        <div class="grid-layout">
-            <div class="card"><div class="card-title">Nhiệt Độ</div><div class="card-value"><span id="temp">--</span><span class="unit">°C</span></div></div>
-            <div class="card"><div class="card-title">Độ Ẩm</div><div class="card-value"><span id="hum">--</span><span class="unit">%</span></div></div>
-            <div class="card"><div class="card-title">Khí Gas</div><div class="card-value"><span id="gas">--</span><span class="unit">PPM</span></div></div>
-            <div class="card"><div class="card-title">Khí CO2</div><div class="card-value"><span id="co2">--</span><span class="unit">PPM</span></div></div>
-            <div class="card"><div class="card-title">Bụi PM2.5</div><div class="card-value"><span id="dust">--</span><span class="unit">µg/m³</span></div></div>
-            <div class="card"><div class="card-title">Chỉ Số AQI</div><div class="card-value" style="color:var(--primary);"><span id="aqi">--</span></div></div>
-        </div>
-
-        <div class="module-box">
-            <div class="section-title">📈 BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC (CẬP NHẬT MỖI 5 GIÂY)</div>
-            <div style="position: relative; height: 260px; width: 100%;">
-                <canvas id="envChart"></canvas>
+            <div class="grid-layout">
+                <div class="card"><div class="card-title">Nhiệt Độ</div><div class="card-value"><span id="temp">--</span><span class="unit">°C</span></div><div class="card-sub">Min: <span id="minTemp">--</span> | Max: <span id="maxTemp">--</span></div></div>
+                <div class="card"><div class="card-title">Độ Ẩm</div><div class="card-value"><span id="hum">--</span><span class="unit">%</span></div><div class="card-sub">Độ ẩm tương đối</div></div>
+                <div class="card"><div class="card-title">Khí Gas</div><div class="card-value"><span id="gas">--</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetGas">180</span></div></div>
+                <div class="card"><div class="card-title">Khí CO2</div><div class="card-value"><span id="co2">--</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetCo2">900</span></div></div>
+                <div class="card"><div class="card-title">Bụi PM2.5</div><div class="card-value"><span id="dust">--</span><span class="unit">µg/m³</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetDust">150</span></div></div>
+                <div class="card"><div class="card-title">Chỉ Số AQI</div><div class="card-value" style="color:var(--primary);"><span id="aqi">--</span></div><div class="card-sub" id="aqiDesc">Đánh giá: ĐANG ĐỒNG BỘ</div></div>
             </div>
-        </div>
 
-        <div class="module-box">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="module-box">
+                <div class="section-title">📈 BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC (CLOUDFEED)</div>
+                <div style="position: relative; height: 260px; width: 100%;">
+                    <canvas id="envChart"></canvas>
+                </div>
+            </div>
+
+            <div class="module-box">
+                <div class="section-title">⚙️ THIẾT LẬP NGƯỠNG CẢNH BÁO</div>
+                <div class="settings-grid">
+                    <div class="input-group"><label>Ngưỡng Nhiệt Độ (°C)</label><input type="number" id="setTemp" step="0.5" value="38.0"></div>
+                    <div class="input-group"><label>Ngưỡng Khí CO2 (PPM)</label><input type="number" id="setCo2" value="900"></div>
+                    <div class="input-group"><label>Ngưỡng Bụi PM2.5 (µg/m³)</label><input type="number" id="setDust" value="150"></div>
+                    <div class="input-group"><label>Ngưỡng Khí Gas (PPM)</label><input type="number" id="setGas" value="180"></div>
+                    <button class="btn-save" onclick="saveThresholds()">ÁP DỤNG NGƯỠNG</button>
+                </div>
+            </div>
+
+            <div class="module-box">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div class="section-title">📝 SỔ NHẬT KÝ CA TRỰC</div>
+                    <button class="btn-clear-db" onclick="clearNoteLogs()">🗑️ Xóa Sổ Nhật Ký</button>
+                </div>
+                
+                <div class="note-input-row">
+                    <div class="input-group">
+                        <label>Người Ghi Chú</label>
+                        <input type="text" id="noteAuthor" maxlength="30" value="Nguyễn Trọng Phước" placeholder="Tên kỹ sư / người trực...">
+                    </div>
+                    <div class="input-group">
+                        <label>Nội Dung Ghi Chú</label>
+                        <input type="text" id="noteContent" maxlength="120" placeholder="Nhập diễn biến ca trực, kiểm tra thiết bị...">
+                    </div>
+                    <button class="btn-save" onclick="submitNewNote()">THÊM GHI CHÚ</button>
+                </div>
+
+                <div class="note-list-container" id="noteListContainer">
+                    <div style="padding:15px; text-align:center; color:var(--text-sub);">Đang tải nhật ký...</div>
+                </div>
+            </div>
+
+            <div class="module-box">
                 <div class="section-title">🗄️ LỊCH SỬ ĐO ĐẠC ĐƯỢC LƯU TRÊN FIREBASE CLOUD</div>
-                <button class="btn-export" onclick="exportCsv()">📥 Xuất Báo Cáo Excel (CSV)</button>
-            </div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr><th>Thời Gian</th><th>Nhiệt Độ (°C)</th><th>Độ Ẩm (%)</th><th>Khí Gas (PPM)</th><th>Khí CO2 (PPM)</th><th>Bụi PM2.5 (µg/m³)</th><th>AQI</th><th>Trạng Thái</th></tr>
-                    </thead>
-                    <tbody id="logTableBody"></tbody>
-                </table>
+                <div class="filter-controls">
+                    <select id="timeRangeFilter" onchange="onTimeFilterChange()">
+                        <option value="all">Tất cả lịch sử</option>
+                        <option value="5m">5 phút gần nhất</option>
+                        <option value="15m">15 phút gần nhất</option>
+                        <option value="1h">1 giờ gần nhất</option>
+                        <option value="custom">Chọn ngày cụ thể...</option>
+                    </select>
+                    <input type="date" id="datePicker" onchange="smartFilterTable()" style="display: none;">
+                    <div class="search-box"><input type="text" id="tableSearch" placeholder="Tìm kiếm mốc giờ, loại khí..." onkeyup="smartFilterTable()"></div>
+                    <button class="btn-export" onclick="openExportModal()">📥 Xuất Báo Cáo</button>
+                    <button class="btn-clear-db" onclick="clearDatabase()">🗑️ Xóa Bộ Nhớ Đo</button>
+                </div>
+                <div class="table-responsive">
+                    <table id="logTable">
+                        <thead>
+                            <tr><th>Thời Gian</th><th>Nhiệt Độ (°C)</th><th>Độ Ẩm (%)</th><th>Khí Gas (PPM)</th><th>Khí CO2 (PPM)</th><th>Bụi PM2.5 (µg/m³)</th><th>AQI</th><th>Trạng Thái</th></tr>
+                        </thead>
+                        <tbody id="logTableBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+        // =========================================================
+        // KẾT NỐI TỚI CƠ SỞ DỮ LIỆU GOOGLE FIREBASE CỦA BẠN
+        // =========================================================
         const firebaseConfig = {
             databaseURL: "https://giam-sat-moi-truong-nha-xuong-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        let curTemp = 0, curHum = 0, curGas = 0, curCo2 = 0, curDust = 0;
-        let isFanCloudForced = false;
-        let isMuteCloudForced = false;
-        let historyRecords = [];
+        let cfgTemp = 38.0, cfgCo2 = 900, cfgDust = 150, cfgGas = 180;
+        let minT = 99.0, maxT = 0.0;
+        let curSimTemp = 0.0, curSimHum = 0.0, curSimGas = 0, curSimCo2 = 0, curSimDust = 0;
         let lastReceivedTime = 0;
         let isDeviceOnline = false;
+
+        let projHeader = {
+            university: "Trường Đại học Công nghiệp TP.HCM (IUH)",
+            projectName: "Hệ Thống Giám Sát Môi Trường Nhà Xưởng",
+            author: "Nguyễn Trọng Phước",
+            location: "Khu Nhà Xưởng - TP.HCM",
+            systemTime: "--/--/---- --:--:--"
+        };
+
+        let cachedNoteList = [];
+        let logData = [];
 
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
 
@@ -159,20 +338,81 @@
             setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
-        function toggleFanCloud() {
-            if (!isDeviceOnline) { showTopToast("Trạm đang Offline, không thể điều khiển!"); return; }
-            isFanCloudForced = !isFanCloudForced;
-            database.ref('/controls/fanOverride').set(isFanCloudForced ? 1 : 0);
-            showTopToast(isFanCloudForced ? "Đã gửi lệnh BẬT quạt!" : "Đã chuyển quạt về TỰ ĐỘNG!");
+        function saveThresholds() {
+            cfgTemp = parseFloat(document.getElementById('setTemp').value);
+            cfgCo2  = parseFloat(document.getElementById('setCo2').value);
+            cfgDust = parseFloat(document.getElementById('setDust').value);
+            cfgGas  = parseFloat(document.getElementById('setGas').value);
+
+            document.getElementById('dispSetGas').innerText = cfgGas;
+            document.getElementById('dispSetCo2').innerText = cfgCo2;
+            document.getElementById('dispSetDust').innerText = cfgDust;
+            showTopToast("Đã áp dụng ngưỡng mới thành công!");
         }
 
-        function toggleMuteCloud() {
-            if (!isDeviceOnline) { showTopToast("Trạm đang Offline, không thể điều khiển!"); return; }
-            isMuteCloudForced = !isMuteCloudForced;
-            database.ref('/controls/muteAudio').set(isMuteCloudForced ? 1 : 0);
-            showTopToast(isMuteCloudForced ? "Đã tắt còi cảnh báo!" : "Đã mở lại còi!");
+        // =========================================================
+        // SỔ NHẬT KÝ CA TRỰC LƯU TRÊN FIREBASE (/notes)
+        // =========================================================
+        function submitNewNote() {
+            const author = document.getElementById('noteAuthor').value.trim();
+            const content = document.getElementById('noteContent').value.trim();
+            if (!content) {
+                showTopToast("Vui lòng nhập nội dung ghi chú!");
+                return;
+            }
+            const newNote = {
+                time: new Date().toLocaleString(),
+                author: author || "Nguyễn Trọng Phước",
+                content: content,
+                timestamp: Date.now()
+            };
+            database.ref('/notes').push(newNote).then(() => {
+                document.getElementById('noteContent').value = '';
+                showTopToast("Đã lưu ghi chú lên Cloud!");
+            }).catch(() => showTopToast("Lỗi khi lưu ghi chú!"));
         }
 
+        function renderNotesUI(list) {
+            const box = document.getElementById('noteListContainer');
+            box.innerHTML = '';
+            if (!list || list.length === 0) {
+                box.innerHTML = '<div style="padding:15px; text-align:center; color:var(--text-sub);">Chưa có ghi chú nào.</div>';
+                return;
+            }
+            list.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'note-item';
+                div.innerHTML = `
+                    <div class="note-meta">
+                        <span>👤 ${item.author}</span>
+                        <span>⏱️ ${item.time}</span>
+                    </div>
+                    <div class="note-text">${item.content}</div>
+                `;
+                box.appendChild(div);
+            });
+        }
+
+        function clearNoteLogs() {
+            if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ sổ nhật ký trên Cloud?")) return;
+            database.ref('/notes').remove().then(() => {
+                cachedNoteList = [];
+                renderNotesUI([]);
+                showTopToast("Đã xóa sạch sổ nhật ký trên Cloud!");
+            });
+        }
+
+        database.ref('/notes').on('value', (snapshot) => {
+            cachedNoteList = [];
+            snapshot.forEach(child => {
+                cachedNoteList.unshift(child.val());
+            });
+            renderNotesUI(cachedNoteList);
+        });
+
+        // =========================================================
+        // BIỂU ĐỒ REALTIME CHART.JS
+        // =========================================================
         const ctx = document.getElementById('envChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
@@ -196,71 +436,86 @@
                             onRefresh: function(chart) {
                                 if (isDeviceOnline) {
                                     const now = Date.now();
-                                    chart.data.datasets[0].data.push({ x: now, y: curTemp });
-                                    chart.data.datasets[1].data.push({ x: now, y: curHum });
-                                    chart.data.datasets[2].data.push({ x: now, y: curGas });
-                                    chart.data.datasets[3].data.push({ x: now, y: curCo2 });
-                                    chart.data.datasets[4].data.push({ x: now, y: curDust });
+                                    chart.data.datasets[0].data.push({ x: now, y: curSimTemp });
+                                    chart.data.datasets[1].data.push({ x: now, y: curSimHum });
+                                    chart.data.datasets[2].data.push({ x: now, y: curSimGas });
+                                    chart.data.datasets[3].data.push({ x: now, y: curSimCo2 });
+                                    chart.data.datasets[4].data.push({ x: now, y: curSimDust });
                                 }
                             }
                         },
                         grid: { display: false }
                     },
                     yTemp: { type: 'linear', position: 'left', suggestedMin: 20, suggestedMax: 100 },
-                    yGas: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, suggestedMin: 0, suggestedMax: 2000 }
+                    yGas: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, suggestedMin: 0, suggestedMax: 1200 }
                 }
             }
         });
 
-        // 1. Nhận dữ liệu Realtime
+        // =========================================================
+        // 1. NHẬN DỮ LIỆU REALTIME TỪ FIREBASE (/current)
+        // =========================================================
         database.ref('/current').on('value', (snapshot) => {
             const data = snapshot.val();
             if (!data) return;
 
             lastReceivedTime = Date.now();
             isDeviceOnline = true;
-            document.getElementById('stationStatusBadge').innerText = "ONLINE (5s)";
-            document.getElementById('stationStatusBadge').style.color = "#10b981";
+            document.getElementById('cloudStatus').innerText = "ONLINE (5s)";
+            document.getElementById('cloudStatus').style.color = "#10b981";
 
-            curTemp = parseFloat(data.temp || 0);
-            curHum  = parseFloat(data.hum || 0);
-            curGas  = parseInt(data.gas || 0);
-            curCo2  = parseInt(data.co2 || 0);
-            curDust = parseInt(data.dust || 0);
+            document.getElementById('realtimeClock').innerText = data.time || "--/--/---- --:--:--";
+            projHeader.systemTime = data.time || "";
+
+            curSimTemp = parseFloat(data.temp || 0);
+            curSimHum  = parseFloat(data.hum || 0);
+            curSimGas  = parseInt(data.gas || 0);
+            curSimCo2  = parseInt(data.co2 || 0);
+            curSimDust = parseInt(data.dust || 0);
             let curAqi = parseInt(data.aqi || 0);
 
-            document.getElementById('temp').innerText = curTemp.toFixed(1);
-            document.getElementById('hum').innerText  = curHum.toFixed(1);
-            document.getElementById('gas').innerText  = curGas;
-            document.getElementById('co2').innerText  = curCo2;
-            document.getElementById('dust').innerText = curDust;
+            document.getElementById('temp').innerText = curSimTemp.toFixed(1);
+            document.getElementById('hum').innerText  = curSimHum.toFixed(1);
+            document.getElementById('gas').innerText  = curSimGas;
+            document.getElementById('co2').innerText  = curSimCo2;
+            document.getElementById('dust').innerText = curSimDust;
             document.getElementById('aqi').innerText  = curAqi;
-            document.getElementById('realtimeClock').innerText = data.time || "--:--:--";
 
+            if (minT === 99.0 || curSimTemp < minT) minT = curSimTemp;
+            if (curSimTemp > maxT) maxT = curSimTemp;
+            document.getElementById('minTemp').innerText = minT.toFixed(1);
+            document.getElementById('maxTemp').innerText = maxT.toFixed(1);
+
+            let isCurrentDanger = (data.status === "CANH BAO" || curSimGas >= cfgGas || curSimCo2 >= cfgCo2 || curSimTemp >= cfgTemp || curSimDust >= cfgDust);
             const envBadge = document.getElementById('envBadge');
-            if (data.status === "CANH BAO") {
+            if (isCurrentDanger) {
                 envBadge.className = "badge badge-danger";
                 envBadge.innerText = "● CẢNH BÁO";
+                document.getElementById('aqiDesc').innerText = "Đánh giá: CẢNH BÁO";
             } else {
                 envBadge.className = "badge badge-safe";
                 envBadge.innerText = "● TỐT";
+                document.getElementById('aqiDesc').innerText = "Đánh giá: TỐT";
             }
         });
 
-        // Giám sát kết nối: Nếu quá 12 giây không có tin mới -> ESP32 bị mất điện hoặc mất WiFi
+        // =========================================================
+        // BỘ ĐẾM KIỂM SOÁT OFFLINE: NẾU QUÁ 12S KHÔNG NHẬN ĐƯỢC TIN
+        // =========================================================
         setInterval(() => {
             if (Date.now() - lastReceivedTime > 12000 && lastReceivedTime !== 0) {
                 isDeviceOnline = false;
-                document.getElementById('stationStatusBadge').innerText = "OFFLINE (MẤT KẾT NỐI)";
-                document.getElementById('stationStatusBadge').style.color = "#ef4444";
+                document.getElementById('cloudStatus').innerText = "OFFLINE (MẤT KẾT NỐI)";
+                document.getElementById('cloudStatus').style.color = "#ef4444";
 
-                // Đưa các thẻ thông số về trạng thái không có giá trị
+                // Đưa các thẻ thông số tức thời về trạng thái không có giá trị
                 document.getElementById('temp').innerText = "--";
                 document.getElementById('hum').innerText  = "--";
                 document.getElementById('gas').innerText  = "--";
                 document.getElementById('co2').innerText  = "--";
                 document.getElementById('dust').innerText = "--";
                 document.getElementById('aqi').innerText  = "--";
+                document.getElementById('aqiDesc').innerText = "Đánh giá: MẤT KẾT NỐI TRẠM";
 
                 const envBadge = document.getElementById('envBadge');
                 envBadge.className = "badge badge-offline";
@@ -268,53 +523,203 @@
             }
         }, 3000);
 
-        // 2. Lấy dữ liệu Lịch sử lưu trên Cloud (Không bao giờ bị xóa khi mất điện)
-        database.ref('/history').limitToLast(150).on('value', (snapshot) => {
-            historyRecords = [];
+        // =========================================================
+        // 2. LẤY TOÀN BỘ LỊCH SỬ LƯU TRÊN CLOUD (/history)
+        // =========================================================
+        database.ref('/history').limitToLast(200).on('value', (snapshot) => {
+            logData = [];
+            let totalAlarm = 0;
+            let iTemp = 0, iGas = 0, iCo2 = 0, iDust = 0;
+            let lastDangerName = "Không có";
+            let lastDangerTime = "--:--:--";
+            let lastDangerStatus = "TOT";
+
             snapshot.forEach((child) => {
-                historyRecords.unshift(child.val());
+                const item = child.val();
+                const record = {
+                    timestamp: child.key,
+                    fullTime: item.time || "",
+                    timeStr: (item.time && item.time.length >= 8) ? item.time.substring(0, 8) : "--:--:--",
+                    dateISO: new Date().toISOString().slice(0, 10),
+                    curTemp: parseFloat(item.temp || 0),
+                    curHum: parseFloat(item.hum || 0),
+                    curGas: parseInt(item.gas || 0),
+                    curCo2: parseInt(item.co2 || 0),
+                    curDust: parseInt(item.dust || 0),
+                    curAqi: parseInt(item.aqi || 0),
+                    statusText: item.status || "TOT",
+                    isDanger: (item.status === "CANH BAO")
+                };
+
+                if (record.isDanger) {
+                    totalAlarm++;
+                    if (record.curTemp >= cfgTemp) iTemp++;
+                    if (record.curGas >= cfgGas) iGas++;
+                    if (record.curCo2 >= cfgCo2) iCo2++;
+                    if (record.curDust >= cfgDust) iDust++;
+                    lastDangerName = "CẢNH BÁO MÔI TRƯỜNG";
+                    lastDangerTime = record.timeStr;
+                    lastDangerStatus = "CANH BAO";
+                }
+
+                logData.unshift(record);
             });
 
+            // Cập nhật KPI & Sự cố
+            document.getElementById('kpiTotalIncidents').innerText = totalAlarm;
+            document.getElementById('incTemp').innerText = iTemp;
+            document.getElementById('incGas').innerText  = iGas;
+            document.getElementById('incCo2').innerText  = iCo2;
+            document.getElementById('incDust').innerText = iDust;
+            document.getElementById('kpiIncidentRatio').innerText = (totalAlarm / 1.0).toFixed(2);
+
+            document.getElementById('lastIncName').innerText = lastDangerName;
+            document.getElementById('lastIncTime').innerText = lastDangerTime;
+            const stBadge = document.getElementById('lastIncStatus');
+            if (lastDangerStatus === "CANH BAO") {
+                stBadge.className = "badge badge-danger";
+                stBadge.innerText = "CẢNH BÁO";
+            } else {
+                stBadge.className = "badge badge-safe";
+                stBadge.innerText = "TỐT";
+            }
+
+            smartFilterTable();
+        });
+
+        // =========================================================
+        // XỬ LÝ LỌC BẢNG LỊCH SỬ
+        // =========================================================
+        function onTimeFilterChange() {
+            const val = document.getElementById('timeRangeFilter').value;
+            document.getElementById('datePicker').style.display = (val === 'custom') ? 'inline-block' : 'none';
+            smartFilterTable();
+        }
+
+        function renderTableRows(records) {
             const tbody = document.getElementById('logTableBody');
             tbody.innerHTML = '';
-            historyRecords.forEach((row) => {
+            if (!records || records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:15px; color:var(--text-sub);">Chưa có dữ liệu lịch sử nào trên Cloud.</td></tr>';
+                return;
+            }
+            records.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${row.time}</td>
-                    <td>${parseFloat(row.temp).toFixed(1)}</td>
-                    <td>${parseFloat(row.hum).toFixed(1)}</td>
-                    <td>${row.gas}</td>
-                    <td>${row.co2}</td>
-                    <td>${row.dust}</td>
-                    <td>${row.aqi}</td>
-                    <td><span class="badge ${row.status === 'CANH BAO' ? 'badge-danger' : 'badge-safe'}">${row.status}</span></td>
+                    <td>${row.fullTime}</td>
+                    <td>${row.curTemp.toFixed(1)}</td>
+                    <td>${row.curHum.toFixed(1)}</td>
+                    <td>${row.curGas}</td>
+                    <td>${row.curCo2}</td>
+                    <td>${row.curDust}</td>
+                    <td>${row.curAqi}</td>
+                    <td><span class="badge ${row.isDanger ? 'badge-danger' : 'badge-safe'}">${row.statusText}</span></td>
                 `;
                 tbody.appendChild(tr);
             });
-        });
+        }
 
-        function exportCsv() {
-            if (historyRecords.length === 0) {
-                showTopToast("Chưa có bản ghi lịch sử nào!");
+        function smartFilterTable() {
+            let input = document.getElementById('tableSearch').value.trim().toLowerCase();
+            const rangeVal = document.getElementById('timeRangeFilter').value;
+            const customDate = document.getElementById('datePicker').value;
+
+            let filtered = logData.filter(row => {
+                if (rangeVal === 'custom' && customDate) return row.dateISO === customDate;
+                return true;
+            });
+
+            if (input) {
+                filtered = filtered.filter(row => {
+                    let fullText = `${row.fullTime} ${row.timeStr} ${row.curTemp} ${row.curHum} ${row.curGas} ${row.curCo2} ${row.curDust} ${row.curAqi} ${row.statusText}`.toLowerCase();
+                    return fullText.indexOf(input) > -1;
+                });
+            }
+
+            renderTableRows(filtered.slice(0, 100));
+        }
+
+        function clearDatabase() {
+            if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử đo đạc trên Firebase Cloud?")) return;
+            database.ref('/history').remove().then(() => {
+                logData = [];
+                renderTableRows([]);
+                showTopToast("Đã xóa sạch bộ nhớ lịch sử trên Cloud!");
+            });
+        }
+
+        // =========================================================
+        // XUẤT FILE BÁO CÁO CSV / EXCEL
+        // =========================================================
+        function openExportModal() { document.getElementById('exportModal').style.display = 'flex'; }
+        function closeExportModal() { document.getElementById('exportModal').style.display = 'none'; }
+
+        function onExportScopeChange() {
+            const val = document.getElementById('exportScope').value;
+            document.getElementById('exportDateGroup').style.display = (val === 'date') ? 'flex' : 'none';
+            document.getElementById('exportMonthGroup').style.display = (val === 'month') ? 'flex' : 'none';
+        }
+
+        function processExportCSV() {
+            if (logData.length === 0 && cachedNoteList.length === 0) {
+                showTopToast("Chưa có dữ liệu trên Cloud để xuất!");
                 return;
             }
-            let csv = "====================================================================\n";
-            csv += "HE THONG GIAM SAT MOI TRUONG NHA XUONG CONG NGHIEP\n";
-            csv += "Truong Dai hoc Cong nghiep TP.HCM (IUH) - SV: Nguyen Trong Phuoc\n";
-            csv += `Thoi gian xuat file: ${new Date().toLocaleString()}\n`;
-            csv += "====================================================================\n\n";
-            csv += "Thoi Gian,Nhiet Do (C),Do Am (%),Gas (PPM),CO2 (PPM),Bui PM2.5 (ug/m3),AQI,Trang Thai\n";
+            const scope = document.getElementById('exportScope').value;
+            const targetDate = document.getElementById('exportDate').value;
+            const targetMonth = document.getElementById('exportMonth').value;
 
-            historyRecords.forEach(r => {
-                csv += `"${r.time}",${r.temp},${r.hum},${r.gas},${r.co2},${r.dust},${r.aqi},"${r.status}"\n`;
+            let exportList = logData;
+            let fileSuffix = "All";
+
+            if (scope === 'date') {
+                if (!targetDate) { showTopToast("Vui lòng chọn ngày!"); return; }
+                exportList = logData.filter(r => r.dateISO === targetDate);
+                fileSuffix = targetDate;
+            } else if (scope === 'month') {
+                if (!targetMonth) { showTopToast("Vui lòng chọn tháng!"); return; }
+                exportList = logData.filter(r => r.dateISO && r.dateISO.startsWith(targetMonth));
+                fileSuffix = targetMonth;
+            }
+
+            closeExportModal();
+
+            let csv = "====================================================================\n";
+            csv += `TEN TRUONG,${REPORT_NAME_FORMAT(projHeader.university)}\n`;
+            csv += `DE TAI / DU AN,${REPORT_NAME_FORMAT(projHeader.projectName)}\n`;
+            csv += `NGUOI THUC HIEN,${REPORT_NAME_FORMAT(projHeader.author)}\n`;
+            csv += `VI TRI LAP DAT,${REPORT_NAME_FORMAT(projHeader.location)}\n`;
+            csv += `THOI GIAN XUAT BAO CAO,${new Date().toLocaleString()}\n`;
+            csv += "====================================================================\n\n";
+
+            csv += "--- SO NHAT KY CA TRUC (CLOUD) ---\n";
+            csv += "STT,Thoi Gian Ghi,Nguoi Ghi Chu,Noi Dung Chi Tiet\n";
+            if (cachedNoteList && cachedNoteList.length > 0) {
+                cachedNoteList.forEach((n, idx) => {
+                    csv += `${idx + 1},"${n.time}","${n.author}","${n.content.replace(/"/g, '""')}"\n`;
+                });
+            } else {
+                csv += "1,--,--,Khong co ghi chu nao\n";
+            }
+            csv += "\n";
+
+            csv += "--- DU LIEU DO DAC MOI TRUONG (FIREBASE CLOUD) ---\n";
+            csv += "Thoi Gian,Nhiet Do (C),Do Am (%),Gas (PPM),CO2 (PPM),Bui PM2.5 (ug/m3),AQI,Trang Thai\n";
+            exportList.forEach(row => {
+                csv += `"${row.fullTime}",${row.curTemp},${row.curHum},${row.curGas},${row.curCo2},${row.curDust},${row.curAqi},"${row.statusText}"\n`;
             });
 
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `BaoCao_LichSu_${Date.now()}.csv`;
+            link.download = `BaoCao_MoiTruong_${fileSuffix}.csv`;
             link.click();
-            showTopToast("Đã tải xuống file báo cáo thành công!");
+
+            showTopToast(`Đã xuất báo cáo thành công!`);
+        }
+
+        function REPORT_NAME_FORMAT(str) {
+            return `"${(str || '').replace(/"/g, '""')}"`;
         }
     </script>
 </body>
