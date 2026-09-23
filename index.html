@@ -19,7 +19,6 @@
             --bg: #f8fafc; --card-bg: #ffffff; --text-main: #0f172a; --text-sub: #64748b;
             --border: #e2e8f0; --safe: #10b981; --safe-bg: #ecfdf5;
             --danger: #ef4444; --danger-bg: #fef2f2; --warn: #f59e0b; --warn-bg: #fef3c7;
-            --offline: #64748b; --offline-bg: #f1f5f9;
             --radius-main: 14px; --radius-sub: 10px;
         }
 
@@ -27,7 +26,6 @@
             --bg: #0b0f19; --card-bg: #151d2a; --text-main: #f8fafc; --text-sub: #94a3b8;
             --border: #263346; --primary-bg: rgba(2, 132, 199, 0.15);
             --safe-bg: rgba(16, 185, 129, 0.15); --danger-bg: rgba(239, 68, 68, 0.15); --warn-bg: rgba(245, 158, 11, 0.15);
-            --offline-bg: rgba(148, 163, 184, 0.15);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
@@ -38,32 +36,8 @@
         .toast { background: #0f172a; color: #fff; padding: 10px 22px; border-radius: 25px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.25); transform: translateY(-40px); opacity: 0; transition: all 0.3s; pointer-events: auto; }
         .toast.show { transform: translateY(0); opacity: 1; }
 
-        #disconnectOverlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(15, 23, 42, 0.65); z-index: 999998;
-            display: none; justify-content: center; align-items: center; padding: 20px;
-        }
-        .disconnect-card {
-            background: var(--card-bg); border-radius: var(--radius-main);
-            border: 2px solid var(--danger); padding: 26px 32px; max-width: 440px; width: 100%;
-            box-shadow: 0 20px 40px rgba(239, 68, 68, 0.3); text-align: center;
-            animation: alertPulse 1.4s infinite;
-        }
-        .disconnect-card h2 {
-            font-size: 1.25rem; font-weight: 800; color: var(--danger); margin-bottom: 8px; letter-spacing: 0.5px;
-        }
-        .disconnect-card p {
-            font-size: 0.88rem; color: var(--text-sub); line-height: 1.5; margin-bottom: 18px;
-        }
-        .btn-dismiss {
-            background: var(--danger); color: #fff; border: none; padding: 8px 26px;
-            border-radius: 20px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
-        }
-
         .nav-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .nav-tabs { display: flex; gap: 6px; background: rgba(0, 0, 0, 0.05); padding: 4px; border-radius: 25px; }
-        body.dark-mode .nav-tabs { background: rgba(255, 255, 255, 0.08); }
-        .nav-btn { background: var(--card-bg); border: none; padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; }
+        .nav-btn { background: var(--card-bg); border: none; padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .btn-theme { background: var(--card-bg); border: 1px solid var(--border); padding: 7px 15px; border-radius: 20px; font-weight: 700; font-size: 0.82rem; color: var(--text-main); cursor: pointer; }
 
         header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 16px 20px; border-radius: var(--radius-main); border: 1px solid var(--border); border-left: 5px solid var(--primary); flex-wrap: wrap; gap: 12px; }
@@ -78,7 +52,6 @@
         .badge-safe { background: var(--safe-bg); color: var(--safe); }
         .badge-danger { background: var(--danger-bg); color: var(--danger); animation: pulse 1.2s infinite; }
         .badge-warn { background: var(--warn-bg); color: var(--warn); }
-        .badge-offline { background: var(--offline-bg); color: var(--offline); }
 
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
         .kpi-card { background: var(--card-bg); border-radius: var(--radius-main); padding: 14px 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
@@ -127,20 +100,11 @@
         .btn-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-sub); }
 
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        @keyframes alertPulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.5); } 50% { transform: scale(1.02); box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
 </head>
 <body>
 
     <div id="toastContainer"></div>
-
-    <div id="disconnectOverlay">
-        <div class="disconnect-card">
-            <h2>MẤT KẾT NỐI MÁY CHỦ</h2>
-            <p>Trạm đo hiện đang mất tín hiệu kết nối. Các tính năng cập nhật tạm thời bị khóa cho đến khi có mạng trở lại.</p>
-            <button class="btn-dismiss" onclick="dismissDisconnectAlert()">ĐÓNG</button>
-        </div>
-    </div>
 
     <div id="exportModal" class="modal-overlay">
         <div class="modal-card">
@@ -169,9 +133,7 @@
 
     <div class="container">
         <div class="nav-bar">
-            <div class="nav-tabs">
-                <button class="nav-btn">Giám Sát Môi Trường Nhà Xưởng</button>
-            </div>
+            <div class="nav-btn">Giám Sát Môi Trường Nhà Xưởng</div>
             <button class="btn-theme" onclick="toggleDarkMode()">Giao Diện Đêm / Sáng</button>
         </div>
 
@@ -183,7 +145,7 @@
                         <span>Trường: <strong id="dispUniv">Trường Đại học Công nghiệp TP.HCM</strong></span>
                         <span>Quản lý: <strong id="dispAuthor">Nguyễn Trọng Phước</strong></span>
                         <span>Vị trí: <strong id="dispLocation">Khu Nhà Xưởng - TP.HCM</strong></span>
-                        <span>Trạng thái: <strong id="cloudStatus" style="color:#64748b;">ĐANG KẾT NỐI...</strong></span>
+                        <span>Trạng thái: <strong id="cloudStatus" style="color:#10b981;">TRỰC TUYẾN</strong></span>
                     </div>
                 </div>
                 <div id="realtimeClock" class="realtime-clock">--:--:-- --/--/----</div>
@@ -203,7 +165,7 @@
 
             <div class="status-banner">
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <span id="envBadge" class="badge badge-offline">ĐANG KẾT NỐI</span>
+                    <span id="envBadge" class="badge badge-safe">TỐT</span>
                 </div>
                 <div style="font-size:0.82rem; color:var(--text-sub); font-weight:700;">
                     Chu kỳ đồng bộ: <strong>5 giây</strong>
@@ -228,12 +190,12 @@
             </div>
 
             <div class="grid-layout">
-                <div class="card"><div class="card-title">Nhiệt Độ</div><div class="card-value"><span id="temp">--</span><span class="unit">°C</span></div><div class="card-sub">Min: <span id="minTemp">--</span> | Max: <span id="maxTemp">--</span></div></div>
-                <div class="card"><div class="card-title">Độ Ẩm</div><div class="card-value"><span id="hum">--</span><span class="unit">%</span></div><div class="card-sub">Độ ẩm tương đối</div></div>
-                <div class="card"><div class="card-title">Khí Gas</div><div class="card-value"><span id="gas">--</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetGas">180</span></div></div>
-                <div class="card"><div class="card-title">Khí CO2</div><div class="card-value"><span id="co2">--</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetCo2">900</span></div></div>
-                <div class="card"><div class="card-title">Bụi PM2.5</div><div class="card-value"><span id="dust">--</span><span class="unit">µg/m³</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetDust">150</span></div></div>
-                <div class="card"><div class="card-title">Chỉ Số AQI</div><div class="card-value" style="color:var(--primary);"><span id="aqi">--</span></div><div class="card-sub" id="aqiDesc">Đang kết nối</div></div>
+                <div class="card"><div class="card-title">Nhiệt Độ</div><div class="card-value"><span id="temp">0.0</span><span class="unit">°C</span></div><div class="card-sub">Min: <span id="minTemp">--</span> | Max: <span id="maxTemp">--</span></div></div>
+                <div class="card"><div class="card-title">Độ Ẩm</div><div class="card-value"><span id="hum">0.0</span><span class="unit">%</span></div><div class="card-sub">Độ ẩm tương đối</div></div>
+                <div class="card"><div class="card-title">Khí Gas</div><div class="card-value"><span id="gas">0</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetGas">180</span></div></div>
+                <div class="card"><div class="card-title">Khí CO2</div><div class="card-value"><span id="co2">0</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetCo2">900</span></div></div>
+                <div class="card"><div class="card-title">Bụi PM2.5</div><div class="card-value"><span id="dust">0</span><span class="unit">µg/m³</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetDust">150</span></div></div>
+                <div class="card"><div class="card-title">Chỉ Số AQI</div><div class="card-value" style="color:var(--primary);"><span id="aqi">0</span></div><div class="card-sub" id="aqiDesc">Chất lượng tốt</div></div>
             </div>
 
             <div class="module-box">
@@ -312,23 +274,11 @@
         let cfgTemp = 38.0, cfgCo2 = 900, cfgDust = 150, cfgGas = 180;
         let minT = 99.0, maxT = 0.0;
         let curSimTemp = 0.0, curSimHum = 0.0, curSimGas = 0, curSimCo2 = 0, curSimDust = 0;
-        let lastReceivedLocalTime = 0;
-        let lastHbCounter = -1;
-        let isDeviceOnline = false;
-        let isAlertDismissed = false;
 
         let cachedNoteList = [];
         let logData = [];
 
         function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
-
-        // Đồng hồ thời gian thực độc lập
-        setInterval(() => {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('vi-VN');
-            const dateStr = now.toLocaleDateString('vi-VN');
-            document.getElementById('realtimeClock').innerText = `${timeStr}${dateStr}`;
-        }, 1000);
 
         function showTopToast(message) {
             const container = document.getElementById('toastContainer');
@@ -340,23 +290,7 @@
             setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
         }
 
-        function dismissDisconnectAlert() {
-            document.getElementById('disconnectOverlay').style.display = 'none';
-            isAlertDismissed = true;
-        }
-
-        function triggerDisconnectAlert() {
-            if (!isAlertDismissed) {
-                document.getElementById('disconnectOverlay').style.display = 'flex';
-            }
-        }
-
         function saveThresholds() {
-            if (!isDeviceOnline) {
-                showTopToast("Không thể áp dụng. Trạm đo đang mất kết nối máy chủ");
-                triggerDisconnectAlert();
-                return;
-            }
             cfgTemp = parseFloat(document.getElementById('setTemp').value);
             cfgCo2  = parseFloat(document.getElementById('setCo2').value);
             cfgDust = parseFloat(document.getElementById('setDust').value);
@@ -369,11 +303,6 @@
         }
 
         function submitNewNote() {
-            if (!isDeviceOnline) {
-                showTopToast("Không thể thêm ghi chú. Trạm đo đang mất kết nối máy chủ");
-                triggerDisconnectAlert();
-                return;
-            }
             const author = document.getElementById('noteAuthor').value.trim();
             const content = document.getElementById('noteContent').value.trim();
             if (!content) { showTopToast("Vui lòng nhập nội dung ghi chú"); return; }
@@ -411,11 +340,6 @@
         }
 
         function clearNoteLogs() {
-            if (!isDeviceOnline) {
-                showTopToast("Không thể xóa. Trạm đo đang mất kết nối máy chủ");
-                triggerDisconnectAlert();
-                return;
-            }
             if (!confirm("Xác nhận xóa toàn bộ sổ nhật ký?")) return;
             database.ref('/notes').remove().then(() => {
                 cachedNoteList = [];
@@ -453,14 +377,12 @@
                         realtime: {
                             duration: 60000, refresh: 5000, delay: 2000,
                             onRefresh: function(chart) {
-                                if (isDeviceOnline) {
-                                    const now = Date.now();
-                                    chart.data.datasets[0].data.push({ x: now, y: curSimTemp });
-                                    chart.data.datasets[1].data.push({ x: now, y: curSimHum });
-                                    chart.data.datasets[2].data.push({ x: now, y: curSimGas });
-                                    chart.data.datasets[3].data.push({ x: now, y: curSimCo2 });
-                                    chart.data.datasets[4].data.push({ x: now, y: curSimDust });
-                                }
+                                const now = Date.now();
+                                chart.data.datasets[0].data.push({ x: now, y: curSimTemp });
+                                chart.data.datasets[1].data.push({ x: now, y: curSimHum });
+                                chart.data.datasets[2].data.push({ x: now, y: curSimGas });
+                                chart.data.datasets[3].data.push({ x: now, y: curSimCo2 });
+                                chart.data.datasets[4].data.push({ x: now, y: curSimDust });
                             }
                         },
                         grid: { display: false }
@@ -471,22 +393,16 @@
             }
         });
 
-        // 1. Nhận dữ liệu Realtime
+        // 1. NHẬN DỮ LIỆU REALTIME TỪ FIREBASE
         database.ref('/current').on('value', (snapshot) => {
             const data = snapshot.val();
             if (!data) return;
 
-            const curHb = (data.heartbeat !== undefined) ? data.heartbeat : 0;
-            if (curHb !== lastHbCounter) {
-                lastHbCounter = curHb;
-                lastReceivedLocalTime = Date.now();
-                isDeviceOnline = true;
-                isAlertDismissed = false;
-                document.getElementById('disconnectOverlay').style.display = 'none';
+            document.getElementById('cloudStatus').innerText = "TRỰC TUYẾN";
+            document.getElementById('cloudStatus').style.color = "#10b981";
 
-                document.getElementById('cloudStatus').innerText = "TRỰC TUYẾN";
-                document.getElementById('cloudStatus').style.color = "#10b981";
-            }
+            // Hiển thị thời gian cập nhật lần cuối từ trạm đo gửi lên
+            document.getElementById('realtimeClock').innerText = data.time || "--:--:-- --/--/----";
 
             curSimTemp = parseFloat(data.temp || 0);
             curSimHum  = parseFloat(data.hum || 0);
@@ -495,60 +411,32 @@
             curSimDust = parseInt(data.dust || 0);
             let curAqi = parseInt(data.aqi || 0);
 
-            if (isDeviceOnline) {
-                document.getElementById('temp').innerText = curSimTemp.toFixed(1);
-                document.getElementById('hum').innerText  = curSimHum.toFixed(1);
-                document.getElementById('gas').innerText  = curSimGas;
-                document.getElementById('co2').innerText  = curSimCo2;
-                document.getElementById('dust').innerText = curSimDust;
-                document.getElementById('aqi').innerText  = curAqi;
+            document.getElementById('temp').innerText = curSimTemp.toFixed(1);
+            document.getElementById('hum').innerText  = curSimHum.toFixed(1);
+            document.getElementById('gas').innerText  = curSimGas;
+            document.getElementById('co2').innerText  = curSimCo2;
+            document.getElementById('dust').innerText = curSimDust;
+            document.getElementById('aqi').innerText  = curAqi;
 
-                if (minT === 99.0 || curSimTemp < minT) minT = curSimTemp;
-                if (curSimTemp > maxT) maxT = curSimTemp;
-                document.getElementById('minTemp').innerText = minT.toFixed(1);
-                document.getElementById('maxTemp').innerText = maxT.toFixed(1);
+            if (minT === 99.0 || curSimTemp < minT) minT = curSimTemp;
+            if (curSimTemp > maxT) maxT = curSimTemp;
+            document.getElementById('minTemp').innerText = minT.toFixed(1);
+            document.getElementById('maxTemp').innerText = maxT.toFixed(1);
 
-                let isCurrentDanger = (data.status === "CANH BAO");
-                const envBadge = document.getElementById('envBadge');
-                if (isCurrentDanger) {
-                    envBadge.className = "badge badge-danger";
-                    envBadge.innerText = `CẢNH BÁO: ${data.incType || 'SỰ CỐ'}`;
-                    document.getElementById('aqiDesc').innerText = `Cảnh báo ${data.incType || ''}`;
-                } else {
-                    envBadge.className = "badge badge-safe";
-                    envBadge.innerText = "TỐT";
-                    document.getElementById('aqiDesc').innerText = "Chất lượng tốt";
-                }
+            let isCurrentDanger = (data.status === "CANH BAO");
+            const envBadge = document.getElementById('envBadge');
+            if (isCurrentDanger) {
+                envBadge.className = "badge badge-danger";
+                envBadge.innerText = `CẢNH BÁO: ${data.incType || 'SỰ CỐ'}`;
+                document.getElementById('aqiDesc').innerText = `Cảnh báo ${data.incType || ''}`;
+            } else {
+                envBadge.className = "badge badge-safe";
+                envBadge.innerText = "TỐT";
+                document.getElementById('aqiDesc').innerText = "Chất lượng tốt";
             }
         });
 
-        function setStationOffline() {
-            isDeviceOnline = false;
-            document.getElementById('cloudStatus').innerText = "MẤT KẾT NỐI";
-            document.getElementById('cloudStatus').style.color = "#ef4444";
-
-            document.getElementById('temp').innerText = "--";
-            document.getElementById('hum').innerText  = "--";
-            document.getElementById('gas').innerText  = "--";
-            document.getElementById('co2').innerText  = "--";
-            document.getElementById('dust').innerText = "--";
-            document.getElementById('aqi').innerText  = "--";
-            document.getElementById('aqiDesc').innerText = "Mất tín hiệu trạm";
-
-            const envBadge = document.getElementById('envBadge');
-            envBadge.className = "badge badge-offline";
-            envBadge.innerText = "MẤT TÍN HIỆU";
-
-            triggerDisconnectAlert();
-        }
-
-        setInterval(() => {
-            if (Date.now() - lastReceivedLocalTime > 15000) {
-                setStationOffline();
-            }
-        }, 3000);
-
-        // 2. Nhận dữ liệu Lịch sử và tự động tính theo ngày
+        // 2. NHẬN DỮ LIỆU LỊCH SỬ VÀ RESET THEO NGÀY
         database.ref('/history').limitToLast(300).on('value', (snapshot) => {
             logData = [];
             const todayStr = new Date().toISOString().slice(0, 10);
@@ -673,12 +561,7 @@
         }
 
         function clearDatabase() {
-            if (!isDeviceOnline) {
-                showTopToast("Không thể xóa lịch sử. Trạm đo đang mất kết nối máy chủ");
-                triggerDisconnectAlert();
-                return;
-            }
-            if (!confirm("Xác nhận xóa toàn bộ lịch sử đo đạc?")) return;
+            if (!confirm("Xác nhận xóa toàn bộ lịch sử đo đạc trên Cloud?")) return;
             database.ref('/history').remove().then(() => {
                 logData = [];
                 renderTableRows([]);
@@ -686,14 +569,7 @@
             });
         }
 
-        function openExportModal() {
-            if (!isDeviceOnline && logData.length === 0) {
-                showTopToast("Không thể xuất báo cáo. Chưa có dữ liệu lịch sử");
-                triggerDisconnectAlert();
-                return;
-            }
-            document.getElementById('exportModal').style.display = 'flex';
-        }
+        function openExportModal() { document.getElementById('exportModal').style.display = 'flex'; }
         function closeExportModal() { document.getElementById('exportModal').style.display = 'none'; }
 
         function onExportScopeChange() {
