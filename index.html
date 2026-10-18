@@ -113,6 +113,11 @@
         .nav-item:hover, .nav-item.active { background: var(--primary-bg); color: var(--primary); }
         .nav-item i { font-size: 1.05rem; width: 20px; text-align: center; }
 
+        /* Quản lý các Tab Giao diện SPA */
+        .app-page { display: none; }
+        .app-page.active { display: flex; flex-direction: column; gap: 20px; animation: fadeIn 0.25s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
         /* Toast Notification */
         #toastContainer { position: fixed; top: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast { 
@@ -130,9 +135,7 @@
             align-items: center;
             gap: 12px;
             border-left: 4px solid var(--primary);
-            border-top: 1px solid var(--border);
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
+            border: 1px solid var(--border);
         }
         .toast.show { transform: translateX(0); }
 
@@ -313,14 +316,14 @@
         .btn-clear-db { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); padding: 9px 16px; border-radius: 30px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
         .btn-clear-db:hover { background: var(--danger); color: #fff; }
 
-        .table-responsive { max-height: 380px; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-main); }
+        .table-responsive { max-height: 420px; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-main); }
         table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; font-size: 0.85rem; min-width: 700px; }
         th, td { padding: 11px 16px; border-bottom: 1px solid var(--border); }
         th { background: var(--bg); color: var(--text-sub); font-weight: 800; position: sticky; top: 0; z-index: 10; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px; }
         tr:last-child td { border-bottom: none; }
 
         .note-input-row { display: grid; grid-template-columns: 220px 1fr 150px; gap: 12px; align-items: flex-end; }
-        .note-list-container { max-height: 260px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-main); display: flex; flex-direction: column; }
+        .note-list-container { max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-main); display: flex; flex-direction: column; }
         .note-item { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; transition: background 0.15s; }
         .note-item:last-child { border-bottom: none; }
         .note-item:hover { background: var(--primary-bg); }
@@ -386,7 +389,7 @@
     </div>
 
     <div class="app-layout">
-        <!-- Sidebar Drawer cho Di Động và PC -->
+        <!-- Sidebar Navigation Drawer -->
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
         <aside class="sidebar" id="sidebar">
             <div>
@@ -399,10 +402,10 @@
                 </div>
 
                 <nav class="nav-menu">
-                    <a class="nav-item active" onclick="closeSidebar()"><i class="fa-solid fa-chart-line"></i> Dashboard Giám Sát</a>
-                    <a class="nav-item" onclick="closeSidebar()"><i class="fa-solid fa-sliders"></i> Cấu Hình Ngưỡng</a>
-                    <a class="nav-item" onclick="closeSidebar()"><i class="fa-solid fa-book-bookmark"></i> Nhật Ký Ca Trực</a>
-                    <a class="nav-item" onclick="closeSidebar()"><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử Đo Đạc</a>
+                    <a class="nav-item active" onclick="switchTab('view-dashboard', this)"><i class="fa-solid fa-chart-line"></i> Dashboard Giám Sát</a>
+                    <a class="nav-item" onclick="switchTab('view-settings', this)"><i class="fa-solid fa-sliders"></i> Cấu Hình Ngưỡng</a>
+                    <a class="nav-item" onclick="switchTab('view-notes', this)"><i class="fa-solid fa-book-bookmark"></i> Nhật Ký Ca Trực</a>
+                    <a class="nav-item" onclick="switchTab('view-history', this)"><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử Đo Đạc</a>
                 </nav>
             </div>
 
@@ -414,6 +417,7 @@
         </aside>
 
         <main class="main-wrapper">
+            <!-- Top Bar Header Dùng Chung -->
             <div class="top-bar">
                 <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
                 <header>
@@ -429,173 +433,184 @@
                 </header>
             </div>
 
-            <div class="incident-banner">
-                <div>
-                    <i class="fa-solid fa-triangle-exclamation" style="color:#d97706; margin-right:6px;"></i>
-                    <strong>Sự Cố Gần Nhất:</strong> <span id="lastIncName" style="color:#d97706; font-weight:700;">Không có</span>
+            <!-- TAB 1: DASHBOARD GIÁM SÁT THỜI GIAN THỰC -->
+            <section id="view-dashboard" class="app-page active">
+                <div class="incident-banner">
+                    <div>
+                        <i class="fa-solid fa-triangle-exclamation" style="color:#d97706; margin-right:6px;"></i>
+                        <strong>Sự Cố Gần Nhất:</strong> <span id="lastIncName" style="color:#d97706; font-weight:700;">Không có</span>
+                    </div>
+                    <div>
+                        Trạng Thái: <span id="lastIncStatus" class="badge badge-safe">AN TOÀN</span>
+                    </div>
+                    <div>
+                        Thời Gian: <strong id="lastIncTime" class="tech-data">--:--:--</strong>
+                    </div>
                 </div>
-                <div>
-                    Trạng Thái: <span id="lastIncStatus" class="badge badge-safe">AN TOÀN</span>
-                </div>
-                <div>
-                    Thời Gian: <strong id="lastIncTime" class="tech-data">--:--:--</strong>
-                </div>
-            </div>
 
-            <div class="status-banner">
-                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                    <span id="envBadge" class="badge badge-safe"><i class="fa-solid fa-shield-halved"></i> AN TOÀN</span>
-                    <span id="speakerBadge" class="badge badge-spk-on"><i class="fa-solid fa-volume-high"></i> LOA BÁO ĐỘNG: ĐANG BẬT</span>
-                    
-                    <!-- Quạt Hút Công Nghiệp Visual Widget -->
-                    <div class="fan-widget-container">
-                        <div class="fan-icon-box stopped" id="fanIconBox">
-                            <i class="fa-solid fa-fan"></i>
+                <div class="status-banner">
+                    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                        <span id="envBadge" class="badge badge-safe"><i class="fa-solid fa-shield-halved"></i> AN TOÀN</span>
+                        <span id="speakerBadge" class="badge badge-spk-on"><i class="fa-solid fa-volume-high"></i> LOA BÁO ĐỘNG: ĐANG BẬT</span>
+                        
+                        <!-- Quạt Hút Công Nghiệp Visual Widget -->
+                        <div class="fan-widget-container">
+                            <div class="fan-icon-box stopped" id="fanIconBox">
+                                <i class="fa-solid fa-fan"></i>
+                            </div>
+                            <span id="fanBadge" style="font-size:0.82rem; font-weight:700; color:var(--text-sub);">QUẠT HÚT: TỰ ĐỘNG (TẮT)</span>
                         </div>
-                        <span id="fanBadge" style="font-size:0.82rem; font-weight:700; color:var(--text-sub);">QUẠT HÚT: TỰ ĐỘNG (TẮT)</span>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn-action btn-ack" onclick="ackAlert()"><i class="fa-solid fa-check-double"></i> XÁC NHẬN SỰ CỐ</button>
+                        <button class="btn-action btn-emergency" onclick="triggerEmergency()"><i class="fa-solid fa-bell"></i> BÁO ĐỘNG KHẨN</button>
+                        <button class="btn-action btn-mute" onclick="triggerMute()"><i class="fa-solid fa-volume-xmark"></i> TẮT LOA TẠM</button>
+                        <button class="btn-action btn-unmute" onclick="triggerUnmute()"><i class="fa-solid fa-volume-high"></i> BẬT LOA</button>
                     </div>
                 </div>
 
-                <div class="btn-group">
-                    <button class="btn-action btn-ack" onclick="ackAlert()"><i class="fa-solid fa-check-double"></i> XÁC NHẬN SỰ CỐ</button>
-                    <button class="btn-action btn-emergency" onclick="triggerEmergency()"><i class="fa-solid fa-bell"></i> BÁO ĐỘNG KHẨN</button>
-                    <button class="btn-action btn-mute" onclick="triggerMute()"><i class="fa-solid fa-volume-xmark"></i> TẮT LOA TẠM</button>
-                    <button class="btn-action btn-unmute" onclick="triggerUnmute()"><i class="fa-solid fa-volume-high"></i> BẬT LOA</button>
-                </div>
-            </div>
-
-            <div class="kpi-grid">
-                <div class="kpi-card" style="border-left: 5px solid #ef4444;">
-                    <div class="kpi-title"><i class="fa-solid fa-chart-pie" style="color:#ef4444;"></i> Tỉ Lệ Sự Cố / Ca Trực</div>
-                    <div class="kpi-value" style="color: #ef4444;"><span id="kpiIncidentRatio">0.00</span> /ca</div>
-                </div>
-                <div class="kpi-card" style="border-left: 5px solid #0284c7;">
-                    <div class="kpi-title"><i class="fa-solid fa-cubes-stacked" style="color:#0284c7;"></i> Tổng Số Lần Sự Cố Tích Lũy</div>
-                    <div class="kpi-value" style="color: #0284c7;"><span id="kpiTotalIncidents">0</span> lần</div>
-                </div>
-                <div class="kpi-card" style="border-left: 5px solid #f59e0b;">
-                    <div class="kpi-title"><i class="fa-solid fa-list-check" style="color:#f59e0b;"></i> Phân Loại Sự Cố</div>
-                    <div style="font-size:0.88rem; font-weight:700; margin-top:4px;" class="tech-data">
-                        Nhiệt: <span id="incTemp" style="color:#ef4444;">0</span> | Gas: <span id="incGas" style="color:#ef4444;">0</span> | CO2: <span id="incCo2" style="color:#ef4444;">0</span> | Bụi: <span id="incDust" style="color:#ef4444;">0</span>
+                <div class="kpi-grid">
+                    <div class="kpi-card" style="border-left: 5px solid #ef4444;">
+                        <div class="kpi-title"><i class="fa-solid fa-chart-pie" style="color:#ef4444;"></i> Tỉ Lệ Sự Cố / Ca Trực</div>
+                        <div class="kpi-value" style="color: #ef4444;"><span id="kpiIncidentRatio">0.00</span> /ca</div>
+                    </div>
+                    <div class="kpi-card" style="border-left: 5px solid #0284c7;">
+                        <div class="kpi-title"><i class="fa-solid fa-cubes-stacked" style="color:#0284c7;"></i> Tổng Số Lần Sự Cố Tích Lũy</div>
+                        <div class="kpi-value" style="color: #0284c7;"><span id="kpiTotalIncidents">0</span> lần</div>
+                    </div>
+                    <div class="kpi-card" style="border-left: 5px solid #f59e0b;">
+                        <div class="kpi-title"><i class="fa-solid fa-list-check" style="color:#f59e0b;"></i> Phân Loại Sự Cố</div>
+                        <div style="font-size:0.88rem; font-weight:700; margin-top:4px;" class="tech-data">
+                            Nhiệt: <span id="incTemp" style="color:#ef4444;">0</span> | Gas: <span id="incGas" style="color:#ef4444;">0</span> | CO2: <span id="incCo2" style="color:#ef4444;">0</span> | Bụi: <span id="incDust" style="color:#ef4444;">0</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="grid-layout">
-                <div class="card">
-                    <div class="card-title"><i class="fa-solid fa-temperature-three-quarters" style="color:#0284c7;"></i> Nhiệt Độ</div>
-                    <div class="card-value"><span id="temp">0.0</span><span class="unit">°C</span></div>
-                    <div class="card-sub">Min: <span id="minTemp">--</span> | Max: <span id="maxTemp">--</span></div>
-                </div>
-                <div class="card">
-                    <div class="card-title"><i class="fa-solid fa-droplet" style="color:#06b6d4;"></i> Độ Ẩm</div>
-                    <div class="card-value"><span id="hum">0.0</span><span class="unit">%RH</span></div>
-                    <div class="card-sub">Độ ẩm tương đối</div>
-                </div>
-                <div class="card">
-                    <div class="card-title"><i class="fa-solid fa-gas-pump" style="color:#f59e0b;"></i> Khí Gas</div>
-                    <div class="card-value"><span id="gas">0</span><span class="unit">PPM</span></div>
-                    <div class="card-sub">Ngưỡng: &lt;<span id="dispSetGas">180</span></div>
-                </div>
-                <div class="card">
-                    <div class="card-title"><i class="fa-solid fa-smog" style="color:#10b981;"></i> Khí CO2</div>
-                    <div class="card-value"><span id="co2">0</span><span class="unit">PPM</span></div>
-                    <div class="card-sub">Ngưỡng: &lt;<span id="dispSetCo2">900</span></div>
-                </div>
-                <div class="card">
-                    <div class="card-title"><i class="fa-solid fa-wind" style="color:#ef4444;"></i> Bụi PM2.5</div>
-                    <div class="card-value"><span id="dust">0</span><span class="unit">µg/m³</span></div>
-                    <div class="card-sub">Ngưỡng: &lt;<span id="dispSetDust">150</span></div>
-                </div>
-                <div class="card">
-                    <div class="card-title"><i class="fa-solid fa-heart-pulse" style="color:#8b5cf6;"></i> Chỉ Số AQI</div>
-                    <div class="card-value" style="color:var(--primary);"><span id="aqi">0</span></div>
-                    <div class="card-sub" id="aqiDesc">Đánh giá: TỐT</div>
-                </div>
-            </div>
-
-            <!-- Biểu Đồ Thời Gian Thực Nâng Cấp -->
-            <div class="module-box">
-                <div class="section-title"><i class="fa-solid fa-chart-line"></i> BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC (DỮ LIỆU TỪ ESP32)</div>
-                <div style="position: relative; height: 300px; width: 100%;">
-                    <canvas id="envChart"></canvas>
-                </div>
-            </div>
-
-            <div class="module-box">
-                <div class="section-title"><i class="fa-solid fa-sliders"></i> THIẾT LẬP NGƯỠNG CẢNH BÁO TỪ XA</div>
-                <div class="settings-grid">
-                    <div class="input-group"><label>Ngưỡng Nhiệt Độ °C</label><input type="number" id="setTemp" step="0.5" value="38.0"></div>
-                    <div class="input-group"><label>Ngưỡng Khí CO2 PPM</label><input type="number" id="setCo2" value="900"></div>
-                    <div class="input-group"><label>Ngưỡng Bụi PM2.5 µg/m³</label><input type="number" id="setDust" value="150"></div>
-                    <div class="input-group"><label>Ngưỡng Khí Gas PPM</label><input type="number" id="setGas" value="180"></div>
-                    <button class="btn-save" onclick="saveThresholds()"><i class="fa-solid fa-floppy-disk"></i> ÁP DỤNG NGƯỠNG</button>
-                </div>
-            </div>
-
-            <div class="module-box">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-                    <div class="section-title"><i class="fa-solid fa-book"></i> SỔ NHẬT KÝ CA TRỰC NHÀ XƯỞNG</div>
-                    <button class="btn-clear-db" onclick="clearNoteLogs()"><i class="fa-solid fa-trash-can"></i> Xóa Nhật Ký</button>
-                </div>
-                
-                <div class="note-input-row">
-                    <div class="input-group">
-                        <label>Người Ghi Chú</label>
-                        <input type="text" id="noteAuthor" maxlength="30" value="Nguyễn Trọng Phước" placeholder="Tên kỹ sư ca trực...">
+                <div class="grid-layout">
+                    <div class="card">
+                        <div class="card-title"><i class="fa-solid fa-temperature-three-quarters" style="color:#0284c7;"></i> Nhiệt Độ</div>
+                        <div class="card-value"><span id="temp">0.0</span><span class="unit">°C</span></div>
+                        <div class="card-sub">Min: <span id="minTemp">--</span> | Max: <span id="maxTemp">--</span></div>
                     </div>
-                    <div class="input-group">
-                        <label>Nội Dung Ghi Chú</label>
-                        <input type="text" id="noteContent" maxlength="120" placeholder="Nhập diễn biến ca trực, kiểm tra thiết bị...">
+                    <div class="card">
+                        <div class="card-title"><i class="fa-solid fa-droplet" style="color:#06b6d4;"></i> Độ Ẩm</div>
+                        <div class="card-value"><span id="hum">0.0</span><span class="unit">%RH</span></div>
+                        <div class="card-sub">Độ ẩm tương đối</div>
                     </div>
-                    <button class="btn-save" onclick="submitNewNote()"><i class="fa-solid fa-plus"></i> THÊM GHI CHÚ</button>
+                    <div class="card">
+                        <div class="card-title"><i class="fa-solid fa-gas-pump" style="color:#f59e0b;"></i> Khí Gas</div>
+                        <div class="card-value"><span id="gas">0</span><span class="unit">PPM</span></div>
+                        <div class="card-sub">Ngưỡng: &lt;<span id="dispSetGas">180</span></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title"><i class="fa-solid fa-smog" style="color:#10b981;"></i> Khí CO2</div>
+                        <div class="card-value"><span id="co2">0</span><span class="unit">PPM</span></div>
+                        <div class="card-sub">Ngưỡng: &lt;<span id="dispSetCo2">900</span></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title"><i class="fa-solid fa-wind" style="color:#ef4444;"></i> Bụi PM2.5</div>
+                        <div class="card-value"><span id="dust">0</span><span class="unit">µg/m³</span></div>
+                        <div class="card-sub">Ngưỡng: &lt;<span id="dispSetDust">150</span></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title"><i class="fa-solid fa-heart-pulse" style="color:#8b5cf6;"></i> Chỉ Số AQI</div>
+                        <div class="card-value" style="color:var(--primary);"><span id="aqi">0</span></div>
+                        <div class="card-sub" id="aqiDesc">Đánh giá: TỐT</div>
+                    </div>
                 </div>
 
-                <div class="note-list-container" id="noteListContainer">
-                    <div style="padding:15px; text-align:center; color:var(--text-sub);">Đang tải nhật ký...</div>
+                <div class="module-box">
+                    <div class="section-title"><i class="fa-solid fa-chart-line"></i> BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC (DỮ LIỆU TỪ ESP32)</div>
+                    <div style="position: relative; height: 320px; width: 100%;">
+                        <canvas id="envChart"></canvas>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="module-box">
-                <div class="section-title"><i class="fa-solid fa-database"></i> LỊCH SỬ ĐO ĐẠC CLOUD</div>
-                <div class="filter-controls">
-                    <select id="timeRangeFilter" onchange="onTimeFilterChange()" style="padding:9px 14px; border-radius:30px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); font-size:0.85rem;">
-                        <option value="all">Tất cả lịch sử</option>
-                        <option value="custom">Chọn ngày cụ thể...</option>
-                    </select>
-                    <input type="date" id="datePicker" onchange="smartFilterTable()" style="display: none; padding:9px 14px; border-radius:30px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); font-size:0.85rem;">
-                    
-                    <div class="search-box">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="tableSearch" placeholder="Tìm kiếm mốc giờ, loại khí..." onkeyup="smartFilterTable()">
+            <!-- TAB 2: CẤU HÌNH NGƯỠNG CẢNH BÁO -->
+            <section id="view-settings" class="app-page">
+                <div class="module-box">
+                    <div class="section-title"><i class="fa-solid fa-sliders"></i> THIẾT LẬP NGƯỠNG CẢNH BÁO TỪ XA</div>
+                    <div class="settings-grid">
+                        <div class="input-group"><label>Ngưỡng Nhiệt Độ °C</label><input type="number" id="setTemp" step="0.5" value="38.0"></div>
+                        <div class="input-group"><label>Ngưỡng Khí CO2 PPM</label><input type="number" id="setCo2" value="900"></div>
+                        <div class="input-group"><label>Ngưỡng Bụi PM2.5 µg/m³</label><input type="number" id="setDust" value="150"></div>
+                        <div class="input-group"><label>Ngưỡng Khí Gas PPM</label><input type="number" id="setGas" value="180"></div>
+                        <button class="btn-save" onclick="saveThresholds()"><i class="fa-solid fa-floppy-disk"></i> ÁP DỤNG NGƯỠNG</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: NHẬT KÝ CA TRỰC -->
+            <section id="view-notes" class="app-page">
+                <div class="module-box">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div class="section-title"><i class="fa-solid fa-book"></i> SỔ NHẬT KÝ CA TRỰC NHÀ XƯỞNG</div>
+                        <button class="btn-clear-db" onclick="clearNoteLogs()"><i class="fa-solid fa-trash-can"></i> Xóa Nhật Ký</button>
                     </div>
                     
-                    <button class="btn-export" onclick="openExportModal()"><i class="fa-solid fa-file-export"></i> Xuất Báo Cáo</button>
-                    <button class="btn-clear-db" onclick="clearDatabase()"><i class="fa-solid fa-trash-can"></i> Xóa Lịch Sử</button>
-                </div>
+                    <div class="note-input-row">
+                        <div class="input-group">
+                            <label>Người Ghi Chú</label>
+                            <input type="text" id="noteAuthor" maxlength="30" value="Nguyễn Trọng Phước" placeholder="Tên kỹ sư ca trực...">
+                        </div>
+                        <div class="input-group">
+                            <label>Nội Dung Ghi Chú</label>
+                            <input type="text" id="noteContent" maxlength="120" placeholder="Nhập diễn biến ca trực, kiểm tra thiết bị...">
+                        </div>
+                        <button class="btn-save" onclick="submitNewNote()"><i class="fa-solid fa-plus"></i> THÊM GHI CHÚ</button>
+                    </div>
 
-                <div class="table-responsive">
-                    <table id="logTable">
-                        <thead>
-                            <tr>
-                                <th>Thời Gian</th>
-                                <th>Nhiệt Độ °C</th>
-                                <th>Độ Ẩm %</th>
-                                <th>Khí Gas PPM</th>
-                                <th>Khí CO2 PPM</th>
-                                <th>Bụi PM2.5 µg/m³</th>
-                                <th>AQI</th>
-                                <th>Trạng Thái</th>
-                            </tr>
-                        </thead>
-                        <tbody id="logTableBody"></tbody>
-                    </table>
+                    <div class="note-list-container" id="noteListContainer">
+                        <div style="padding:15px; text-align:center; color:var(--text-sub);">Đang tải nhật ký...</div>
+                    </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- TAB 4: LỊCH SỬ ĐO ĐẠC CLOUD -->
+            <section id="view-history" class="app-page">
+                <div class="module-box">
+                    <div class="section-title"><i class="fa-solid fa-database"></i> LỊCH SỬ ĐO ĐẠC CLOUD</div>
+                    <div class="filter-controls">
+                        <select id="timeRangeFilter" onchange="onTimeFilterChange()" style="padding:9px 14px; border-radius:30px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); font-size:0.85rem;">
+                            <option value="all">Tất cả lịch sử</option>
+                            <option value="custom">Chọn ngày cụ thể...</option>
+                        </select>
+                        <input type="date" id="datePicker" onchange="smartFilterTable()" style="display: none; padding:9px 14px; border-radius:30px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); font-size:0.85rem;">
+                        
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="tableSearch" placeholder="Tìm kiếm mốc giờ, loại khí..." onkeyup="smartFilterTable()">
+                        </div>
+                        
+                        <button class="btn-export" onclick="openExportModal()"><i class="fa-solid fa-file-export"></i> Xuất Báo Cáo</button>
+                        <button class="btn-clear-db" onclick="clearDatabase()"><i class="fa-solid fa-trash-can"></i> Xóa Lịch Sử</button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="logTable">
+                            <thead>
+                                <tr>
+                                    <th>Thời Gian</th>
+                                    <th>Nhiệt Độ °C</th>
+                                    <th>Độ Ẩm %</th>
+                                    <th>Khí Gas PPM</th>
+                                    <th>Khí CO2 PPM</th>
+                                    <th>Bụi PM2.5 µg/m³</th>
+                                    <th>AQI</th>
+                                    <th>Trạng Thái</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
-    <!-- LOGIC FIREBASE & ĐỒNG BỘ DỮ LIỆU THỜI GIAN THỰC -->
+    <!-- SCRIPT CHUYỂN TAB VÀ ĐỒNG BỘ FIREBASE TỰ ĐỘNG -->
     <script>
         const firebaseConfig = {
             databaseURL: "https://giam-sat-moi-truong-nha-xuong-default-rtdb.asia-southeast1.firebasedatabase.app"
@@ -618,6 +633,23 @@
         let cachedNoteList = [];
         let logData = [];
         let currentClockDate = null;
+
+        // Hàm Chuyển Tab Giao Diện Chuyên Nghiệp
+        function switchTab(pageId, navElement) {
+            document.querySelectorAll('.app-page').forEach(page => page.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) targetPage.classList.add('active');
+            if (navElement) navElement.classList.add('active');
+
+            closeSidebar();
+
+            // Căn chỉnh lại kích thước biểu đồ khi quay lại Dashboard
+            if (pageId === 'view-dashboard' && typeof chart !== 'undefined') {
+                setTimeout(() => chart.resize(), 50);
+            }
+        }
 
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
@@ -691,7 +723,7 @@
             document.getElementById('envBadge').className = "badge badge-danger";
             document.getElementById('envBadge').innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> CẢNH BÁO KHẨN`;
             document.getElementById('aqiDesc').innerText = "Đánh giá: BÁO ĐỘNG KHẨN CẤP TỪ XA";
-            showTopToast("ĐÃ KÍCH HOẠT BÁO ĐỘNG KHẨN CẤP!");
+            showTopToast("ĐẤ KÍCH HOẠT BÁO ĐỘNG KHẨN CẤP!");
         }
 
         function ackAlert() {
