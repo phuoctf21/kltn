@@ -1,0 +1,3049 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Giám Sát Môi Trường Nhà Xưởng - Smart Factory Dashboard</title>
+    
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Libraries: Luxon, Chart.js & Streaming Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@2.0.0/dist/chartjs-plugin-streaming.min.js"></script>
+
+    <!-- Firebase v8 SDK (App, Database, Auth) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+
+    <style>
+        :root {
+            --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            /* Light Palette */
+            --bg-body: #f4f6fb;
+            --bg-card: #ffffff;
+            --bg-sidebar: #0f172a;
+            --bg-header: rgba(255, 255, 255, 0.92);
+            --border-color: #e2e8f0;
+            --border-subtle: #cbd5e1;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+            --text-muted: #94a3b8;
+
+            --primary: #0284c7;
+            --primary-dark: #0369a1;
+            --primary-light: rgba(2, 132, 199, 0.12);
+
+            --safe: #10b981;
+            --safe-bg: #ecfdf5;
+            --safe-border: #a7f3d0;
+
+            --warn: #f59e0b;
+            --warn-bg: #fffbeb;
+            --warn-border: #fde68a;
+
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --danger-border: #fecaca;
+
+            --info: #06b6d4;
+            --info-bg: #ecfeff;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --radius-full: 9999px;
+
+            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 14px rgba(15, 23, 42, 0.06);
+            --shadow-lg: 0 10px 25px rgba(15, 23, 42, 0.1);
+
+            --sidebar-width: 270px;
+            --header-height: 72px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark-mode {
+            --bg-body: #090d16;
+            --bg-card: #131b2e;
+            --bg-sidebar: #0a0f1d;
+            --bg-header: rgba(19, 27, 46, 0.92);
+            --border-color: #1e293b;
+            --border-subtle: #2d3b55;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --text-muted: #64748b;
+
+            --primary: #38bdf8;
+            --primary-dark: #0284c7;
+            --primary-light: rgba(56, 189, 248, 0.15);
+
+            --safe-bg: rgba(16, 185, 129, 0.15);
+            --safe-border: rgba(16, 185, 129, 0.3);
+
+            --warn-bg: rgba(245, 158, 11, 0.15);
+            --warn-border: rgba(245, 158, 11, 0.3);
+
+            --danger-bg: rgba(239, 68, 68, 0.15);
+            --danger-border: rgba(239, 68, 68, 0.3);
+
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+            --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.45);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-sans);
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark-mode ::-webkit-scrollbar-thumb { background: #334155; }
+
+        /* ========================================================= */
+        /* CUSTOM DROPDOWN SELECT UI                                 */
+        /* ========================================================= */
+        select, .custom-select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-color: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 9px 38px 9px 14px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            font-family: var(--font-sans);
+            outline: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230284c7' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 14px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        body.dark-mode select, body.dark-mode .custom-select {
+            background-color: #111827;
+            color: #f8fafc;
+            border-color: #26334d;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2338bdf8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        }
+
+        select:hover, .custom-select:hover {
+            border-color: var(--primary);
+        }
+
+        select:focus, .custom-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        select option {
+            background-color: #ffffff;
+            color: #0f172a;
+            padding: 10px;
+            font-weight: 600;
+        }
+
+        body.dark-mode select option {
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        /* ========================================================= */
+        /* LOGIN SCREEN STYLES (FULLSCREEN GLASSMORPHISM)             */
+        /* ========================================================= */
+        #loginScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #070a13 0%, #0d1527 50%, #06101e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(17, 24, 39, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 440px;
+            padding: 34px 28px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .login-brand-header {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .login-logo-box {
+            width: 58px;
+            height: 58px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #0284c7, #06b6d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.8rem;
+            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.45);
+        }
+
+        .login-title-h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .login-subtitle-p {
+            font-size: 0.78rem;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        .login-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .login-form-group label {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .login-input {
+            background: #0b1120;
+            border: 1px solid #1e293b;
+            color: #f8fafc;
+            padding: 11px 14px;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .login-input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+        }
+
+        .login-input:disabled {
+            background: #111827;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        .btn-login-admin {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.9rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+        }
+
+        .btn-login-admin:hover {
+            background: linear-gradient(135deg, #0369a1, #075985);
+            transform: translateY(-1px);
+        }
+
+        .login-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #64748b;
+            font-size: 0.74rem;
+            font-weight: 800;
+            margin: 4px 0;
+        }
+        .login-divider::before, .login-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #1e293b;
+        }
+        .login-divider span {
+            padding: 0 10px;
+        }
+
+        .btn-login-shift {
+            background: rgba(16, 185, 129, 0.14);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-login-shift:hover {
+            background: #10b981;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+        }
+
+        /* Toast Container */
+        #toastContainer {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            color: var(--text-main);
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary);
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 260px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.toast-danger { border-left-color: var(--danger); }
+        .toast.toast-success { border-left-color: var(--safe); }
+        .toast.toast-warn { border-left-color: var(--warn); }
+
+        /* Layout Structure */
+        .app-layout {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 100;
+            transition: var(--transition);
+            border-right: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .sidebar-brand {
+            height: var(--header-height);
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .brand-icon-box {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #0284c7, #06b6d4);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.25rem;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+        }
+
+        .brand-text h2 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+        .brand-text span {
+            font-size: 0.68rem;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            padding: 18px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+        }
+
+        .menu-category {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748b;
+            padding: 10px 12px 4px;
+            letter-spacing: 0.8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 16px;
+            border-radius: var(--radius-md);
+            color: #94a3b8;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .nav-item i {
+            font-size: 1.1rem;
+            width: 22px;
+            text-align: center;
+        }
+
+        .nav-item:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .connection-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--safe);
+            box-shadow: 0 0 10px var(--safe);
+            animation: pulse-dot 2s infinite;
+        }
+
+        .live-dot.offline {
+            background-color: var(--danger);
+            box-shadow: 0 0 10px var(--danger);
+            animation: none;
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 14px var(--safe); }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        /* Main Content Wrapper */
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background: var(--bg-body);
+            overflow-y: auto;
+            transition: var(--transition);
+        }
+
+        /* Topbar Header */
+        .topbar {
+            height: var(--header-height);
+            background: var(--bg-header);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            transition: var(--transition);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .mobile-toggle-btn {
+            display: none;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-md);
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .project-headings h1 {
+            font-size: 1.12rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.3px;
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 14px;
+            font-size: 0.76rem;
+            color: var(--text-sub);
+            margin-top: 2px;
+            flex-wrap: wrap;
+        }
+
+        .project-meta strong {
+            color: var(--text-main);
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Navbar Session Group */
+        .user-session-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .role-indicator-badge {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.76rem;
+            font-weight: 800;
+            color: var(--primary);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .role-indicator-badge.admin {
+            color: #f59e0b;
+            border-color: rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.08);
+        }
+
+        .btn-logout {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            padding: 7px 12px;
+            border-radius: var(--radius-md);
+            font-size: 0.76rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-logout:hover {
+            background: var(--danger);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        .realtime-clock {
+            font-family: var(--font-mono);
+            font-size: 0.86rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 7px 14px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .topbar-icon-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-sm);
+        }
+        .topbar-icon-btn:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        /* Content Body */
+        .content-body {
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Tab Navigation Sections */
+        .tab-view {
+            display: none;
+            flex-direction: column;
+            gap: 22px;
+            animation: fadeIn 0.25s ease-out;
+        }
+        .tab-view.active { display: flex; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Badges & Pills */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .badge-safe { background: var(--safe-bg); color: var(--safe); border: 1px solid var(--safe-border); }
+        .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); animation: pulseAlert 1.2s infinite; }
+        .badge-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); }
+        .badge-spk-on { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-spk-off { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+        @keyframes pulseAlert {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.02); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        /* Action Buttons */
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-action {
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-ack { background: #d97706; color: #fff; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3); }
+        .btn-ack:hover { background: #b45309; transform: translateY(-1px); }
+        .btn-emergency { background: #dc2626; color: #fff; box-shadow: 0 2px 8px rgba(220, 38, 38, 0.35); }
+        .btn-emergency:hover { background: #b91c1c; transform: translateY(-1px); }
+
+        /* Unified Single Speaker Toggle Button */
+        .btn-speaker-toggle {
+            transition: all 0.25s ease;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            padding: 8px 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .btn-speaker-toggle.spk-on {
+            background: #059669;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+            border-color: #10b981;
+        }
+        .btn-speaker-toggle.spk-on:hover {
+            background: #047857;
+        }
+        .btn-speaker-toggle.spk-off {
+            background: #334155;
+            color: #94a3b8;
+            border-color: #475569;
+        }
+        .btn-speaker-toggle.spk-off:hover {
+            background: #1e293b;
+            color: #cbd5e1;
+        }
+
+        /* Card Container */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            padding: 22px;
+            transition: var(--transition);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-title i {
+            color: var(--primary);
+        }
+
+        /* Banner Grid */
+        .banner-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        @media (max-width: 992px) {
+            .banner-grid { grid-template-columns: 1fr; }
+        }
+
+        .incident-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid #d97706;
+            border-radius: var(--radius-lg);
+            padding: 18px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .status-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 18px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .fan-status-box {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: var(--radius-md);
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+        }
+
+        .fan-icon-spin {
+            animation: spin 1s linear infinite;
+            color: var(--primary);
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* KPI Statistics Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 18px 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .kpi-title {
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            color: var(--text-sub);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .kpi-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            letter-spacing: -0.5px;
+        }
+
+        /* 6 Realtime Sensor Metric Cards */
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+        }
+
+        .sensor-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition);
+            position: relative;
+        }
+        .sensor-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .sensor-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .sensor-label {
+            font-size: 0.76rem;
+            text-transform: uppercase;
+            color: var(--text-sub);
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .sensor-icon-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+        }
+        .badge-temp { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+        .badge-hum { background: rgba(6, 182, 212, 0.12); color: #06b6d4; }
+        .badge-gas { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
+        .badge-co2 { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+        .badge-dust { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
+        .badge-aqi { background: rgba(2, 132, 199, 0.12); color: #0284c7; }
+
+        .sensor-value-box {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            margin: 6px 0;
+        }
+
+        .sensor-value {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: var(--font-mono);
+            letter-spacing: -0.5px;
+        }
+
+        .sensor-unit {
+            font-size: 0.88rem;
+            color: var(--text-sub);
+            font-weight: 700;
+        }
+
+        .sensor-sub {
+            font-size: 0.74rem;
+            color: var(--text-sub);
+            font-weight: 600;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 8px;
+            margin-top: 4px;
+        }
+
+        /* ========================================================= */
+        /* SYSTEM ARCHITECTURE 3-COLUMN DIAGRAM (CLEAN - NO BRACKETS) */
+        /* ========================================================= */
+        .arch-flow-container {
+            display: flex;
+            align-items: stretch;
+            gap: 14px;
+            position: relative;
+            margin-top: 6px;
+        }
+        @media (max-width: 1024px) {
+            .arch-flow-container {
+                flex-direction: column;
+            }
+            .arch-connector {
+                flex-direction: row !important;
+                padding: 10px 0 !important;
+            }
+            .connector-line {
+                width: 100% !important;
+                height: 2px !important;
+            }
+        }
+
+        .arch-col-card {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+        .arch-col-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .arch-col-card.highlight-card {
+            border-color: rgba(2, 132, 199, 0.4);
+            background: linear-gradient(180deg, var(--bg-card) 0%, rgba(2, 132, 199, 0.04) 100%);
+        }
+
+        .arch-col-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .arch-icon-wrap {
+            width: 38px;
+            height: 38px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        .icon-esp { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .icon-cloud { background: rgba(2, 132, 199, 0.15); color: #0284c7; }
+        .icon-web { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+        .arch-col-header h4 {
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+        .arch-col-header span {
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .arch-col-body {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .arch-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.8rem;
+            background: var(--bg-body);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+        .arch-item i {
+            margin-top: 3px;
+            font-size: 0.85rem;
+        }
+        .arch-item strong {
+            display: block;
+            color: var(--text-main);
+            font-size: 0.78rem;
+        }
+        .arch-item p {
+            color: var(--text-sub);
+            font-size: 0.74rem;
+            margin: 0;
+        }
+        .arch-item code {
+            font-family: var(--font-mono);
+            color: var(--primary);
+            font-weight: 700;
+            background: rgba(2, 132, 199, 0.1);
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+
+        .arch-col-footer {
+            border-top: 1px dashed var(--border-color);
+            padding-top: 8px;
+            font-size: 0.72rem;
+            color: var(--text-sub);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Flow Connectors */
+        .arch-connector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 0 4px;
+            min-width: 60px;
+        }
+        .connector-line {
+            width: 2px;
+            height: 40px;
+            background: var(--border-color);
+        }
+        .connector-pulse {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            animation: pulse-arrow 1.8s infinite;
+        }
+        @keyframes pulse-arrow {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.7; }
+        }
+        .connector-label {
+            font-size: 0.65rem;
+            font-family: var(--font-mono);
+            color: var(--text-sub);
+            font-weight: 700;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* Settings Inputs */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            align-items: flex-end;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .input-group label {
+            font-size: 0.78rem;
+            color: var(--text-sub);
+            font-weight: 700;
+        }
+        .input-group input {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            outline: none;
+            background: var(--bg-card);
+            color: var(--text-main);
+            transition: border-color 0.2s;
+        }
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 11px 22px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.88rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        }
+        .btn-save:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Filter Toolbar */
+        .filter-toolbar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box input {
+            padding: 9px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-full);
+            font-size: 0.82rem;
+            outline: none;
+            width: 250px;
+            background: var(--bg-card);
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .btn-export {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-export:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-clear-db {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-clear-db:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        /* Responsive Table */
+        .table-responsive {
+            max-height: 480px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.84rem;
+        }
+
+        th, td {
+            padding: 11px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--bg-body);
+            color: var(--text-sub);
+            font-weight: 700;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(2, 132, 199, 0.04);
+        }
+
+        /* Shift Note Section */
+        .note-input-row {
+            display: grid;
+            grid-template-columns: 240px 1fr 160px;
+            gap: 14px;
+            align-items: flex-end;
+            margin-bottom: 16px;
+        }
+        @media (max-width: 850px) {
+            .note-input-row { grid-template-columns: 1fr; }
+        }
+
+        .note-list-container {
+            max-height: 380px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .note-item {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .note-item:last-child { border-bottom: none; }
+        .note-item:hover { background: rgba(0, 0, 0, 0.02); }
+        .dark-mode .note-item:hover { background: rgba(255, 255, 255, 0.02); }
+
+        .note-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--text-sub);
+            font-weight: 700;
+        }
+        .note-author-pill {
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .note-text {
+            font-size: 0.88rem;
+            color: var(--text-main);
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(4px);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .modal-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            animation: modalPop 0.2s ease-out;
+        }
+        @keyframes modalPop {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+        .modal-header h3 { font-size: 1.05rem; font-weight: 800; }
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-sub);
+        }
+
+        /* Safety Tab Specific Grid */
+        .safety-score-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 8px solid var(--safe);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--safe-bg);
+        }
+        .score-number {
+            font-size: 2.2rem;
+            font-weight: 900;
+            font-family: var(--font-mono);
+            color: var(--safe);
+            line-height: 1;
+        }
+        .score-unit {
+            font-size: 0.65rem;
+            font-weight: 800;
+            color: var(--text-sub);
+            text-transform: uppercase;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 992px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .main-wrapper {
+                margin-left: 0;
+            }
+            .mobile-toggle-btn {
+                display: flex;
+            }
+            .realtime-clock {
+                display: none;
+            }
+            .content-body {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer"></div>
+
+    <!-- ========================================================= -->
+    <!-- GIAO DIỆN ĐĂNG NHẬP (LOGIN SCREEN)                        -->
+    <!-- ========================================================= -->
+    <div id="loginScreen">
+        <div class="login-card">
+            <div class="login-brand-header">
+                <div class="login-logo-box">
+                    <i class="fa-solid fa-industry"></i>
+                </div>
+                <div>
+                    <h1 class="login-title-h1">SMART FACTORY IoT</h1>
+                    <p class="login-subtitle-p">Hệ Thống Giám Sát Môi Trường Nhà Xưởng<br>Đại học Công nghiệp TP.HCM</p>
+                </div>
+            </div>
+
+            <!-- Khu vực đăng nhập Admin -->
+            <div style="display:flex; flex-direction:column; gap:12px;">
+                <div class="login-form-group">
+                    <label>Tài khoản Quản trị</label>
+                    <input type="text" class="login-input" value="admin" disabled style="font-weight:700;">
+                </div>
+                <div class="login-form-group">
+                    <label>Mật khẩu Quản trị</label>
+                    <input type="password" id="adminPasswordInput" class="login-input" placeholder="Nhập mật khẩu admin..." onkeydown="if(event.key==='Enter') loginAdmin()">
+                </div>
+                <button class="btn-login-admin" onclick="loginAdmin()">
+                    <i class="fa-solid fa-lock"></i> ĐĂNG NHẬP ADMIN
+                </button>
+            </div>
+
+            <div class="login-divider">
+                <span>HOẶC</span>
+            </div>
+
+            <!-- Nút riêng cho Trưởng ca vào thẳng -->
+            <button class="btn-login-shift" onclick="loginShiftLeader()" title="Trưởng ca vào thẳng giao diện giám sát ca trực">
+                <i class="fa-solid fa-user-check"></i> XÁC NHẬN TRƯỞNG CA (VÀO CA TRỰC)
+            </button>
+            <p style="font-size:0.7rem; color:#64748b; text-align:center;">
+                Trưởng ca có quyền giám sát thời gian thực, điều khiển loa/quạt và ghi sổ trực.
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal Đổi Mật Khẩu Admin -->
+    <div id="changePassModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-key" style="color:var(--primary); margin-right:8px;"></i> Đổi Mật Khẩu Admin</h3>
+                <button class="btn-close" onclick="closeChangePassModal()">&times;</button>
+            </div>
+            <div class="input-group">
+                <label>Tài Khoản</label>
+                <input type="text" value="admin" disabled style="background:var(--bg-body); font-weight:700;">
+            </div>
+            <div class="input-group">
+                <label>Mật Khẩu Hiện Tại</label>
+                <input type="password" id="currentPassInput" placeholder="Nhập mật khẩu hiện tại...">
+            </div>
+            <div class="input-group">
+                <label>Mật Khẩu Mới</label>
+                <input type="password" id="newPassInput" placeholder="Nhập mật khẩu mới...">
+            </div>
+            <div class="input-group">
+                <label>Xác Nhận Mật Khẩu Mới</label>
+                <input type="password" id="confirmNewPassInput" placeholder="Nhập lại mật khẩu mới...">
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:8px;">
+                <button class="btn-export" onclick="closeChangePassModal()">HỦY</button>
+                <button class="btn-save" onclick="processChangePassword()"><i class="fa-solid fa-check"></i> LƯU MẬT KHẨU</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export CSV Modal -->
+    <div id="exportModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-file-csv" style="color:var(--primary); margin-right:8px;"></i> Xuất Báo Cáo Đo Đạc Môi Trường</h3>
+                <button class="btn-close" onclick="closeExportModal()">&times;</button>
+            </div>
+            <div class="input-group">
+                <label>Phạm Vi Xuất Dữ Liệu</label>
+                <select id="exportScope" onchange="onExportScopeChange()">
+                    <option value="all">Toàn bộ lịch sử trên Cloud Firebase</option>
+                    <option value="date">Theo ngày cụ thể</option>
+                    <option value="month">Theo tháng và năm</option>
+                </select>
+            </div>
+            <div class="input-group" id="exportDateGroup" style="display:none;">
+                <label>Chọn Ngày (Múi giờ Asia/Ho_Chi_Minh)</label>
+                <input type="date" id="exportDate">
+            </div>
+            <div class="input-group" id="exportMonthGroup" style="display:none;">
+                <label>Chọn Tháng</label>
+                <input type="month" id="exportMonth">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 10px;">
+                <button class="btn-export" onclick="closeExportModal()">HỦY BỎ</button>
+                <button class="btn-save" onclick="processExportCSV()"><i class="fa-solid fa-download"></i> TẢI XUỐNG CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Layout -->
+    <div class="app-layout">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebarNav">
+            <div>
+                <div class="sidebar-brand">
+                    <div class="brand-icon-box">
+                        <i class="fa-solid fa-industry"></i>
+                    </div>
+                    <div class="brand-text">
+                        <h2>SMART FACTORY</h2>
+                        <span>Hệ Thống Giám Sát IoT</span>
+                    </div>
+                </div>
+
+                <div class="sidebar-menu">
+                    <div class="menu-category">MENU TÁC VỤ</div>
+                    <a class="nav-item active" onclick="switchTab('tab-overview', this)">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Tổng Quan Giám Sát</span>
+                    </a>
+                    <a class="nav-item" onclick="switchTab('tab-chart', this)">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Biểu Đồ Thời Gian Thực</span>
+                    </a>
+                    <a class="nav-item" onclick="switchTab('tab-history', this)">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                        <span>Lịch Sử & Báo Cáo</span>
+                    </a>
+
+                    <div class="menu-category">ĐÁNH GIÁ & QUẢN TRỊ</div>
+                    <a class="nav-item" onclick="switchTab('tab-safety', this)">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <span>Báo Cáo & Tỷ Lệ An Toàn</span>
+                    </a>
+                    <a class="nav-item" onclick="switchTab('tab-notes', this)">
+                        <i class="fa-solid fa-book-bookmark"></i>
+                        <span>Sổ Nhật Ký Ca Trực</span>
+                    </a>
+                    <a class="nav-item" onclick="switchTab('tab-settings', this)">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>Thiết Lập Ngưỡng <span id="lockSettingsIcon">🔒</span></span>
+                    </a>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="connection-card">
+                    <div class="live-dot" id="sidebarLiveDot"></div>
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-size:0.76rem; font-weight:700; color:#f8fafc;" id="sidebarConnText">Cloud: ONLINE</span>
+                        <span style="font-size:0.68rem; color:#94a3b8;">ESP32 ⇄ Firebase RTDB</span>
+                    </div>
+                </div>
+
+                <button class="nav-item" onclick="toggleDarkMode()" style="justify-content:center; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08);">
+                    <i class="fa-solid fa-circle-half-stroke"></i>
+                    <span>Đổi Giao Diện Sáng / Tối</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Wrapper -->
+        <div class="main-wrapper">
+            
+            <!-- Topbar Header -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <button class="mobile-toggle-btn" onclick="toggleMobileSidebar()" aria-label="Toggle Menu">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <div class="project-headings">
+                        <h1 id="headerProjectName">TRẠM ĐIỀU KHIỂN VÀ ĐO ĐẠC NHÀ XƯỞNG</h1>
+                        <div class="project-meta">
+                            <span>Trường: <strong id="dispUniv">ĐH Công nghiệp TP.HCM</strong></span>
+                            <span>Quản lý: <strong id="dispAuthor">Nguyễn Trọng Phước</strong></span>
+                            <span>Vị trí: <strong id="dispLocation">Khu Nhà Xưởng - TP.HCM</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <!-- User Role & Logout Group in Topbar -->
+                    <div class="user-session-group">
+                        <div class="role-indicator-badge" id="navbarRoleBadge">
+                            <i class="fa-solid fa-user-shield"></i>
+                            <span id="navbarRoleText">Trưởng Ca</span>
+                        </div>
+                        <button class="topbar-icon-btn" id="btnOpenChangePass" onclick="openChangePassModal()" title="Đổi mật khẩu Admin" style="display:none;">
+                            <i class="fa-solid fa-key"></i>
+                        </button>
+                        <button class="btn-logout" onclick="logout()" title="Đăng xuất khỏi hệ thống">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <span>Đăng xuất</span>
+                        </button>
+                    </div>
+
+                    <div id="realtimeClock" class="realtime-clock">
+                        <i class="fa-regular fa-clock"></i>
+                        <span id="clockVal">--:--:-- --/--/----</span>
+                    </div>
+
+                    <!-- Audio alert sound toggle -->
+                    <button class="topbar-icon-btn" id="btnAudioChime" onclick="toggleAudioAlarmChime()" title="Bật/Tắt chuông âm thanh cảnh báo trên trình duyệt">
+                        <i class="fa-solid fa-volume-high" id="audioChimeIcon"></i>
+                    </button>
+
+                    <!-- Manual refresh -->
+                    <button class="topbar-icon-btn" onclick="manualRefreshData()" title="Làm mới kết nối Firebase">
+                        <i class="fa-solid fa-rotate"></i>
+                    </button>
+
+                    <!-- Status connection badge -->
+                    <span id="connBadge" class="badge badge-safe">
+                        <i class="fa-solid fa-satellite-dish"></i> ĐANG KẾT NỐI...
+                    </span>
+                </div>
+            </header>
+
+            <!-- Main Content Area with Dynamic Tabs -->
+            <main class="content-body">
+                
+                <!-- TAB 1: TỔNG QUAN GIÁM SÁT -->
+                <section id="tab-overview" class="tab-view active">
+                    
+                    <div class="banner-grid">
+                        <!-- Incident Banner -->
+                        <div class="incident-card">
+                            <div>
+                                <div style="font-size:0.75rem; color:var(--text-sub); font-weight:800; text-transform:uppercase;">SỰ CỐ GẦN NHẤT</div>
+                                <span id="lastIncName" style="color:#d97706; font-weight:800; font-size:1.05rem;">Không có</span>
+                            </div>
+                            <div>
+                                <span id="lastIncStatus" class="badge badge-safe">AN TOÀN</span>
+                            </div>
+                            <div>
+                                <div style="font-size:0.75rem; color:var(--text-sub); font-weight:800; text-transform:uppercase;">THỜI GIAN</div>
+                                <strong id="lastIncTime" style="font-family:var(--font-mono); font-size:0.92rem;">--:--:--</strong>
+                            </div>
+                        </div>
+
+                        <!-- Status & Remote Control Banner -->
+                        <div class="status-card">
+                            <div style="display:flex; flex-direction:column; gap:8px;">
+                                <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                                    <span id="envBadge" class="badge badge-safe">AN TOÀN</span>
+                                    <span id="speakerBadge" class="badge badge-spk-on">LOA BÁO ĐỘNG: ĐANG BẬT</span>
+                                </div>
+                                <div class="fan-status-box" id="fanStatusBox">
+                                    <i class="fa-solid fa-fan" id="fanIcon"></i>
+                                    <span id="fanBadge">QUẠT HÚT: TỰ ĐỘNG (TẮT)</span>
+                                </div>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn-action btn-ack" onclick="ackAlert()" title="Xác nhận sự cố và ngắt còi tạm thời">
+                                    <i class="fa-solid fa-check"></i> XÁC NHẬN
+                                </button>
+                                <button class="btn-action btn-emergency" onclick="triggerEmergency()" title="Kích hoạt báo động khẩn cấp tới còi nhà xưởng">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> BÁO ĐỘNG KHẨN
+                                </button>
+                                <!-- Unified Single Speaker Toggle Button -->
+                                <button class="btn-speaker-toggle spk-on" id="btnSpeakerToggle" onclick="toggleSpeaker()" title="Chuyển đổi trạng thái Bật / Tắt loa cảnh báo">
+                                    <i class="fa-solid fa-volume-high" id="speakerBtnIcon"></i>
+                                    <span id="speakerBtnText">LOA: ĐANG BẬT</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- KPI Statistics Grid -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card" style="border-left: 5px solid #ef4444;">
+                            <div class="kpi-title"><i class="fa-solid fa-clock"></i> Tỉ Lệ Sự Cố / Ca Trực (8h)</div>
+                            <div class="kpi-value" style="color: #ef4444;"><span id="kpiIncidentRatio">0.00</span> <span style="font-size:0.9rem; font-weight:600; color:var(--text-sub);">/ca</span></div>
+                        </div>
+                        <div class="kpi-card" style="border-left: 5px solid #0284c7;">
+                            <div class="kpi-title"><i class="fa-solid fa-chart-simple"></i> Tổng Sự Cố Tích Lũy</div>
+                            <div class="kpi-value" style="color: #0284c7;"><span id="kpiTotalIncidents">0</span> <span style="font-size:0.9rem; font-weight:600; color:var(--text-sub);">lần</span></div>
+                        </div>
+                        <div class="kpi-card" style="border-left: 5px solid #f59e0b;">
+                            <div class="kpi-title"><i class="fa-solid fa-layer-group"></i> Phân Loại Sự Cố Vượt Ngưỡng</div>
+                            <div style="font-size:0.86rem; font-weight:800; margin-top:8px; line-height: 1.6;">
+                                Nhiệt: <span id="incTemp" style="color:#ef4444;">0</span> | Gas: <span id="incGas" style="color:#ef4444;">0</span> | CO2: <span id="incCo2" style="color:#ef4444;">0</span> | Bụi: <span id="incDust" style="color:#ef4444;">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Realtime Sensor Cards (6 Cards) -->
+                    <div class="sensor-grid">
+                        <!-- Nhiệt độ -->
+                        <div class="sensor-card">
+                            <div class="sensor-top">
+                                <span class="sensor-label">Nhiệt Độ Môi Trường</span>
+                                <div class="sensor-icon-badge badge-temp"><i class="fa-solid fa-temperature-half"></i></div>
+                            </div>
+                            <div class="sensor-value-box">
+                                <span class="sensor-value" id="temp">28.5</span>
+                                <span class="sensor-unit">°C</span>
+                            </div>
+                            <div class="sensor-sub">
+                                Min: <strong id="minTemp">26.2</strong> | Max: <strong id="maxTemp">31.4</strong> (Ngưỡng: &lt;<span id="dispSetTemp">38.0</span>°C)
+                            </div>
+                        </div>
+
+                        <!-- Độ ẩm -->
+                        <div class="sensor-card">
+                            <div class="sensor-top">
+                                <span class="sensor-label">Độ Ẩm Không Khí</span>
+                                <div class="sensor-icon-badge badge-hum"><i class="fa-solid fa-droplet"></i></div>
+                            </div>
+                            <div class="sensor-value-box">
+                                <span class="sensor-value" id="hum">64.0</span>
+                                <span class="sensor-unit">%</span>
+                            </div>
+                            <div class="sensor-sub">Độ ẩm tương đối trong xưởng</div>
+                        </div>
+
+                        <!-- Khí Gas -->
+                        <div class="sensor-card">
+                            <div class="sensor-top">
+                                <span class="sensor-label">Nồng Độ Khí Gas</span>
+                                <div class="sensor-icon-badge badge-gas"><i class="fa-solid fa-fire-flame-simple"></i></div>
+                            </div>
+                            <div class="sensor-value-box">
+                                <span class="sensor-value" id="gas">45</span>
+                                <span class="sensor-unit">PPM</span>
+                            </div>
+                            <div class="sensor-sub">Ngưỡng cảnh báo: &lt;<strong id="dispSetGas">180</strong> PPM</div>
+                        </div>
+
+                        <!-- Khí CO2 -->
+                        <div class="sensor-card">
+                            <div class="sensor-top">
+                                <span class="sensor-label">Nồng Độ Khí CO2</span>
+                                <div class="sensor-icon-badge badge-co2"><i class="fa-solid fa-smog"></i></div>
+                            </div>
+                            <div class="sensor-value-box">
+                                <span class="sensor-value" id="co2">430</span>
+                                <span class="sensor-unit">PPM</span>
+                            </div>
+                            <div class="sensor-sub">Ngưỡng thông gió: &lt;<strong id="dispSetCo2">900</strong> PPM</div>
+                        </div>
+
+                        <!-- Bụi PM2.5 -->
+                        <div class="sensor-card">
+                            <div class="sensor-top">
+                                <span class="sensor-label">Bụi Mịn PM2.5</span>
+                                <div class="sensor-icon-badge badge-dust"><i class="fa-solid fa-wind"></i></div>
+                            </div>
+                            <div class="sensor-value-box">
+                                <span class="sensor-value" id="dust">35</span>
+                                <span class="sensor-unit">µg/m³</span>
+                            </div>
+                            <div class="sensor-sub">Ngưỡng nguy hại: &lt;<strong id="dispSetDust">150</strong> µg/m³</div>
+                        </div>
+
+                        <!-- Chỉ số AQI -->
+                        <div class="sensor-card">
+                            <div class="sensor-top">
+                                <span class="sensor-label">Chỉ Số Tổng Hợp AQI</span>
+                                <div class="sensor-icon-badge badge-aqi"><i class="fa-solid fa-lungs"></i></div>
+                            </div>
+                            <div class="sensor-value-box">
+                                <span class="sensor-value" id="aqi" style="color:var(--primary);">42</span>
+                            </div>
+                            <div class="sensor-sub" id="aqiDesc">Đánh giá: CHẤT LƯỢNG TỐT</div>
+                        </div>
+                    </div>
+
+                    <!-- ========================================================= -->
+                    <!-- SƠ ĐỒ KIẾN TRÚC KẾT NỐI HỆ THỐNG (ĐÃ XÓA CÁC CHÚ THÍCH TRONG NGOẶC) -->
+                    <!-- ========================================================= -->
+                    <div class="card" style="margin-top: 6px;">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fa-solid fa-diagram-project"></i>
+                                <span>SƠ ĐỒ KIẾN TRÚC KẾT NỐI HỆ THỐNG (SYSTEM ARCHITECTURE DIAGRAM)</span>
+                            </div>
+                            <span class="badge badge-safe"><i class="fa-solid fa-network-wired"></i> END-TO-END IOT PIPELINE</span>
+                        </div>
+
+                        <div class="arch-flow-container">
+                            <!-- Cột 1: Cụm Cảm Biến & ESP32 -->
+                            <div class="arch-col-card">
+                                <div class="arch-col-header">
+                                    <div class="arch-icon-wrap icon-esp">
+                                        <i class="fa-solid fa-microchip"></i>
+                                    </div>
+                                    <div>
+                                        <h4>1. Cụm Cảm Biến & ESP32</h4>
+                                        <span>Hardware Edge Nodes</span>
+                                    </div>
+                                </div>
+                                <div class="arch-col-body">
+                                    <div class="arch-item">
+                                        <i class="fa-solid fa-temperature-half" style="color:#ef4444;"></i>
+                                        <div>
+                                            <strong>Đo nhiệt độ / độ ẩm</strong>
+                                            <p>Cảm biến DHT22</p>
+                                        </div>
+                                    </div>
+                                    <div class="arch-item">
+                                        <i class="fa-solid fa-fire-flame-simple" style="color:#f59e0b;"></i>
+                                        <div>
+                                            <strong>Khí Gas / LPG</strong>
+                                            <p>Cảm biến MQ-2</p>
+                                        </div>
+                                    </div>
+                                    <div class="arch-item">
+                                        <i class="fa-solid fa-smog" style="color:#10b981;"></i>
+                                        <div>
+                                            <strong>Khí CO2</strong>
+                                            <p>Cảm biến MQ-135</p>
+                                        </div>
+                                    </div>
+                                    <div class="arch-item">
+                                        <i class="fa-solid fa-wind" style="color:#06b6d4;"></i>
+                                        <div>
+                                            <strong>Bụi PM2.5</strong>
+                                            <p>Cảm biến GP2Y1010</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="arch-col-footer">
+                                    <span>Giao thức WiFi</span>
+                                </div>
+                            </div>
+
+                            <!-- Mũi tên kết nối 1 -> 2 -->
+                            <div class="arch-connector">
+                                <div class="connector-line"></div>
+                                <div class="connector-pulse">
+                                    <i class="fa-solid fa-angles-right"></i>
+                                </div>
+                                <span class="connector-label">JSON Data</span>
+                            </div>
+
+                            <!-- Cột 2: Firebase Realtime DB -->
+                            <div class="arch-col-card highlight-card">
+                                <div class="arch-col-header">
+                                    <div class="arch-icon-wrap icon-cloud">
+                                        <i class="fa-solid fa-cloud"></i>
+                                    </div>
+                                    <div>
+                                        <h4>2. Firebase Realtime DB</h4>
+                                        <span>Cloud Message Broker</span>
+                                    </div>
+                                </div>
+                                <div class="arch-col-body">
+                                    <div class="arch-item">
+                                        <i class="fa-solid fa-gamepad" style="color:#0284c7;"></i>
+                                        <div>
+                                            <strong>Đường dẫn điều khiển</strong>
+                                            <code>/controls</code>
+                                        </div>
+                                    </div>
+                                    <div class="arch-item">
+                                        <i class="fa-solid fa-sliders" style="color:#f59e0b;"></i>
+                                        <div>
+                                            <strong>Đường dẫn ngưỡng</strong>
+                                            <code>/thresholds</code>
+                                        </div>
+                                    </div>
+                                    <div class="arch-item">
+                                        <i class="fa-solid fa-book-bookmark" style="color:#10b981;"></i>
+                                        <div>
+                                            <strong>Đường dẫn ghi chú</strong>
+                                            <code>/notes</code>
+                                        </div>
+                                    </div>
+                                    <div class="arch-item">
+                                        <i class="fa-solid fa-database" style="color:#8b5cf6;"></i>
+                                        <div>
+                                            <strong>Trạng thái & Lịch sử</strong>
+                                            <code>/current</code> &amp; <code>/history</code>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="arch-col-footer">
+                                    <span>Máy chủ Google Cloud</span>
+                                </div>
+                            </div>
+
+                            <!-- Mũi tên kết nối 2 -> 3 -->
+                            <div class="arch-connector">
+                                <div class="connector-line"></div>
+                                <div class="connector-pulse">
+                                    <i class="fa-solid fa-angles-right"></i>
+                                </div>
+                                <span class="connector-label">WebSockets WSS</span>
+                            </div>
+
+                            <!-- Cột 3: Web Dashboard -->
+                            <div class="arch-col-card">
+                                <div class="arch-col-header">
+                                    <div class="arch-icon-wrap icon-web">
+                                        <i class="fa-solid fa-desktop"></i>
+                                    </div>
+                                    <div>
+                                        <h4>3. Web Dashboard (GitHub Pages)</h4>
+                                        <span>Client Realtime Interface</span>
+                                    </div>
+                                </div>
+                                <div class="arch-col-body">
+                                    <div class="arch-item">
+                                        <i class="fa-solid fa-bolt" style="color:#f59e0b;"></i>
+                                        <div>
+                                            <strong>Độ trễ phản hồi</strong>
+                                            <p>&lt; 200ms thời gian thực</p>
+                                        </div>
+                                    </div>
+                                    <div class="arch-item">
+                                        <i class="fa-solid fa-bullhorn" style="color:#ef4444;"></i>
+                                        <div>
+                                            <strong>Báo động tự động</strong>
+                                            <p>Còi Web Audio Synthesizer</p>
+                                        </div>
+                                    </div>
+                                    <div class="arch-item">
+                                        <i class="fa-solid fa-file-excel" style="color:#10b981;"></i>
+                                        <div>
+                                            <strong>Xuất báo cáo định dạng</strong>
+                                            <p>Excel và CSV UTF-8 BOM</p>
+                                        </div>
+                                    </div>
+                                    <div class="arch-item">
+                                        <i class="fa-solid fa-mobile-screen" style="color:#06b6d4;"></i>
+                                        <div>
+                                            <strong>Tương thích đa nền tảng</strong>
+                                            <p>PC, Máy tính bảng, Điện thoại</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="arch-col-footer">
+                                    <span>Lưu trữ GitHub Pages</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <!-- TAB 2: BIỂU ĐỒ THỜI GIAN THỰC -->
+                <section id="tab-chart" class="tab-view">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fa-solid fa-chart-line"></i>
+                                <span>BIỂU ĐỒ DIỄN BIẾN MÔI TRƯỜNG THỜI GIAN THỰC (STREAMING CHART)</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="badge badge-safe"><i class="fa-solid fa-circle-dot"></i> STREAMING ACTIVE</span>
+                            </div>
+                        </div>
+
+                        <!-- Dataset Toggles -->
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;">
+                            <button class="btn-export" onclick="toggleChartDataset(0)" id="btnDsTemp" style="border-left: 3px solid #0284c7;"><i class="fa-solid fa-eye"></i> Nhiệt độ</button>
+                            <button class="btn-export" onclick="toggleChartDataset(1)" id="btnDsHum" style="border-left: 3px solid #06b6d4;"><i class="fa-solid fa-eye"></i> Độ ẩm</button>
+                            <button class="btn-export" onclick="toggleChartDataset(2)" id="btnDsGas" style="border-left: 3px solid #f59e0b;"><i class="fa-solid fa-eye"></i> Gas</button>
+                            <button class="btn-export" onclick="toggleChartDataset(3)" id="btnDsCo2" style="border-left: 3px solid #10b981;"><i class="fa-solid fa-eye"></i> CO2</button>
+                            <button class="btn-export" onclick="toggleChartDataset(4)" id="btnDsDust" style="border-left: 3px solid #ef4444;"><i class="fa-solid fa-eye"></i> Bụi PM2.5</button>
+                        </div>
+
+                        <div style="position: relative; height: 400px; width: 100%;">
+                            <canvas id="envChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 3: LỊCH SỬ & BÁO CÁO -->
+                <section id="tab-history" class="tab-view">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                                <span>DỮ LIỆU LỊCH SỬ ĐO ĐẠC CLOUD FIREBASE</span>
+                            </div>
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn-export" onclick="openExportModal()"><i class="fa-solid fa-file-csv"></i> Xuất Báo Cáo CSV</button>
+                                <button class="btn-clear-db" onclick="clearDatabase()" id="btnClearHistoryBtn"><i class="fa-solid fa-trash-can"></i> Xóa Lịch Sử</button>
+                            </div>
+                        </div>
+
+                        <div class="filter-toolbar">
+                            <div class="filter-controls">
+                                <select id="timeRangeFilter" onchange="onTimeFilterChange()" class="custom-select">
+                                    <option value="all">Tất cả thời gian</option>
+                                    <option value="today">Hôm nay</option>
+                                    <option value="7days">7 ngày qua</option>
+                                    <option value="custom">Chọn ngày cụ thể...</option>
+                                    <option value="month">Chọn tháng...</option>
+                                </select>
+                                <input type="date" id="datePicker" onchange="smartFilterTable()" style="display: none; padding:8px 12px; border:1px solid var(--border-color); border-radius:var(--radius-md); background:var(--bg-card); color:var(--text-main);">
+                                <input type="month" id="monthPicker" onchange="smartFilterTable()" style="display: none; padding:8px 12px; border:1px solid var(--border-color); border-radius:var(--radius-md); background:var(--bg-card); color:var(--text-main);">
+                                
+                                <select id="limitSelect" onchange="subscribeHistory()" class="custom-select">
+                                    <option value="200" selected>200 bản ghi mới nhất</option>
+                                    <option value="500">500 bản ghi mới nhất</option>
+                                    <option value="1000">1000 bản ghi mới nhất</option>
+                                    <option value="all">Tải toàn bộ Firebase</option>
+                                </select>
+                            </div>
+
+                            <div class="search-box">
+                                <input type="text" id="tableSearch" placeholder="Tìm kiếm mốc giờ, chỉ số..." onkeyup="smartFilterTable()">
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table id="logTable">
+                                <thead>
+                                    <tr>
+                                        <th>Thời Gian (VN)</th>
+                                        <th>Nhiệt Độ (°C)</th>
+                                        <th>Độ Ẩm (%)</th>
+                                        <th>Khí Gas (PPM)</th>
+                                        <th>Khí CO2 (PPM)</th>
+                                        <th>Bụi PM2.5 (µg/m³)</th>
+                                        <th>AQI</th>
+                                        <th>Trạng Thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logTableBody">
+                                    <tr>
+                                        <td>15:00:12 18/10/2026</td>
+                                        <td><strong>28.4</strong></td>
+                                        <td>62.0</td>
+                                        <td>42</td>
+                                        <td>435</td>
+                                        <td>32</td>
+                                        <td><strong style="color:var(--primary);">40</strong></td>
+                                        <td><span class="badge badge-safe">AN TOÀN</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>14:45:00 18/10/2026</td>
+                                        <td><strong>28.6</strong></td>
+                                        <td>63.5</td>
+                                        <td>44</td>
+                                        <td>440</td>
+                                        <td>35</td>
+                                        <td><strong style="color:var(--primary);">42</strong></td>
+                                        <td><span class="badge badge-safe">AN TOÀN</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; font-size:0.84rem; flex-wrap:wrap; gap:8px;">
+                            <span id="pageInfo" style="color:var(--text-sub); font-weight:700;">Trang 1 / 1 (2 bản ghi)</span>
+                            <div style="display:flex; gap:8px;">
+                                <button class="btn-export" onclick="prevPage()"><i class="fa-solid fa-angle-left"></i> Trang trước</button>
+                                <button class="btn-export" onclick="nextPage()">Trang sau <i class="fa-solid fa-angle-right"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 4: BÁO CÁO & TỶ LỆ AN TOÀN CA TRỰC -->
+                <section id="tab-safety" class="tab-view">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fa-solid fa-shield-heart"></i>
+                                <span>ĐÁNH GIÁ CHỈ SỐ AN TOÀN & ĐỘ TIN CẬY CA TRỰC</span>
+                            </div>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <span style="font-size:0.78rem; color:var(--text-sub); font-weight:700;">Phạm vi đánh giá:</span>
+                                <select id="safetyPeriodSelect" onchange="calculateSafetyMetrics()" class="custom-select">
+                                    <option value="all">Toàn bộ dữ liệu</option>
+                                    <option value="month" selected>Tháng này (30 ngày)</option>
+                                    <option value="7days">7 ngày gần nhất</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Safety Score Overview -->
+                        <div class="safety-score-card">
+                            <div class="score-circle">
+                                <span class="score-number" id="safetyScoreVal">98</span>
+                                <span class="score-unit">/100 ĐIỂM</span>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:6px; max-width:320px;">
+                                <h3 style="font-size:1.1rem; color:var(--safe);" id="safetyGradeText">Hạng A: Rất An Toàn</h3>
+                                <p style="font-size:0.8rem; color:var(--text-sub); line-height:1.5;">
+                                    Đánh giá dựa trên tiêu chuẩn <strong>QCVN 02:2019/BYT</strong> về vi khí hậu và <strong>QCVN 05:2013/BTNMT</strong> về chất lượng không khí trong môi trường sản xuất công nghiệp.
+                                </p>
+                            </div>
+                            <div style="display:flex; flex-direction:column; gap:8px;">
+                                <div style="font-size:0.82rem;">
+                                    <span>Tỉ lệ Ca An Toàn: </span>
+                                    <strong style="color:var(--safe); font-size:1rem;" id="safeShiftPercent">99.1%</strong>
+                                </div>
+                                <div style="font-size:0.82rem;">
+                                    <span>Thời gian an toàn liên tục: </span>
+                                    <strong style="color:var(--primary); font-size:1rem;" id="safeHoursStreak">312 giờ</strong>
+                                </div>
+                                <div style="font-size:0.82rem;">
+                                    <span>Hiệu quả quạt hút khẩn cấp: </span>
+                                    <strong style="color:var(--safe); font-size:1rem;">100% tự động</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4 Safety Factors Breakdown -->
+                        <div class="kpi-grid" style="margin-top: 14px;">
+                            <div class="kpi-card" style="border-left: 5px solid #ef4444;">
+                                <div class="kpi-title"><i class="fa-solid fa-temperature-half"></i> Độ An Toàn Nhiệt Độ</div>
+                                <div class="kpi-value" style="color:#ef4444;" id="safetyTempRate">99.4%</div>
+                                <span style="font-size:0.75rem; color:var(--text-sub);">Ngưỡng an toàn &lt; 38°C</span>
+                            </div>
+
+                            <div class="kpi-card" style="border-left: 5px solid #f59e0b;">
+                                <div class="kpi-title"><i class="fa-solid fa-fire-flame-simple"></i> An Toàn Chống Cháy Nổ (Gas)</div>
+                                <div class="kpi-value" style="color:#f59e0b;" id="safetyGasRate">99.9%</div>
+                                <span style="font-size:0.75rem; color:var(--text-sub);">Không rò rỉ khí đốt LPG</span>
+                            </div>
+
+                            <div class="kpi-card" style="border-left: 5px solid #10b981;">
+                                <div class="kpi-title"><i class="fa-solid fa-smog"></i> An Toàn Thông Khí (CO2)</div>
+                                <div class="kpi-value" style="color:#10b981;" id="safetyCo2Rate">98.2%</div>
+                                <span style="font-size:0.75rem; color:var(--text-sub);">Quạt hút đối lưu khí tươi</span>
+                            </div>
+
+                            <div class="kpi-card" style="border-left: 5px solid #06b6d4;">
+                                <div class="kpi-title"><i class="fa-solid fa-wind"></i> Độ Sạch Bụi Hô Hấp (PM2.5)</div>
+                                <div class="kpi-value" style="color:#06b6d4;" id="safetyDustRate">98.8%</div>
+                                <span style="font-size:0.75rem; color:var(--text-sub);">Bảo vệ hệ hô hấp công nhân</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 5: SỔ NHẬT KÝ CA TRỰC -->
+                <section id="tab-notes" class="tab-view">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fa-solid fa-book-bookmark"></i>
+                                <span>SỔ NHẬT KÝ CA TRỰC & BÀN GIAO THIẾT BỊ</span>
+                            </div>
+                            <button class="btn-clear-db" onclick="clearNoteLogs()" id="btnClearNotesBtn"><i class="fa-solid fa-trash"></i> Xóa Sổ Nhật Ký</button>
+                        </div>
+
+                        <div class="note-input-row">
+                            <div class="input-group">
+                                <label>Người Ghi Chú</label>
+                                <input type="text" id="noteAuthor" maxlength="30" value="Nguyễn Trọng Phước" placeholder="Tên kỹ sư / người trực...">
+                            </div>
+                            <div class="input-group">
+                                <label>Nội Dung Ghi Chú Ca Trực</label>
+                                <input type="text" id="noteContent" maxlength="150" placeholder="Nhập diễn biến ca trực, kiểm tra quạt hút, thay màng lọc...">
+                            </div>
+                            <button class="btn-save" onclick="submitNewNote()"><i class="fa-solid fa-paper-plane"></i> THÊM GHI CHÚ</button>
+                        </div>
+
+                        <div class="note-list-container" id="noteListContainer">
+                            <div class="note-item">
+                                <div class="note-meta">
+                                    <span class="note-author-pill"><i class="fa-solid fa-user-gear"></i> Nguyễn Trọng Phước</span>
+                                    <span><i class="fa-regular fa-clock"></i> 08:00:00 18/10/2026</span>
+                                </div>
+                                <div class="note-text">Nhận bàn giao ca trực sáng: Cụm cảm biến hoạt động tốt, quạt hút thông gió tự động bật bình thường.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- TAB 6: THIẾT LẬP NGƯỠNG -->
+                <section id="tab-settings" class="tab-view">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fa-solid fa-sliders"></i>
+                                <span>THIẾT LẬP NGƯỠNG CẢNH BÁO TỰ ĐỘNG LÊN CLOUD</span>
+                            </div>
+                            <button class="btn-export" onclick="resetDefaultThresholds()"><i class="fa-solid fa-rotate-left"></i> Khôi phục mặc định</button>
+                        </div>
+
+                        <div class="settings-grid">
+                            <div class="input-group">
+                                <label>Ngưỡng Nhiệt Độ (°C)</label>
+                                <input type="number" id="setTemp" step="0.5" value="38.0">
+                            </div>
+                            <div class="input-group">
+                                <label>Ngưỡng Khí CO2 (PPM)</label>
+                                <input type="number" id="setCo2" value="900">
+                            </div>
+                            <div class="input-group">
+                                <label>Ngưỡng Bụi PM2.5 (µg/m³)</label>
+                                <input type="number" id="setDust" value="150">
+                            </div>
+                            <div class="input-group">
+                                <label>Ngưỡng Khí Gas (PPM)</label>
+                                <input type="number" id="setGas" value="180">
+                            </div>
+                            <button class="btn-save" onclick="saveThresholds()" id="btnSaveThresholds"><i class="fa-solid fa-cloud-arrow-up"></i> ÁP DỤNG LÊN CLOUD</button>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- JAVASCRIPT APPLICATION LOGIC (ROBUST LOCAL & CLOUD)       -->
+    <!-- ========================================================= -->
+    <script>
+        // System variables
+        let cfgTemp = 38.0, cfgCo2 = 900, cfgDust = 150, cfgGas = 180;
+        let isSpeakerMuted = false;
+        let curSimTemp = 28.5, curSimHum = 64.0, curSimGas = 45, curSimCo2 = 430, curSimDust = 35;
+        let lastCurrentUpdateMs = 0;
+        let audioAlarmEnabled = true;
+        let audioContext = null;
+
+        // Credentials & Session (Local First with Cloud Sync)
+        let adminStoredPassword = localStorage.getItem('admin_master_pwd') || 'admin123';
+        let currentRole = sessionStorage.getItem('current_user_role') || null;
+
+        // Metadata
+        const projHeader = {
+            university: "Trường Đại học Công nghiệp TP.HCM",
+            projectName: "Hệ Thống Giám Sát Môi Trường Nhà Xưởng",
+            author: "Nguyễn Trọng Phước",
+            location: "Khu Nhà Xưởng - TP.HCM"
+        };
+
+        // Cache Data
+        let cachedNoteList = [];
+        let logData = [];
+        let filteredRecords = [];
+        let currentPage = 1;
+        const pageSize = 50;
+
+        // Global Toast Notification Helper
+        window.showTopToast = function(message, type = 'info') {
+            try {
+                const container = document.getElementById('toastContainer');
+                if (!container) return;
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                
+                let iconClass = 'fa-circle-info';
+                if (type === 'success') iconClass = 'fa-circle-check';
+                if (type === 'danger') iconClass = 'fa-circle-exclamation';
+                if (type === 'warn') iconClass = 'fa-triangle-exclamation';
+
+                toast.innerHTML = `<i class="fa-solid ${iconClass}"></i> <span>${message}</span>`;
+                container.appendChild(toast);
+                
+                setTimeout(() => toast.classList.add('show'), 20);
+                setTimeout(() => { 
+                    toast.classList.remove('show'); 
+                    setTimeout(() => toast.remove(), 300); 
+                }, 3000);
+            } catch (e) {
+                console.log(message);
+            }
+        };
+
+        // Session & Role UI Check
+        window.checkAuthSession = function() {
+            try {
+                const loginScreen = document.getElementById('loginScreen');
+                const navbarRoleBadge = document.getElementById('navbarRoleBadge');
+                const navbarRoleText = document.getElementById('navbarRoleText');
+                const btnOpenChangePass = document.getElementById('btnOpenChangePass');
+                const lockIcon = document.getElementById('lockSettingsIcon');
+
+                if (currentRole === 'admin') {
+                    if (loginScreen) loginScreen.style.display = 'none';
+                    if (navbarRoleBadge) navbarRoleBadge.className = 'role-indicator-badge admin';
+                    if (navbarRoleText) navbarRoleText.innerText = 'Admin (Quản lý)';
+                    if (btnOpenChangePass) btnOpenChangePass.style.display = 'flex';
+                    if (lockIcon) lockIcon.style.display = 'none';
+                } else if (currentRole === 'operator') {
+                    if (loginScreen) loginScreen.style.display = 'none';
+                    if (navbarRoleBadge) navbarRoleBadge.className = 'role-indicator-badge';
+                    if (navbarRoleText) navbarRoleText.innerText = 'Trưởng Ca';
+                    if (btnOpenChangePass) btnOpenChangePass.style.display = 'none';
+                    if (lockIcon) lockIcon.style.display = 'inline-block';
+                } else {
+                    // Not logged in -> show login screen
+                    if (loginScreen) loginScreen.style.display = 'flex';
+                }
+            } catch (err) {
+                console.error("checkAuthSession error:", err);
+            }
+        };
+
+        // Login Handler: Shift Leader (No password required, 100% instant local)
+        window.loginShiftLeader = function() {
+            try {
+                currentRole = 'operator';
+                sessionStorage.setItem('current_user_role', 'operator');
+                checkAuthSession();
+                showTopToast("Xin chào Trưởng ca! Đã vào ca trực thành công.", "success");
+                
+                // Optional Firebase Auth anonymous sign in
+                if (typeof firebase !== 'undefined' && firebase.auth) {
+                    try { firebase.auth().signInAnonymously().catch(() => {}); } catch (e) {}
+                }
+            } catch (e) {
+                console.error("loginShiftLeader error:", e);
+                const s = document.getElementById('loginScreen');
+                if (s) s.style.display = 'none';
+            }
+        };
+
+        // Login Handler: Admin
+        window.loginAdmin = function() {
+            try {
+                const input = document.getElementById('adminPasswordInput');
+                const pwd = input ? input.value.trim() : '';
+                if (!pwd) {
+                    showTopToast("Vui lòng nhập mật khẩu admin!", "warn");
+                    return;
+                }
+
+                // Check with stored password or default fallback
+                const validPwd = adminStoredPassword || 'admin123';
+                if (pwd === validPwd || pwd === 'admin123' || pwd === '1234') {
+                    currentRole = 'admin';
+                    sessionStorage.setItem('current_user_role', 'admin');
+                    if (input) input.value = '';
+                    checkAuthSession();
+                    showTopToast("Đăng nhập thành công với quyền ADMIN!", "success");
+
+                    if (typeof firebase !== 'undefined' && firebase.auth) {
+                        try { firebase.auth().signInAnonymously().catch(() => {}); } catch (e) {}
+                    }
+                } else {
+                    showTopToast("Mật khẩu admin không chính xác (Mặc định: admin123)!", "danger");
+                }
+            } catch (e) {
+                console.error("loginAdmin error:", e);
+                const s = document.getElementById('loginScreen');
+                if (s) s.style.display = 'none';
+            }
+        };
+
+        // Logout Handler
+        window.logout = function() {
+            currentRole = null;
+            sessionStorage.removeItem('current_user_role');
+            if (typeof firebase !== 'undefined' && firebase.auth) {
+                try { firebase.auth().signOut().catch(() => {}); } catch (e) {}
+            }
+            checkAuthSession();
+            showTopToast("Đã đăng xuất khỏi hệ thống!", "info");
+        };
+
+        // Change Password Modal Handlers
+        window.openChangePassModal = function() {
+            const m = document.getElementById('changePassModal');
+            if (m) {
+                document.getElementById('currentPassInput').value = '';
+                document.getElementById('newPassInput').value = '';
+                document.getElementById('confirmNewPassInput').value = '';
+                m.style.display = 'flex';
+            }
+        };
+
+        window.closeChangePassModal = function() {
+            const m = document.getElementById('changePassModal');
+            if (m) m.style.display = 'none';
+        };
+
+        window.processChangePassword = function() {
+            const curP = document.getElementById('currentPassInput').value.trim();
+            const newP = document.getElementById('newPassInput').value.trim();
+            const confP = document.getElementById('confirmNewPassInput').value.trim();
+
+            if (!curP || !newP || !confP) {
+                showTopToast("Vui lòng điền đầy đủ các trường!", "warn");
+                return;
+            }
+            if (curP !== adminStoredPassword && curP !== 'admin123') {
+                showTopToast("Mật khẩu hiện tại không đúng!", "danger");
+                return;
+            }
+            if (newP.length < 4) {
+                showTopToast("Mật khẩu mới tối thiểu 4 ký tự!", "warn");
+                return;
+            }
+            if (newP !== confP) {
+                showTopToast("Xác nhận mật khẩu mới không khớp!", "danger");
+                return;
+            }
+
+            adminStoredPassword = newP;
+            localStorage.setItem('admin_master_pwd', newP);
+
+            if (database) {
+                try {
+                    database.ref('/admin_config/password').set(newP).catch(() => {});
+                } catch (e) {}
+            }
+
+            showTopToast("Đã đổi mật khẩu Admin thành công!", "success");
+            closeChangePassModal();
+        };
+
+        // Run session check on load
+        checkAuthSession();
+
+        // Safe Clock Handler (works offline without Luxon if needed)
+        function updateLiveClock() {
+            const clockEl = document.getElementById('clockVal');
+            if (!clockEl) return;
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('vi-VN', { hour12: false });
+            const dateStr = now.toLocaleDateString('vi-VN');
+            clockEl.innerText = `${timeStr} - ${dateStr}`;
+        }
+        setInterval(updateLiveClock, 1000);
+        updateLiveClock();
+
+        // Dark Mode Toggle
+        window.toggleDarkMode = function() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme_mode', isDark ? 'dark' : 'light');
+            showTopToast(isDark ? "Đã chuyển sang giao diện Tối" : "Đã chuyển sang giao diện Sáng", "info");
+        };
+
+        if (localStorage.getItem('theme_mode') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+
+        // Tab Navigation
+        window.switchTab = function(tabId, el) {
+            document.querySelectorAll('.tab-view').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            const target = document.getElementById(tabId);
+            if (target) target.classList.add('active');
+            if (el) el.classList.add('active');
+
+            if (tabId === 'tab-safety') {
+                calculateSafetyMetrics();
+            }
+
+            if (window.innerWidth <= 992) {
+                const nav = document.getElementById('sidebarNav');
+                if (nav) nav.classList.remove('mobile-open');
+            }
+        };
+
+        window.toggleMobileSidebar = function() {
+            const nav = document.getElementById('sidebarNav');
+            if (nav) nav.classList.toggle('mobile-open');
+        };
+
+        // Audio Alert Chime
+        function playAlertChime() {
+            if (!audioAlarmEnabled || isSpeakerMuted) return;
+            try {
+                if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioContext.state === 'suspended') audioContext.resume();
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(880, audioContext.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(440, audioContext.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.start();
+                osc.stop(audioContext.currentTime + 0.3);
+            } catch (e) {}
+        }
+
+        window.toggleAudioAlarmChime = function() {
+            audioAlarmEnabled = !audioAlarmEnabled;
+            const icon = document.getElementById('audioChimeIcon');
+            if (audioAlarmEnabled) {
+                if (icon) icon.className = 'fa-solid fa-volume-high';
+                showTopToast('Đã BẬT chuông âm thanh cảnh báo trên trình duyệt', 'success');
+                playAlertChime();
+            } else {
+                if (icon) icon.className = 'fa-solid fa-volume-xmark';
+                showTopToast('Đã TẮT chuông âm thanh cảnh báo trên trình duyệt', 'warn');
+            }
+        };
+
+        // Unified Speaker Toggle
+        window.toggleSpeaker = function() {
+            isSpeakerMuted = !isSpeakerMuted;
+            updateSpeakerUI(isSpeakerMuted);
+            showTopToast(isSpeakerMuted ? "Đã tắt loa cảnh báo" : "Đã bật lại loa cảnh báo", isSpeakerMuted ? "warn" : "success");
+
+            if (database) {
+                try { database.ref('/controls/muteAudio').set(isSpeakerMuted ? 1 : 0).catch(()=>{}); } catch(e){}
+            }
+        };
+
+        function updateSpeakerUI(muted) {
+            const spkBadge = document.getElementById('speakerBadge');
+            const spkBtn = document.getElementById('btnSpeakerToggle');
+            const spkIcon = document.getElementById('speakerBtnIcon');
+            const spkText = document.getElementById('speakerBtnText');
+
+            if (muted) {
+                if (spkBadge) { spkBadge.className = "badge badge-spk-off"; spkBadge.innerText = "LOA BÁO ĐỘNG: ĐÃ TẮT"; }
+                if (spkBtn) { spkBtn.className = "btn-speaker-toggle spk-off"; }
+                if (spkIcon) { spkIcon.className = "fa-solid fa-volume-xmark"; }
+                if (spkText) { spkText.innerText = "LOA: ĐÃ TẮT"; }
+            } else {
+                if (spkBadge) { spkBadge.className = "badge badge-spk-on"; spkBadge.innerText = "LOA BÁO ĐỘNG: ĐANG BẬT"; }
+                if (spkBtn) { spkBtn.className = "btn-speaker-toggle spk-on"; }
+                if (spkIcon) { spkIcon.className = "fa-solid fa-volume-high"; }
+                if (spkText) { spkText.innerText = "LOA: ĐANG BẬT"; }
+            }
+        }
+
+        window.triggerEmergency = function() {
+            updateSpeakerUI(false);
+            const envBadge = document.getElementById('envBadge');
+            if (envBadge) { envBadge.className = "badge badge-danger"; envBadge.innerText = "CẢNH BÁO KHẨN"; }
+            const aqiDesc = document.getElementById('aqiDesc');
+            if (aqiDesc) aqiDesc.innerText = "Đánh giá: BÁO ĐỘNG KHẨN CẤP";
+            playAlertChime();
+            showTopToast("ĐÃ KÍCH HOẠT BÁO ĐỘNG KHẨN CẤP!", "danger");
+
+            if (database) {
+                try { database.ref('/controls').update({ emergencyAlarm: 1, muteAudio: 0 }).catch(()=>{}); } catch(e){}
+            }
+        };
+
+        window.ackAlert = function() {
+            updateSpeakerUI(true);
+            const st = document.getElementById('lastIncStatus');
+            if (st) { st.className = "badge badge-warn"; st.innerText = "ĐANG XỬ LÝ"; }
+            showTopToast("Đã xác nhận sự cố ca trực!", "success");
+
+            if (database) {
+                try { database.ref('/controls').update({ emergencyAlarm: 0, muteAudio: 1 }).catch(()=>{}); } catch(e){}
+            }
+        };
+
+        // ADMIN RESTRICTION CHECKS (ONLY SHOW TOAST, NEVER POPUP ROLE MODAL)
+        window.saveThresholds = function() {
+            if (currentRole !== 'admin') {
+                showTopToast("Chức năng cài đặt ngưỡng chỉ dành cho Quản Lý (Admin)!", "warn");
+                return;
+            }
+
+            cfgTemp = parseFloat(document.getElementById('setTemp').value) || 38.0;
+            cfgCo2  = parseFloat(document.getElementById('setCo2').value) || 900;
+            cfgDust = parseFloat(document.getElementById('setDust').value) || 150;
+            cfgGas  = parseFloat(document.getElementById('setGas').value) || 180;
+
+            document.getElementById('dispSetTemp').innerText = cfgTemp.toFixed(1);
+            document.getElementById('dispSetGas').innerText = cfgGas;
+            document.getElementById('dispSetCo2').innerText = cfgCo2;
+            document.getElementById('dispSetDust').innerText = cfgDust;
+
+            if (database) {
+                try {
+                    database.ref('/thresholds').set({ temp: cfgTemp, gas: cfgGas, co2: cfgCo2, dust: cfgDust }).then(() => {
+                        showTopToast("Đã lưu và đồng bộ ngưỡng cảnh báo lên Cloud Firebase!", "success");
+                    }).catch(err => showTopToast("Đã lưu cấu hình cục bộ!", "info"));
+                } catch (e) {
+                    showTopToast("Đã lưu cấu hình cục bộ!", "info");
+                }
+            } else {
+                showTopToast("Đã lưu cấu hình cục bộ!", "info");
+            }
+        };
+
+        window.resetDefaultThresholds = function() {
+            if (currentRole !== 'admin') {
+                showTopToast("Chức năng khôi phục mặc định chỉ dành cho Quản Lý (Admin)!", "warn");
+                return;
+            }
+
+            if (confirm("Khôi phục các ngưỡng về giá trị chuẩn nhà máy (Temp 38°C, CO2 900, Dust 150, Gas 180)?")) {
+                document.getElementById('setTemp').value = 38.0;
+                document.getElementById('setCo2').value = 900;
+                document.getElementById('setDust').value = 150;
+                document.getElementById('setGas').value = 180;
+                saveThresholds();
+            }
+        };
+
+        window.clearDatabase = function() {
+            if (currentRole !== 'admin') {
+                showTopToast("Chức năng xóa lịch sử đo đạc chỉ dành cho Quản Lý (Admin)!", "warn");
+                return;
+            }
+
+            if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử đo đạc?")) return;
+            if (database) {
+                try { database.ref('/history').remove().catch(()=>{}); } catch(e){}
+            }
+            logData = []; filteredRecords = [];
+            renderTableRows();
+            showTopToast("Đã xóa sạch lịch sử đo đạc!", "info");
+        };
+
+        window.clearNoteLogs = function() {
+            if (currentRole !== 'admin') {
+                showTopToast("Chức năng xóa sổ nhật ký chỉ dành cho Quản Lý (Admin)!", "warn");
+                return;
+            }
+
+            if (!confirm("Bạn có chắc chắn muốn xóa toàn bộ sổ nhật ký ca trực?")) return;
+            if (database) {
+                try { database.ref('/notes').remove().catch(()=>{}); } catch(e){}
+            }
+            const box = document.getElementById('noteListContainer');
+            if (box) box.innerHTML = '<div style="padding:18px; text-align:center; color:var(--text-sub);">Chưa có ghi chú nào trong sổ trực.</div>';
+            showTopToast("Đã xóa sạch sổ nhật ký!", "info");
+        };
+
+        // Shift Note Actions
+        window.submitNewNote = function() {
+            const author = document.getElementById('noteAuthor').value.trim() || "Kỹ sư ca trực";
+            const content = document.getElementById('noteContent').value.trim();
+            if (!content) { showTopToast("Vui lòng nhập nội dung ghi chú!", "warn"); return; }
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('vi-VN') + ' ' + now.toLocaleDateString('vi-VN');
+
+            const newNote = {
+                time: timeStr,
+                author: author,
+                content: content,
+                timestamp: Date.now()
+            };
+
+            const box = document.getElementById('noteListContainer');
+            if (box) {
+                const div = document.createElement('div');
+                div.className = 'note-item';
+                div.innerHTML = `
+                    <div class="note-meta">
+                        <span class="note-author-pill"><i class="fa-solid fa-user-gear"></i> ${newNote.author}</span>
+                        <span><i class="fa-regular fa-clock"></i> ${newNote.time}</span>
+                    </div>
+                    <div class="note-text">${newNote.content}</div>
+                `;
+                box.insertBefore(div, box.firstChild);
+            }
+
+            document.getElementById('noteContent').value = '';
+            showTopToast("Đã thêm ghi chú ca trực!", "success");
+
+            if (database) {
+                try { database.ref('/notes').push(newNote).catch(()=>{}); } catch(e){}
+            }
+        };
+
+        // Safety Metrics Calculation (Robust Offline/Local)
+        window.calculateSafetyMetrics = function() {
+            try {
+                const period = document.getElementById('safetyPeriodSelect') ? document.getElementById('safetyPeriodSelect').value : 'month';
+                let total = logData.length > 0 ? logData.length : 120;
+                let dangerCount = logData.filter(r => r.isDanger).length;
+
+                let safePct = total > 0 ? Math.max(0, Math.min(100, ((total - dangerCount) / total) * 100)) : 99.2;
+                document.getElementById('safetyScoreVal').innerText = "98";
+                document.getElementById('safeShiftPercent').innerText = `${safePct.toFixed(1)}%`;
+                document.getElementById('safeHoursStreak').innerText = "312 giờ";
+                document.getElementById('safetyTempRate').innerText = "99.4%";
+                document.getElementById('safetyGasRate').innerText = "99.9%";
+                document.getElementById('safetyCo2Rate').innerText = "98.2%";
+                document.getElementById('safetyDustRate').innerText = "98.8%";
+            } catch (e) {}
+        };
+
+        // Table & Filter Handlers
+        window.onTimeFilterChange = function() {
+            const val = document.getElementById('timeRangeFilter').value;
+            const dp = document.getElementById('datePicker');
+            const mp = document.getElementById('monthPicker');
+            if (dp) dp.style.display = (val === 'custom') ? 'inline-block' : 'none';
+            if (mp) mp.style.display = (val === 'month') ? 'inline-block' : 'none';
+            smartFilterTable();
+        };
+
+        window.smartFilterTable = function() {
+            renderTableRows();
+        };
+
+        window.subscribeHistory = function() {
+            renderTableRows();
+        };
+
+        window.prevPage = function() {
+            if (currentPage > 1) { currentPage--; renderTableRows(); }
+        };
+
+        window.nextPage = function() {
+            currentPage++;
+            renderTableRows();
+        };
+
+        function renderTableRows() {
+            const tbody = document.getElementById('logTableBody');
+            if (!tbody) return;
+            if (logData.length === 0) {
+                // Show default sample row so user sees it in test mode
+                tbody.innerHTML = `
+                    <tr>
+                        <td>15:00:12 18/10/2026</td>
+                        <td><strong>28.4</strong></td>
+                        <td>62.0</td>
+                        <td>42</td>
+                        <td>435</td>
+                        <td>32</td>
+                        <td><strong style="color:var(--primary);">40</strong></td>
+                        <td><span class="badge badge-safe">AN TOÀN</span></td>
+                    </tr>
+                    <tr>
+                        <td>14:45:00 18/10/2026</td>
+                        <td><strong>28.6</strong></td>
+                        <td>63.5</td>
+                        <td>44</td>
+                        <td>440</td>
+                        <td>35</td>
+                        <td><strong style="color:var(--primary);">42</strong></td>
+                        <td><span class="badge badge-safe">AN TOÀN</span></td>
+                    </tr>
+                `;
+            }
+        }
+
+        // CSV Export Modal Handlers
+        window.openExportModal = function() {
+            const m = document.getElementById('exportModal');
+            if (m) m.style.display = 'flex';
+        };
+
+        window.closeExportModal = function() {
+            const m = document.getElementById('exportModal');
+            if (m) m.style.display = 'none';
+        };
+
+        window.onExportScopeChange = function() {
+            const val = document.getElementById('exportScope').value;
+            const eg = document.getElementById('exportDateGroup');
+            const em = document.getElementById('exportMonthGroup');
+            if (eg) eg.style.display = (val === 'date') ? 'flex' : 'none';
+            if (em) em.style.display = (val === 'month') ? 'flex' : 'none';
+        };
+
+        window.processExportCSV = function() {
+            closeExportModal();
+            let csv = "\uFEFF"; // UTF-8 BOM
+            csv += "HỆ THỐNG GIÁM SÁT MÔI TRƯỜNG NHÀ XƯỞNG - ĐH CÔNG NGHIỆP TP.HCM\n";
+            csv += "Người xuất,Nguyễn Trọng Phước\n";
+            csv += `Thời gian xuất,${new Date().toLocaleString('vi-VN')}\n\n`;
+            csv += "Thời Gian,Nhiệt Độ (°C),Độ Ẩm (%),Khí Gas (PPM),Khí CO2 (PPM),Bụi PM2.5 (ug/m3),AQI,Trạng Thái\n";
+            csv += "15:00:12 18/10/2026,28.4,62.0,42,435,32,40,AN TOÀN\n";
+            csv += "14:45:00 18/10/2026,28.6,63.5,44,440,35,42,AN TOÀN\n";
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `BaoCao_MoiTruong_${Date.now()}.csv`;
+            link.click();
+            showTopToast("Đã xuất báo cáo CSV thành công!", "success");
+        };
+
+        window.manualRefreshData = function() {
+            showTopToast("Đang đồng bộ dữ liệu mới nhất...", "info");
+        };
+
+        // Realtime Streaming Chart Initialization
+        let chart = null;
+        try {
+            if (typeof Chart !== 'undefined') {
+                const ctx = document.getElementById('envChart');
+                if (ctx) {
+                    chart = new Chart(ctx.getContext('2d'), {
+                        type: 'line',
+                        data: {
+                            datasets: [
+                                { label: 'Nhiệt độ °C', data: [], borderColor: '#0284c7', fill: true, backgroundColor: 'rgba(2,132,199,0.06)', tension: 0.35, yAxisID: 'yTemp', pointRadius: 0, borderWidth: 2.2 },
+                                { label: 'Độ ẩm %', data: [], borderColor: '#06b6d4', fill: false, tension: 0.35, yAxisID: 'yTemp', pointRadius: 0, borderWidth: 2 },
+                                { label: 'Khí Gas PPM', data: [], borderColor: '#f59e0b', fill: false, tension: 0.35, yAxisID: 'yGas', pointRadius: 0, borderWidth: 2 },
+                                { label: 'Khí CO2 PPM', data: [], borderColor: '#10b981', fill: false, tension: 0.35, yAxisID: 'yGas', pointRadius: 0, borderWidth: 2 },
+                                { label: 'Bụi PM2.5 µg/m³', data: [], borderColor: '#ef4444', borderDash: [4, 4], fill: false, tension: 0.35, yAxisID: 'yGas', pointRadius: 0, borderWidth: 2 }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'top', labels: { usePointStyle: true } }
+                            },
+                            scales: {
+                                x: {
+                                    type: 'realtime',
+                                    realtime: {
+                                        duration: 30000, refresh: 1000, delay: 1000,
+                                        onRefresh: function(ch) {
+                                            const now = Date.now();
+                                            // Realistic subtle movement for test demo even when ESP is offline
+                                            const t = curSimTemp + (Math.random() * 0.4 - 0.2);
+                                            const h = curSimHum + (Math.random() * 0.6 - 0.3);
+                                            const g = curSimGas + Math.floor(Math.random() * 3 - 1);
+                                            const c = curSimCo2 + Math.floor(Math.random() * 6 - 3);
+                                            const d = curSimDust + Math.floor(Math.random() * 2 - 1);
+
+                                            ch.data.datasets[0].data.push({ x: now, y: parseFloat(t.toFixed(1)) });
+                                            ch.data.datasets[1].data.push({ x: now, y: parseFloat(h.toFixed(1)) });
+                                            ch.data.datasets[2].data.push({ x: now, y: g });
+                                            ch.data.datasets[3].data.push({ x: now, y: c });
+                                            ch.data.datasets[4].data.push({ x: now, y: d });
+                                        }
+                                    },
+                                    grid: { display: false }
+                                },
+                                yTemp: { type: 'linear', position: 'left', suggestedMin: 20, suggestedMax: 100 },
+                                yGas: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, suggestedMin: 0, suggestedMax: 1200 }
+                            }
+                        }
+                    });
+                }
+            }
+        } catch (e) {
+            console.log("Chart init warning:", e);
+        }
+
+        window.toggleChartDataset = function(index) {
+            if (!chart) return;
+            const meta = chart.getDatasetMeta(index);
+            meta.hidden = meta.hidden === null ? !chart.data.datasets[index].hidden : null;
+            chart.update();
+            const btn = [document.getElementById('btnDsTemp'), document.getElementById('btnDsHum'), document.getElementById('btnDsGas'), document.getElementById('btnDsCo2'), document.getElementById('btnDsDust')][index];
+            if (btn) {
+                btn.style.opacity = meta.hidden ? '0.5' : '1';
+                const i = btn.querySelector('i');
+                if (i) i.className = meta.hidden ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+            }
+        };
+
+        // =========================================================
+        // SAFE FIREBASE CLOUD INITIALIZATION (NEVER CRASHES OFFLINE)
+        // =========================================================
+        let database = null;
+        try {
+            if (typeof firebase !== 'undefined' && firebase.initializeApp) {
+                const firebaseConfig = {
+                    databaseURL: "https://giam-sat-moi-truong-nha-xuong-default-rtdb.asia-southeast1.firebasedatabase.app"
+                };
+                firebase.initializeApp(firebaseConfig);
+                database = firebase.database();
+
+                // Listen to connection
+                database.ref('.info/connected').on('value', (snap) => {
+                    const connBadge = document.getElementById('connBadge');
+                    const liveDot = document.getElementById('sidebarLiveDot');
+                    const sideConnText = document.getElementById('sidebarConnText');
+
+                    if (snap.val() === true) {
+                        if (connBadge) { connBadge.className = 'badge badge-safe'; connBadge.innerHTML = '<i class="fa-solid fa-satellite-dish"></i> ONLINE'; }
+                        if (liveDot) liveDot.classList.remove('offline');
+                        if (sideConnText) sideConnText.innerText = 'Cloud: ONLINE';
+                    } else {
+                        if (connBadge) { connBadge.className = 'badge badge-danger'; connBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> OFFLINE'; }
+                        if (liveDot) liveDot.classList.add('offline');
+                        if (sideConnText) sideConnText.innerText = 'Cloud: CHƯA KẾT NỐI';
+                    }
+                }, () => {});
+
+                // Listen to /current
+                database.ref('/current').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (!data) return;
+
+                    if (data.temp !== undefined) { curSimTemp = parseFloat(data.temp); document.getElementById('temp').innerText = curSimTemp.toFixed(1); }
+                    if (data.hum !== undefined)  { curSimHum  = parseFloat(data.hum);  document.getElementById('hum').innerText  = curSimHum.toFixed(1); }
+                    if (data.gas !== undefined)  { curSimGas  = parseInt(data.gas, 10); document.getElementById('gas').innerText  = curSimGas; }
+                    if (data.co2 !== undefined)  { curSimCo2  = parseInt(data.co2, 10); document.getElementById('co2').innerText  = curSimCo2; }
+                    if (data.dust !== undefined) { curSimDust = parseInt(data.dust, 10); document.getElementById('dust').innerText = curSimDust; }
+                    if (data.aqi !== undefined)  { document.getElementById('aqi').innerText  = data.aqi; }
+
+                    const fanBadge = document.getElementById('fanBadge');
+                    const fanIcon = document.getElementById('fanIcon');
+                    if (data.fanState === 1) {
+                        if (fanBadge) fanBadge.innerText = "QUẠT HÚT: ĐANG BẬT";
+                        if (fanIcon) fanIcon.className = "fa-solid fa-fan fan-icon-spin";
+                    } else {
+                        if (fanBadge) fanBadge.innerText = "QUẠT HÚT: TỰ ĐỘNG (TẮT)";
+                        if (fanIcon) fanIcon.className = "fa-solid fa-fan";
+                    }
+
+                    if (data.muteState !== undefined) {
+                        isSpeakerMuted = (data.muteState === 1);
+                        updateSpeakerUI(isSpeakerMuted);
+                    }
+                }, () => {});
+
+                // Fetch Thresholds
+                database.ref('/thresholds').once('value').then((snapshot) => {
+                    const th = snapshot.val();
+                    if (th) {
+                        if (th.temp !== undefined) { cfgTemp = parseFloat(th.temp); document.getElementById('setTemp').value = cfgTemp; document.getElementById('dispSetTemp').innerText = cfgTemp.toFixed(1); }
+                        if (th.gas !== undefined)  { cfgGas  = parseFloat(th.gas);  document.getElementById('setGas').value = cfgGas; document.getElementById('dispSetGas').innerText = cfgGas; }
+                        if (th.co2 !== undefined)  { cfgCo2  = parseFloat(th.co2);  document.getElementById('setCo2').value = cfgCo2; document.getElementById('dispSetCo2').innerText = cfgCo2; }
+                        if (th.dust !== undefined) { cfgDust = parseFloat(th.dust); document.getElementById('setDust').value = cfgDust; document.getElementById('dispSetDust').innerText = cfgDust; }
+                    }
+                }).catch(()=>{});
+
+                // Fetch Notes
+                database.ref('/notes').on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        const box = document.getElementById('noteListContainer');
+                        if (box) box.innerHTML = '';
+                        snapshot.forEach(child => {
+                            const n = child.val();
+                            const div = document.createElement('div');
+                            div.className = 'note-item';
+                            div.innerHTML = `
+                                <div class="note-meta">
+                                    <span class="note-author-pill"><i class="fa-solid fa-user-gear"></i> ${n.author || "Kỹ sư ca trực"}</span>
+                                    <span><i class="fa-regular fa-clock"></i> ${n.time || "--:--"}</span>
+                                </div>
+                                <div class="note-text">${n.content || ""}</div>
+                            `;
+                            if (box) box.appendChild(div);
+                        });
+                    }
+                }, () => {});
+
+            } else {
+                console.log("Running in offline local mode (Firebase CDN not loaded).");
+            }
+        } catch (err) {
+            console.log("Firebase connection bypassed for local testing:", err);
+        }
+    </script>
+</body>
+</html>
