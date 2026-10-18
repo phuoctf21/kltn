@@ -3,124 +3,364 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Giám Sát Môi Trường Nhà Xưởng</title>
+    <title>Hệ Thống Giám Sát Môi Trường Nhà Xưởng - Smart Factory</title>
     
+    <!-- Typography: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6.5.1 Vector Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Chart.js & Plugins -->
     <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-streaming@2.0.0/dist/chartjs-plugin-streaming.min.js"></script>
 
+    <!-- Firebase v8 SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
         :root {
-            --primary: #0284c7; --primary-dark: #0369a1; --primary-bg: #e0f2fe;
-            --bg: #f8fafc; --card-bg: #ffffff; --text-main: #0f172a; --text-sub: #64748b;
-            --border: #e2e8f0; --safe: #10b981; --safe-bg: #ecfdf5;
-            --danger: #ef4444; --danger-bg: #fef2f2; --warn: #f59e0b; --warn-bg: #fef3c7;
-            --radius-main: 14px; --radius-sub: 10px;
+            --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-tech: 'JetBrains Mono', monospace;
+
+            --primary: #0284c7;
+            --primary-gradient: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            --primary-dark: #0369a1; 
+            --primary-bg: rgba(2, 132, 199, 0.08);
+            
+            --bg: #f8fafc; 
+            --card-bg: #ffffff; 
+            --sidebar-bg: #ffffff;
+            --text-main: #0f172a; 
+            --text-sub: #64748b;
+            --border: #e2e8f0; 
+            
+            --safe: #10b981; 
+            --safe-bg: #ecfdf5;
+            --danger: #ef4444; 
+            --danger-bg: #fef2f2; 
+            --warn: #f59e0b; 
+            --warn-bg: #fef3c7;
+
+            --radius-xl: 20px;
+            --radius-main: 14px; 
+            --radius-sub: 10px;
+            
+            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.85);
         }
 
         body.dark-mode {
-            --bg: #0b0f19; --card-bg: #151d2a; --text-main: #f8fafc; --text-sub: #94a3b8;
-            --border: #263346; --primary-bg: rgba(2, 132, 199, 0.15);
-            --safe-bg: rgba(16, 185, 129, 0.15); --danger-bg: rgba(239, 68, 68, 0.15); --warn-bg: rgba(245, 158, 11, 0.15);
+            --bg: #0b0f17; 
+            --card-bg: #151e2e; 
+            --sidebar-bg: #111827;
+            --text-main: #f8fafc; 
+            --text-sub: #94a3b8;
+            --border: #243144; 
+            --primary-bg: rgba(2, 132, 199, 0.18);
+            --safe-bg: rgba(16, 185, 129, 0.15); 
+            --danger-bg: rgba(239, 68, 68, 0.15); 
+            --warn-bg: rgba(245, 158, 11, 0.15);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.35);
+            --glass-bg: rgba(21, 30, 46, 0.85);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text-main); padding: 18px 14px; min-height: 100vh; }
-        .container { max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
+        body { background-color: var(--bg); color: var(--text-main); min-height: 100vh; transition: background-color 0.3s ease, color 0.3s ease; display: flex; overflow-x: hidden; }
 
-        #toastContainer { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 99999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-        .toast { background: #0f172a; color: #fff; padding: 10px 22px; border-radius: 25px; font-size: 0.88rem; font-weight: 600; box-shadow: 0 8px 20px rgba(0,0,0,0.25); transform: translateY(-40px); opacity: 0; transition: all 0.3s; pointer-events: auto; }
-        .toast.show { transform: translateY(0); opacity: 1; }
+        /* Font Mono cho các giá trị kỹ thuật */
+        .tech-data, .realtime-clock, .kpi-value, .card-value, table, .badge-tech {
+            font-family: var(--font-tech) !important;
+        }
 
-        .nav-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .nav-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 8px 18px; border-radius: 20px; font-weight: 700; font-size: 0.85rem; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .btn-theme { background: var(--card-bg); border: 1px solid var(--border); padding: 7px 15px; border-radius: 20px; font-weight: 700; font-size: 0.82rem; color: var(--text-main); cursor: pointer; }
+        /* Layout Tổng Thể Smart Factory */
+        .app-layout { display: flex; width: 100vw; min-height: 100vh; }
 
-        header { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 16px 20px; border-radius: var(--radius-main); border: 1px solid var(--border); border-left: 5px solid var(--primary); flex-wrap: wrap; gap: 12px; }
-        .header-title h1 { font-size: 1.2rem; font-weight: 800; }
-        .manager-info { display: flex; gap: 14px; font-size: 0.8rem; color: var(--text-sub); margin-top: 3px; flex-wrap: wrap; }
-        .realtime-clock { font-family: monospace; font-size: 0.95rem; font-weight: 700; color: var(--primary); background: var(--primary-bg); padding: 6px 14px; border-radius: 20px; }
+        /* Sidebar & Drawer */
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1900; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
-        .incident-banner { background: var(--card-bg); border: 1px solid var(--border); border-left: 5px solid #d97706; padding: 12px 18px; border-radius: var(--radius-main); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 0.88rem; }
-        .status-banner { background: var(--card-bg); padding: 12px 18px; border-radius: var(--radius-main); border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .sidebar { 
+            width: 260px; 
+            background: var(--sidebar-bg); 
+            border-right: 1px solid var(--border); 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            padding: 24px 16px; 
+            z-index: 2000; 
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed;
+            top: 0; bottom: 0; left: 0;
+        }
+
+        .main-wrapper { flex: 1; margin-left: 260px; padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; max-width: calc(100vw - 260px); }
+
+        .brand-logo { display: flex; align-items: center; gap: 12px; padding: 0 8px 20px 8px; border-bottom: 1px solid var(--border); }
+        .brand-icon { width: 40px; height: 40px; background: var(--primary-gradient); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 1.2rem; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); }
+        .brand-text { font-size: 1rem; font-weight: 800; letter-spacing: -0.3px; color: var(--text-main); }
+        .brand-sub { font-size: 0.7rem; color: var(--text-sub); font-weight: 600; text-transform: uppercase; }
+
+        .nav-menu { display: flex; flex-direction: column; gap: 6px; margin-top: 20px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: var(--radius-sub); color: var(--text-sub); font-weight: 600; font-size: 0.88rem; text-decoration: none; transition: all 0.2s; cursor: pointer; }
+        .nav-item:hover, .nav-item.active { background: var(--primary-bg); color: var(--primary); }
+        .nav-item i { font-size: 1.05rem; width: 20px; text-align: center; }
+
+        /* Toast Notification */
+        #toastContainer { position: fixed; top: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .toast { 
+            background: var(--card-bg); 
+            color: var(--text-main); 
+            padding: 14px 20px; 
+            border-radius: var(--radius-main); 
+            font-size: 0.88rem; 
+            font-weight: 600; 
+            box-shadow: var(--shadow-md); 
+            transform: translateX(120%); 
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid var(--primary);
+            border-top: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+        .toast.show { transform: translateX(0); }
+
+        /* Top Bar Header */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .mobile-toggle { display: none; background: var(--card-bg); border: 1px solid var(--border); width: 42px; height: 42px; border-radius: var(--radius-sub); color: var(--text-main); font-size: 1.1rem; cursor: pointer; }
+
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: var(--card-bg); 
+            padding: 20px 24px; 
+            border-radius: var(--radius-xl); 
+            border: 1px solid var(--border); 
+            box-shadow: var(--shadow-sm);
+            flex-wrap: wrap; 
+            gap: 16px; 
+            width: 100%;
+            position: relative;
+        }
+        .header-title h1 { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; }
+        .manager-info { display: flex; gap: 16px; font-size: 0.82rem; color: var(--text-sub); margin-top: 6px; flex-wrap: wrap; }
+        .realtime-clock { 
+            font-size: 0.92rem; 
+            font-weight: 700; 
+            color: var(--primary); 
+            background: var(--primary-bg); 
+            padding: 8px 16px; 
+            border-radius: 30px; 
+            border: 1px solid rgba(2, 132, 199, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Banner & Status */
+        .incident-banner { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border); 
+            border-left: 5px solid #d97706; 
+            padding: 14px 20px; 
+            border-radius: var(--radius-main); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 12px; 
+            font-size: 0.88rem; 
+            box-shadow: var(--shadow-sm);
+        }
         
-        .badge { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
-        .badge-safe { background: var(--safe-bg); color: var(--safe); }
-        .badge-danger { background: var(--danger-bg); color: var(--danger); animation: pulse 1.2s infinite; }
-        .badge-warn { background: var(--warn-bg); color: var(--warn); }
-        .badge-spk-on { background: #f0fdf4; color: #166534; }
-        .badge-spk-off { background: #fef2f2; color: #991b1b; }
-
-        .btn-group { display: flex; gap: 6px; flex-wrap: wrap; }
-        .btn-ack { background: #d97706; color: #fff; border: none; padding: 7px 14px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
-        .btn-emergency { background: #7f1d1d; color: #fecaca; border: none; padding: 7px 14px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
-        .btn-mute { background: var(--danger); color: #fff; border: none; padding: 7px 14px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
-        .btn-unmute { background: #10b981; color: #fff; border: none; padding: 7px 14px; border-radius: 20px; font-weight: 700; font-size: 0.8rem; cursor: pointer; }
-
-        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
-        .kpi-card { background: var(--card-bg); border-radius: var(--radius-main); padding: 14px 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
-        .kpi-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); font-weight: 700; }
-        .kpi-value { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
-
-        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-        .card { background: var(--card-bg); border-radius: var(--radius-main); padding: 14px 12px; text-align: center; border: 1px solid var(--border); }
-        .card-title { font-size: 0.72rem; text-transform: uppercase; color: var(--text-sub); font-weight: 700; margin-bottom: 4px; }
-        .card-value { font-size: 1.6rem; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
-        .unit { font-size: 0.78rem; color: var(--text-sub); font-weight: 500; }
-        .card-sub { font-size: 0.72rem; color: var(--text-sub); margin-top: 3px; }
-
-        .module-box { background: var(--card-bg); padding: 18px 20px; border-radius: var(--radius-main); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
-        .section-title { font-size: 0.92rem; font-weight: 800; }
-
-        .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; align-items: flex-end; }
-        .input-group { display: flex; flex-direction: column; gap: 4px; position: relative; }
-        .input-group label { font-size: 0.75rem; color: var(--text-sub); font-weight: 700; }
-        .input-group input, .input-group select { padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--radius-sub); font-size: 0.85rem; outline: none; background: var(--card-bg); color: var(--text-main); }
-        .btn-save { background: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: var(--radius-sub); font-weight: 700; cursor: pointer; height: 35px; font-size: 0.85rem; }
-
-        .filter-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-        .search-box input { padding: 7px 12px; border: 1px solid var(--border); border-radius: 20px; font-size: 0.82rem; outline: none; width: 240px; background: var(--card-bg); color: var(--text-main); }
-        .btn-export { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); padding: 7px 14px; border-radius: 20px; font-weight: 700; font-size: 0.82rem; cursor: pointer; }
-        .btn-clear-db { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); padding: 7px 12px; border-radius: 20px; font-weight: 700; font-size: 0.82rem; cursor: pointer; }
-
-        .table-responsive { max-height: 350px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sub); }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.82rem; }
-        th, td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
-        th { background: rgba(0,0,0,0.03); color: var(--text-sub); font-weight: 700; position: sticky; top: 0; }
-
-        .note-input-row { display: grid; grid-template-columns: 220px 1fr 140px; gap: 10px; align-items: flex-end; }
-        @media (max-width: 768px) {
-            .note-input-row { grid-template-columns: 1fr; }
+        .status-banner { 
+            background: var(--card-bg); 
+            padding: 16px 20px; 
+            border-radius: var(--radius-main); 
+            border: 1px solid var(--border); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 14px; 
+            box-shadow: var(--shadow-sm);
         }
-        .note-list-container { max-height: 250px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sub); display: flex; flex-direction: column; }
-        .note-item { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; }
-        .note-item:last-child { border-bottom: none; }
-        .note-item:nth-child(odd) { background: rgba(0, 0, 0, 0.015); }
-        .note-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-sub); font-weight: 700; }
-        .note-text { font-size: 0.85rem; color: var(--text-main); line-height: 1.4; word-break: break-word; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.7); z-index: 99999; display: none; justify-content: center; align-items: center; padding: 15px; }
-        .modal-card { background: var(--card-bg); border-radius: var(--radius-main); padding: 22px; width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 14px; border: 1px solid var(--border); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-        .modal-header h3 { font-size: 1rem; font-weight: 800; }
-        .btn-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-sub); }
+        .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 30px; font-size: 0.8rem; font-weight: 700; }
+        .badge-safe { background: var(--safe-bg); color: var(--safe); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .badge-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); animation: pulse 1.2s infinite; }
+        .badge-warn { background: var(--warn-bg); color: var(--warn); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-spk-on { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .badge-spk-off { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+        /* Quạt Hút Công Nghiệp - Dynamic Visual Widget */
+        .fan-widget-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 6px 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+        }
+        .fan-icon-box {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        .fan-icon-box.running {
+            background: #dbeafe;
+            color: #0284c7;
+        }
+        .fan-icon-box.running i {
+            animation: spin 1s linear infinite;
+        }
+        .fan-icon-box.stopped {
+            background: rgba(148, 163, 184, 0.15);
+            color: var(--text-sub);
+        }
+        .fan-icon-box.error {
+            background: var(--danger-bg);
+            color: var(--danger);
+            animation: pulse 1s infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Button Groups */
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-action { 
+            border: none; 
+            padding: 9px 16px; 
+            border-radius: 30px; 
+            font-weight: 700; 
+            font-size: 0.82rem; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-ack { background: #d97706; color: #fff; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25); }
+        .btn-emergency { background: #dc2626; color: #fff; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
+        .btn-mute { background: var(--danger); color: #fff; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25); }
+        .btn-unmute { background: #10b981; color: #fff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); }
+        .btn-action:hover { transform: translateY(-2px); filter: brightness(1.08); }
+
+        /* KPI & Sensor Cards */
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+        .kpi-card { background: var(--card-bg); border-radius: var(--radius-main); padding: 18px 20px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; box-shadow: var(--shadow-sm); }
+        .kpi-title { font-size: 0.78rem; text-transform: uppercase; color: var(--text-sub); font-weight: 800; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+
+        .grid-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+        .card { background: var(--card-bg); border-radius: var(--radius-main); padding: 18px 14px; text-align: center; border: 1px solid var(--border); box-shadow: var(--shadow-sm); transition: all 0.2s; }
+        .card:hover { transform: translateY(-3px); border-color: rgba(2, 132, 199, 0.3); }
+        .card-title { font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); font-weight: 800; margin-bottom: 6px; letter-spacing: 0.4px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .card-value { font-size: 1.8rem; font-weight: 800; color: var(--primary); line-height: 1.1; }
+        .unit { font-size: 0.82rem; color: var(--text-sub); font-weight: 600; margin-left: 3px; }
+        .card-sub { font-size: 0.75rem; color: var(--text-sub); margin-top: 6px; font-weight: 500; }
+
+        /* Module Boxes */
+        .module-box { background: var(--card-bg); padding: 22px 24px; border-radius: var(--radius-xl); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-sm); }
+        .section-title { font-size: 0.98rem; font-weight: 800; letter-spacing: -0.2px; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: var(--primary); }
+
+        /* Input Controls & Settings */
+        .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; align-items: flex-end; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
+        .input-group label { font-size: 0.78rem; color: var(--text-sub); font-weight: 700; }
+        .input-group input, .input-group select { 
+            padding: 9px 14px; 
+            border: 1px solid var(--border); 
+            border-radius: var(--radius-sub); 
+            font-size: 0.88rem; 
+            outline: none; 
+            background: var(--card-bg); 
+            color: var(--text-main); 
+            transition: all 0.2s;
+        }
+        .input-group input:focus, .input-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+        .btn-save { background: var(--primary-gradient); color: #fff; border: none; padding: 10px 20px; border-radius: var(--radius-sub); font-weight: 700; cursor: pointer; height: 40px; font-size: 0.88rem; transition: all 0.2s; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25); display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-save:hover { opacity: 0.95; transform: translateY(-1px); }
+
+        /* Table & Logs */
+        .filter-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .search-box { position: relative; }
+        .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-sub); font-size: 0.85rem; }
+        .search-box input { padding: 9px 16px 9px 36px; border: 1px solid var(--border); border-radius: 30px; font-size: 0.85rem; outline: none; width: 260px; background: var(--card-bg); color: var(--text-main); }
+        
+        .btn-export { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border); padding: 9px 18px; border-radius: 30px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-export:hover { border-color: var(--primary); color: var(--primary); }
+        .btn-clear-db { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); padding: 9px 16px; border-radius: 30px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-clear-db:hover { background: var(--danger); color: #fff; }
+
+        .table-responsive { max-height: 380px; overflow-y: auto; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius-main); }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; font-size: 0.85rem; min-width: 700px; }
+        th, td { padding: 11px 16px; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg); color: var(--text-sub); font-weight: 800; position: sticky; top: 0; z-index: 10; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px; }
+        tr:last-child td { border-bottom: none; }
+
+        .note-input-row { display: grid; grid-template-columns: 220px 1fr 150px; gap: 12px; align-items: flex-end; }
+        .note-list-container { max-height: 260px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-main); display: flex; flex-direction: column; }
+        .note-item { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px; transition: background 0.15s; }
+        .note-item:last-child { border-bottom: none; }
+        .note-item:hover { background: var(--primary-bg); }
+        .note-meta { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-sub); font-weight: 700; }
+        .note-text { font-size: 0.88rem; color: var(--text-main); line-height: 1.45; word-break: break-word; }
+
+        /* Modal Overlay */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(6px); z-index: 99999; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .modal-card { background: var(--card-bg); border-radius: var(--radius-xl); padding: 26px; width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 18px; border: 1px solid var(--border); box-shadow: var(--shadow-md); animation: modalZoom 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .modal-header h3 { font-size: 1.1rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+        .btn-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-sub); transition: color 0.2s; }
+        .btn-close:hover { color: var(--danger); }
+
+        /* Responsive Mobile Breakpoints */
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+            .main-wrapper { margin-left: 0; max-width: 100vw; padding: 16px; }
+            .mobile-toggle { display: flex; align-items: center; justify-content: center; }
+            .note-input-row { grid-template-columns: 1fr; }
+            .search-box input { width: 100%; }
+            .filter-controls { flex-direction: column; align-items: stretch; }
+            .btn-export, .btn-clear-db { justify-content: center; }
+        }
 
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        @keyframes modalZoom { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
 
     <div id="toastContainer"></div>
 
+    <!-- Modal Xuất Báo Cáo -->
     <div id="exportModal" class="modal-overlay">
         <div class="modal-card">
             <div class="modal-header">
-                <h3>Xuất Báo Cáo</h3>
-                <button class="btn-close" onclick="closeExportModal()">✕</button>
+                <h3><i class="fa-solid fa-file-csv text-primary"></i> Xuất Báo Cáo CSV</h3>
+                <button class="btn-close" onclick="closeExportModal()"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="input-group">
                 <label>Phạm Vi Xuất Dữ Liệu</label>
@@ -138,118 +378,177 @@
                 <label>Chọn Tháng</label>
                 <input type="month" id="exportMonth">
             </div>
-            <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px;">
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px;">
                 <button class="btn-export" onclick="closeExportModal()">HỦY</button>
-                <button class="btn-save" onclick="processExportCSV()">TẢI XUỐNG</button>
+                <button class="btn-save" onclick="processExportCSV()"><i class="fa-solid fa-download"></i> TẢI XUỐNG</button>
             </div>
         </div>
     </div>
 
-    <div class="container">
-        <div class="nav-bar">
-            <div class="nav-btn">Giám Sát Môi Trường Nhà Xưởng</div>
-            <button class="btn-theme" onclick="toggleDarkMode()">Giao Diện Đêm / Sáng</button>
-        </div>
-
-        <div id="pageDash" style="display:flex; flex-direction:column; gap:16px;">
-            <header>
-                <div class="header-title">
-                    <h1 id="headerProjectName">TRẠM ĐIỀU KHIỂN VÀ ĐO ĐẠC NHÀ XƯỞNG</h1>
-                    <div class="manager-info">
-                        <span>Trường: <strong id="dispUniv">Trường Đại học Công nghiệp TP.HCM</strong></span>
-                        <span>Quản lý: <strong id="dispAuthor">Nguyễn Trọng Phước</strong></span>
-                        <span>Vị trí: <strong id="dispLocation">Khu Nhà Xưởng - TP.HCM</strong></span>
+    <div class="app-layout">
+        <!-- Sidebar Drawer cho Di Động và PC -->
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+        <aside class="sidebar" id="sidebar">
+            <div>
+                <div class="brand-logo">
+                    <div class="brand-icon"><i class="fa-solid fa-industry"></i></div>
+                    <div>
+                        <div class="brand-text">SMART FACTORY</div>
+                        <div class="brand-sub">Enterprise System</div>
                     </div>
                 </div>
-                <div id="realtimeClock" class="realtime-clock">--:--:-- --/--/----</div>
-            </header>
+
+                <nav class="nav-menu">
+                    <a class="nav-item active" onclick="closeSidebar()"><i class="fa-solid fa-chart-line"></i> Dashboard Giám Sát</a>
+                    <a class="nav-item" onclick="closeSidebar()"><i class="fa-solid fa-sliders"></i> Cấu Hình Ngưỡng</a>
+                    <a class="nav-item" onclick="closeSidebar()"><i class="fa-solid fa-book-bookmark"></i> Nhật Ký Ca Trực</a>
+                    <a class="nav-item" onclick="closeSidebar()"><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử Đo Đạc</a>
+                </nav>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button class="btn-export" onclick="toggleDarkMode()" style="width: 100%; justify-content: center;">
+                    <i class="fa-solid fa-circle-half-stroke"></i> Giao Diện Đêm / Sáng
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-wrapper">
+            <div class="top-bar">
+                <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+                <header>
+                    <div class="header-title">
+                        <h1><i class="fa-solid fa-microchip text-primary"></i> <span id="headerProjectName">TRẠM ĐIỀU KHIỂN VÀ ĐO ĐẠC NHÀ XƯỞNG</span></h1>
+                        <div class="manager-info">
+                            <span><i class="fa-solid fa-graduation-cap"></i> Trường: <strong id="dispUniv">Trường Đại học Công nghiệp TP.HCM</strong></span>
+                            <span><i class="fa-solid fa-user-gear"></i> Quản lý: <strong id="dispAuthor">Nguyễn Trọng Phước</strong></span>
+                            <span><i class="fa-solid fa-location-dot"></i> Vị trí: <strong id="dispLocation">Khu Nhà Xưởng - TP.HCM</strong></span>
+                        </div>
+                    </div>
+                    <div id="realtimeClock" class="realtime-clock"><i class="fa-regular fa-clock"></i> --:--:-- --/--/----</div>
+                </header>
+            </div>
 
             <div class="incident-banner">
                 <div>
+                    <i class="fa-solid fa-triangle-exclamation" style="color:#d97706; margin-right:6px;"></i>
                     <strong>Sự Cố Gần Nhất:</strong> <span id="lastIncName" style="color:#d97706; font-weight:700;">Không có</span>
                 </div>
                 <div>
                     Trạng Thái: <span id="lastIncStatus" class="badge badge-safe">AN TOÀN</span>
                 </div>
                 <div>
-                    Thời Gian: <strong id="lastIncTime" style="font-family:monospace;">--:--:--</strong>
+                    Thời Gian: <strong id="lastIncTime" class="tech-data">--:--:--</strong>
                 </div>
             </div>
 
             <div class="status-banner">
-                <div style="display:flex; align-items:center; gap:8px;">
-                    <span id="envBadge" class="badge badge-safe">AN TOÀN</span>
-                    <span id="speakerBadge" class="badge badge-spk-on">LOA BÁO ĐỘNG: ĐANG BẬT</span>
-                    <span id="fanBadge" class="badge" style="background:#f1f5f9; color:#475569;">QUẠT HÚT: TỰ ĐỘNG (TẮT)</span>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <span id="envBadge" class="badge badge-safe"><i class="fa-solid fa-shield-halved"></i> AN TOÀN</span>
+                    <span id="speakerBadge" class="badge badge-spk-on"><i class="fa-solid fa-volume-high"></i> LOA BÁO ĐỘNG: ĐANG BẬT</span>
+                    
+                    <!-- Quạt Hút Công Nghiệp Visual Widget -->
+                    <div class="fan-widget-container">
+                        <div class="fan-icon-box stopped" id="fanIconBox">
+                            <i class="fa-solid fa-fan"></i>
+                        </div>
+                        <span id="fanBadge" style="font-size:0.82rem; font-weight:700; color:var(--text-sub);">QUẠT HÚT: TỰ ĐỘNG (TẮT)</span>
+                    </div>
                 </div>
+
                 <div class="btn-group">
-                    <button class="btn-ack" onclick="ackAlert()">XÁC NHẬN SỰ CỐ</button>
-                    <button class="btn-emergency" onclick="triggerEmergency()">BÁO ĐỘNG KHẨN</button>
-                    <button class="btn-mute" onclick="triggerMute()">TẮT LOA TẠM</button>
-                    <button class="btn-unmute" onclick="triggerUnmute()">BẬT LOA</button>
+                    <button class="btn-action btn-ack" onclick="ackAlert()"><i class="fa-solid fa-check-double"></i> XÁC NHẬN SỰ CỐ</button>
+                    <button class="btn-action btn-emergency" onclick="triggerEmergency()"><i class="fa-solid fa-bell"></i> BÁO ĐỘNG KHẨN</button>
+                    <button class="btn-action btn-mute" onclick="triggerMute()"><i class="fa-solid fa-volume-xmark"></i> TẮT LOA TẠM</button>
+                    <button class="btn-action btn-unmute" onclick="triggerUnmute()"><i class="fa-solid fa-volume-high"></i> BẬT LOA</button>
                 </div>
             </div>
 
             <div class="kpi-grid">
-                <div class="kpi-card" style="border-left: 4px solid #ef4444;">
-                    <div class="kpi-title">Tỉ Lệ Sự Cố / Ca Trực</div>
+                <div class="kpi-card" style="border-left: 5px solid #ef4444;">
+                    <div class="kpi-title"><i class="fa-solid fa-chart-pie" style="color:#ef4444;"></i> Tỉ Lệ Sự Cố / Ca Trực</div>
                     <div class="kpi-value" style="color: #ef4444;"><span id="kpiIncidentRatio">0.00</span> /ca</div>
                 </div>
-                <div class="kpi-card" style="border-left: 4px solid #0284c7;">
-                    <div class="kpi-title">Tổng Số Lần Sự Cố Tích Lũy</div>
+                <div class="kpi-card" style="border-left: 5px solid #0284c7;">
+                    <div class="kpi-title"><i class="fa-solid fa-cubes-stacked" style="color:#0284c7;"></i> Tổng Số Lần Sự Cố Tích Lũy</div>
                     <div class="kpi-value" style="color: #0284c7;"><span id="kpiTotalIncidents">0</span> lần</div>
                 </div>
-                <div class="kpi-card" style="border-left: 4px solid #f59e0b;">
-                    <div class="kpi-title">Phân Loại Sự Cố</div>
-                    <div style="font-size:0.85rem; font-weight:700; margin-top:2px;">
+                <div class="kpi-card" style="border-left: 5px solid #f59e0b;">
+                    <div class="kpi-title"><i class="fa-solid fa-list-check" style="color:#f59e0b;"></i> Phân Loại Sự Cố</div>
+                    <div style="font-size:0.88rem; font-weight:700; margin-top:4px;" class="tech-data">
                         Nhiệt: <span id="incTemp" style="color:#ef4444;">0</span> | Gas: <span id="incGas" style="color:#ef4444;">0</span> | CO2: <span id="incCo2" style="color:#ef4444;">0</span> | Bụi: <span id="incDust" style="color:#ef4444;">0</span>
                     </div>
                 </div>
             </div>
 
             <div class="grid-layout">
-                <div class="card"><div class="card-title">Nhiệt Độ</div><div class="card-value"><span id="temp">0.0</span><span class="unit">°C</span></div><div class="card-sub">Min: <span id="minTemp">--</span> | Max: <span id="maxTemp">--</span></div></div>
-                <div class="card"><div class="card-title">Độ Ẩm</div><div class="card-value"><span id="hum">0.0</span><span class="unit">%</span></div><div class="card-sub">Độ ẩm tương đối</div></div>
-                <div class="card"><div class="card-title">Khí Gas</div><div class="card-value"><span id="gas">0</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetGas">180</span></div></div>
-                <div class="card"><div class="card-title">Khí CO2</div><div class="card-value"><span id="co2">0</span><span class="unit">PPM</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetCo2">900</span></div></div>
-                <div class="card"><div class="card-title">Bụi PM2.5</div><div class="card-value"><span id="dust">0</span><span class="unit">µg/m³</span></div><div class="card-sub">Ngưỡng: &lt;<span id="dispSetDust">150</span></div></div>
-                <div class="card"><div class="card-title">Chỉ Số AQI</div><div class="card-value" style="color:var(--primary);"><span id="aqi">0</span></div><div class="card-sub" id="aqiDesc">Đánh giá: TỐT</div></div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-temperature-three-quarters" style="color:#0284c7;"></i> Nhiệt Độ</div>
+                    <div class="card-value"><span id="temp">0.0</span><span class="unit">°C</span></div>
+                    <div class="card-sub">Min: <span id="minTemp">--</span> | Max: <span id="maxTemp">--</span></div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-droplet" style="color:#06b6d4;"></i> Độ Ẩm</div>
+                    <div class="card-value"><span id="hum">0.0</span><span class="unit">%RH</span></div>
+                    <div class="card-sub">Độ ẩm tương đối</div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-gas-pump" style="color:#f59e0b;"></i> Khí Gas</div>
+                    <div class="card-value"><span id="gas">0</span><span class="unit">PPM</span></div>
+                    <div class="card-sub">Ngưỡng: &lt;<span id="dispSetGas">180</span></div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-smog" style="color:#10b981;"></i> Khí CO2</div>
+                    <div class="card-value"><span id="co2">0</span><span class="unit">PPM</span></div>
+                    <div class="card-sub">Ngưỡng: &lt;<span id="dispSetCo2">900</span></div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-wind" style="color:#ef4444;"></i> Bụi PM2.5</div>
+                    <div class="card-value"><span id="dust">0</span><span class="unit">µg/m³</span></div>
+                    <div class="card-sub">Ngưỡng: &lt;<span id="dispSetDust">150</span></div>
+                </div>
+                <div class="card">
+                    <div class="card-title"><i class="fa-solid fa-heart-pulse" style="color:#8b5cf6;"></i> Chỉ Số AQI</div>
+                    <div class="card-value" style="color:var(--primary);"><span id="aqi">0</span></div>
+                    <div class="card-sub" id="aqiDesc">Đánh giá: TỐT</div>
+                </div>
             </div>
 
+            <!-- Biểu Đồ Thời Gian Thực Nâng Cấp -->
             <div class="module-box">
-                <div class="section-title">BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC</div>
-                <div style="position: relative; height: 260px; width: 100%;">
+                <div class="section-title"><i class="fa-solid fa-chart-line"></i> BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC (DỮ LIỆU TỪ ESP32)</div>
+                <div style="position: relative; height: 300px; width: 100%;">
                     <canvas id="envChart"></canvas>
                 </div>
             </div>
 
             <div class="module-box">
-                <div class="section-title">THIẾT LẬP NGƯỠNG CẢNH BÁO</div>
+                <div class="section-title"><i class="fa-solid fa-sliders"></i> THIẾT LẬP NGƯỠNG CẢNH BÁO TỪ XA</div>
                 <div class="settings-grid">
                     <div class="input-group"><label>Ngưỡng Nhiệt Độ °C</label><input type="number" id="setTemp" step="0.5" value="38.0"></div>
                     <div class="input-group"><label>Ngưỡng Khí CO2 PPM</label><input type="number" id="setCo2" value="900"></div>
                     <div class="input-group"><label>Ngưỡng Bụi PM2.5 µg/m³</label><input type="number" id="setDust" value="150"></div>
                     <div class="input-group"><label>Ngưỡng Khí Gas PPM</label><input type="number" id="setGas" value="180"></div>
-                    <button class="btn-save" onclick="saveThresholds()">ÁP DỤNG NGƯỠNG</button>
+                    <button class="btn-save" onclick="saveThresholds()"><i class="fa-solid fa-floppy-disk"></i> ÁP DỤNG NGƯỠNG</button>
                 </div>
             </div>
 
             <div class="module-box">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div class="section-title">SỔ NHẬT KÝ CA TRỰC</div>
-                    <button class="btn-clear-db" onclick="clearNoteLogs()">Xóa Sổ Nhật Ký</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                    <div class="section-title"><i class="fa-solid fa-book"></i> SỔ NHẬT KÝ CA TRỰC NHÀ XƯỞNG</div>
+                    <button class="btn-clear-db" onclick="clearNoteLogs()"><i class="fa-solid fa-trash-can"></i> Xóa Nhật Ký</button>
                 </div>
                 
                 <div class="note-input-row">
                     <div class="input-group">
                         <label>Người Ghi Chú</label>
-                        <input type="text" id="noteAuthor" maxlength="30" value="Nguyễn Trọng Phước" placeholder="Tên kỹ sư / người trực...">
+                        <input type="text" id="noteAuthor" maxlength="30" value="Nguyễn Trọng Phước" placeholder="Tên kỹ sư ca trực...">
                     </div>
                     <div class="input-group">
                         <label>Nội Dung Ghi Chú</label>
                         <input type="text" id="noteContent" maxlength="120" placeholder="Nhập diễn biến ca trực, kiểm tra thiết bị...">
                     </div>
-                    <button class="btn-save" onclick="submitNewNote()">THÊM GHI CHÚ</button>
+                    <button class="btn-save" onclick="submitNewNote()"><i class="fa-solid fa-plus"></i> THÊM GHI CHÚ</button>
                 </div>
 
                 <div class="note-list-container" id="noteListContainer">
@@ -258,29 +557,45 @@
             </div>
 
             <div class="module-box">
-                <div class="section-title">LỊCH SỬ ĐO ĐẠC</div>
+                <div class="section-title"><i class="fa-solid fa-database"></i> LỊCH SỬ ĐO ĐẠC CLOUD</div>
                 <div class="filter-controls">
-                    <select id="timeRangeFilter" onchange="onTimeFilterChange()">
+                    <select id="timeRangeFilter" onchange="onTimeFilterChange()" style="padding:9px 14px; border-radius:30px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); font-size:0.85rem;">
                         <option value="all">Tất cả lịch sử</option>
                         <option value="custom">Chọn ngày cụ thể...</option>
                     </select>
-                    <input type="date" id="datePicker" onchange="smartFilterTable()" style="display: none;">
-                    <div class="search-box"><input type="text" id="tableSearch" placeholder="Tìm kiếm mốc giờ, loại khí..." onkeyup="smartFilterTable()"></div>
-                    <button class="btn-export" onclick="openExportModal()">Xuất Báo Cáo</button>
-                    <button class="btn-clear-db" onclick="clearDatabase()">Xóa Lịch Sử</button>
+                    <input type="date" id="datePicker" onchange="smartFilterTable()" style="display: none; padding:9px 14px; border-radius:30px; border:1px solid var(--border); background:var(--card-bg); color:var(--text-main); font-size:0.85rem;">
+                    
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="tableSearch" placeholder="Tìm kiếm mốc giờ, loại khí..." onkeyup="smartFilterTable()">
+                    </div>
+                    
+                    <button class="btn-export" onclick="openExportModal()"><i class="fa-solid fa-file-export"></i> Xuất Báo Cáo</button>
+                    <button class="btn-clear-db" onclick="clearDatabase()"><i class="fa-solid fa-trash-can"></i> Xóa Lịch Sử</button>
                 </div>
+
                 <div class="table-responsive">
                     <table id="logTable">
                         <thead>
-                            <tr><th>Thời Gian</th><th>Nhiệt Độ °C</th><th>Độ Ẩm %</th><th>Khí Gas PPM</th><th>Khí CO2 PPM</th><th>Bụi PM2.5 µg/m³</th><th>AQI</th><th>Trạng Thái</th></tr>
+                            <tr>
+                                <th>Thời Gian</th>
+                                <th>Nhiệt Độ °C</th>
+                                <th>Độ Ẩm %</th>
+                                <th>Khí Gas PPM</th>
+                                <th>Khí CO2 PPM</th>
+                                <th>Bụi PM2.5 µg/m³</th>
+                                <th>AQI</th>
+                                <th>Trạng Thái</th>
+                            </tr>
                         </thead>
                         <tbody id="logTableBody"></tbody>
                     </table>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
+    <!-- LOGIC FIREBASE & ĐỒNG BỘ DỮ LIỆU THỜI GIAN THỰC -->
     <script>
         const firebaseConfig = {
             databaseURL: "https://giam-sat-moi-truong-nha-xuong-default-rtdb.asia-southeast1.firebasedatabase.app"
@@ -304,19 +619,31 @@
         let logData = [];
         let currentClockDate = null;
 
-        function toggleDarkMode() { document.body.classList.toggle('dark-mode'); }
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
+
+        function toggleDarkMode() { 
+            document.body.classList.toggle('dark-mode'); 
+        }
 
         function showTopToast(message) {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
             toast.className = 'toast';
-            toast.innerText = message;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info text-primary"></i> <span>${message}</span>`;
             container.appendChild(toast);
             setTimeout(() => toast.classList.add('show'), 20);
-            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 2500);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 350); }, 2500);
         }
 
-        // Tự động đồng bộ ngưỡng từ Firebase khi F5
+        // Tự động đồng bộ ngưỡng từ Firebase
         database.ref('/thresholds').once('value').then((snapshot) => {
             const th = snapshot.val();
             if (th) {
@@ -327,7 +654,7 @@
             }
         });
 
-        // Đồng hồ nhảy mượt 1 giây
+        // Đồng hồ thời gian thực
         setInterval(() => {
             if (currentClockDate) {
                 currentClockDate.setSeconds(currentClockDate.getSeconds() + 1);
@@ -337,7 +664,7 @@
                 const D = String(currentClockDate.getDate()).padStart(2, '0');
                 const M = String(currentClockDate.getMonth() + 1).padStart(2, '0');
                 const Y = currentClockDate.getFullYear();
-                document.getElementById('realtimeClock').innerText = `${h}:${m}:${s} ${D}/${M}/${Y}`;
+                document.getElementById('realtimeClock').innerHTML = `<i class="fa-regular fa-clock"></i> ${h}:${m}:${s} ${D}/${M}/${Y}`;
             }
         }, 1000);
 
@@ -345,38 +672,32 @@
             isSpeakerMuted = true;
             database.ref('/controls/muteAudio').set(1);
             document.getElementById('speakerBadge').className = "badge badge-spk-off";
-            document.getElementById('speakerBadge').innerText = "LOA BÁO ĐỘNG: ĐÃ TẮT";
-            showTopToast("Đã gửi lệnh tắt loa cảnh báo tạm thời lên Cloud!");
+            document.getElementById('speakerBadge').innerHTML = `<i class="fa-solid fa-volume-xmark"></i> LOA BÁO ĐỘNG: ĐÃ TẮT`;
+            showTopToast("Đã gửi lệnh tắt loa cảnh báo tạm thời!");
         }
 
         function triggerUnmute() {
             isSpeakerMuted = false;
             database.ref('/controls/muteAudio').set(0);
             document.getElementById('speakerBadge').className = "badge badge-spk-on";
-            document.getElementById('speakerBadge').innerText = "LOA BÁO ĐỘNG: ĐANG BẬT";
-            showTopToast("Đã gửi lệnh bật lại loa cảnh báo lên Cloud!");
+            document.getElementById('speakerBadge').innerHTML = `<i class="fa-solid fa-volume-high"></i> LOA BÁO ĐỘNG: ĐANG BẬT`;
+            showTopToast("Đã gửi lệnh bật lại loa cảnh báo!");
         }
 
         function triggerEmergency() {
-            database.ref('/controls').update({
-                emergencyAlarm: 1,
-                muteAudio: 0
-            });
+            database.ref('/controls').update({ emergencyAlarm: 1, muteAudio: 0 });
             document.getElementById('speakerBadge').className = "badge badge-spk-on";
-            document.getElementById('speakerBadge').innerText = "LOA BÁO ĐỘNG: BẬT KHẨN CẤP";
+            document.getElementById('speakerBadge').innerHTML = `<i class="fa-solid fa-volume-high"></i> LOA BÁO ĐỘNG: BẬT KHẨN CẤP`;
             document.getElementById('envBadge').className = "badge badge-danger";
-            document.getElementById('envBadge').innerText = "CẢNH BÁO KHẨN";
+            document.getElementById('envBadge').innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> CẢNH BÁO KHẨN`;
             document.getElementById('aqiDesc').innerText = "Đánh giá: BÁO ĐỘNG KHẨN CẤP TỪ XA";
-            showTopToast("ĐÃ KÍCH HOẠT BÁO ĐỘNG KHẨN CẤP LÊN TRẠM!");
+            showTopToast("ĐÃ KÍCH HOẠT BÁO ĐỘNG KHẨN CẤP!");
         }
 
         function ackAlert() {
-            database.ref('/controls').update({
-                emergencyAlarm: 0,
-                muteAudio: 1
-            });
+            database.ref('/controls').update({ emergencyAlarm: 0, muteAudio: 1 });
             document.getElementById('speakerBadge').className = "badge badge-spk-off";
-            document.getElementById('speakerBadge').innerText = "LOA BÁO ĐỘNG: ĐÃ TẮT";
+            document.getElementById('speakerBadge').innerHTML = `<i class="fa-solid fa-volume-xmark"></i> LOA BÁO ĐỘNG: ĐÃ TẮT`;
             document.getElementById('lastIncStatus').className = "badge badge-warn";
             document.getElementById('lastIncStatus').innerText = "ĐANG XỬ LÝ";
             showTopToast("Đã xác nhận sự cố & dừng báo động!");
@@ -393,10 +714,7 @@
             document.getElementById('dispSetDust').innerText = cfgDust;
 
             database.ref('/thresholds').set({
-                temp: cfgTemp,
-                gas: cfgGas,
-                co2: cfgCo2,
-                dust: cfgDust
+                temp: cfgTemp, gas: cfgGas, co2: cfgCo2, dust: cfgDust
             }).then(() => {
                 showTopToast("Đã lưu và đồng bộ ngưỡng xuống trạm đo!");
             });
@@ -414,7 +732,7 @@
             };
             database.ref('/notes').push(newNote).then(() => {
                 document.getElementById('noteContent').value = '';
-                showTopToast("Đã lưu ghi chú lên Firebase Cloud!");
+                showTopToast("Đã lưu ghi chú lên Cloud!");
             });
         }
 
@@ -430,8 +748,8 @@
                 div.className = 'note-item';
                 div.innerHTML = `
                     <div class="note-meta">
-                        <span>${item.author}</span>
-                        <span>${item.time}</span>
+                        <span><i class="fa-solid fa-user-pen"></i> ${item.author}</span>
+                        <span class="tech-data">${item.time}</span>
                     </div>
                     <div class="note-text">${item.content}</div>
                 `;
@@ -444,33 +762,44 @@
             database.ref('/notes').remove().then(() => {
                 cachedNoteList = [];
                 renderNotesUI([]);
-                showTopToast("Đã xóa sạch sổ nhật ký trên Cloud!");
+                showTopToast("Đã xóa sạch sổ nhật ký!");
             });
         }
 
         database.ref('/notes').on('value', (snapshot) => {
             cachedNoteList = [];
-            snapshot.forEach(child => {
-                cachedNoteList.unshift(child.val());
-            });
+            snapshot.forEach(child => cachedNoteList.unshift(child.val()));
             renderNotesUI(cachedNoteList);
         });
 
+        // Biểu đồ Real-time Nâng Cấp với Hai Trục Tung Y & Legend Tương Tác
         const ctx = document.getElementById('envChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
             data: {
                 datasets: [
-                    { label: 'Nhiệt độ °C', data: [], borderColor: '#0284c7', fill: true, backgroundColor: 'rgba(2,132,199,0.05)', cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
-                    { label: 'Độ ẩm %', data: [], borderColor: '#06b6d4', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yTemp', pointRadius: 0 },
-                    { label: 'Khí Gas PPM', data: [], borderColor: '#f59e0b', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
-                    { label: 'Khí CO2 PPM', data: [], borderColor: '#10b981', fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 },
-                    { label: 'Bụi PM2.5 µg/m³', data: [], borderColor: '#ef4444', borderDash: [4, 4], fill: false, cubicInterpolationMode: 'monotone', tension: 0.4, yAxisID: 'yGas', pointRadius: 0 }
+                    { label: 'Nhiệt độ (°C)', data: [], borderColor: '#0284c7', fill: true, backgroundColor: 'rgba(2,132,199,0.05)', tension: 0.3, yAxisID: 'yTemp', pointRadius: 0 },
+                    { label: 'Độ ẩm (%RH)', data: [], borderColor: '#06b6d4', fill: false, tension: 0.3, yAxisID: 'yTemp', pointRadius: 0 },
+                    { label: 'Khí Gas (PPM)', data: [], borderColor: '#f59e0b', fill: false, tension: 0.3, yAxisID: 'yGas', pointRadius: 0 },
+                    { label: 'Khí CO₂ (PPM)', data: [], borderColor: '#10b981', fill: false, tension: 0.3, yAxisID: 'yGas', pointRadius: 0 },
+                    { label: 'Bụi PM2.5 (µg/m³)', data: [], borderColor: '#ef4444', borderDash: [4, 4], fill: false, tension: 0.3, yAxisID: 'yGas', pointRadius: 0 }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: { font: { family: 'Plus Jakarta Sans', weight: '700' }, usePointStyle: true }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        bodyFont: { family: 'JetBrains Mono' }
+                    }
+                },
                 scales: {
                     x: {
                         type: 'realtime',
@@ -487,19 +816,26 @@
                         },
                         grid: { display: false }
                     },
-                    yTemp: { type: 'linear', position: 'left', suggestedMin: 20, suggestedMax: 100 },
-                    yGas: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, suggestedMin: 0, suggestedMax: 1200 }
+                    yTemp: { 
+                        type: 'linear', position: 'left', 
+                        title: { display: true, text: 'Nhiệt độ & Độ ẩm', font: { weight: 'bold' } },
+                        suggestedMin: 15, suggestedMax: 100 
+                    },
+                    yGas: { 
+                        type: 'linear', position: 'right', 
+                        title: { display: true, text: 'Gas / CO2 / Bụi (PPM & µg/m³)', font: { weight: 'bold' } },
+                        grid: { drawOnChartArea: false }, suggestedMin: 0, suggestedMax: 1200 
+                    }
                 }
             }
         });
 
-        // 1. NHẬN DỮ LIỆU TỨC THỜI TỪ FIREBASE
+        // 1. Nhận Dữ Liệu Tức Thời & Trạng Thái Quạt Hút Từ Firebase ESP32
         database.ref('/current').on('value', (snapshot) => {
             const data = snapshot.val();
             if (!data) return;
 
             if (data.time) {
-                document.getElementById('realtimeClock').innerText = data.time;
                 const parts = data.time.split(' ');
                 if (parts.length === 2) {
                     const timeParts = parts[0].split(':');
@@ -533,39 +869,45 @@
             const envBadge = document.getElementById('envBadge');
             if (isCurrentDanger) {
                 envBadge.className = "badge badge-danger";
-                envBadge.innerText = (data.emergencyState === 1) ? "CẢNH BÁO KHẨN" : "CẢNH BÁO";
+                envBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ` + ((data.emergencyState === 1) ? "CẢNH BÁO KHẨN" : "CẢNH BÁO");
                 document.getElementById('aqiDesc').innerText = "Đánh giá: " + (data.detailAlarm || "VƯỢT NGƯỠNG AN TOÀN");
             } else {
                 envBadge.className = "badge badge-safe";
-                envBadge.innerText = "AN TOÀN";
+                envBadge.innerHTML = `<i class="fa-solid fa-shield-halved"></i> AN TOÀN`;
                 document.getElementById('aqiDesc').innerText = "Đánh giá: CHẤT LƯỢNG TỐT";
             }
 
+            // Cập nhật trạng thái Quạt Hút Công Nghiệp (Đang Chạy / Tắt / Lỗi)
             const fanBadge = document.getElementById('fanBadge');
-            if (data.fanState === 1) {
-                fanBadge.innerText = "QUẠT HÚT: ĐANG BẬT";
-                fanBadge.style.background = "#dbeafe";
-                fanBadge.style.color = "#1e40af";
+            const fanBox = document.getElementById('fanIconBox');
+
+            if (data.status === "LOI" || data.fanError === 1) {
+                fanBadge.innerText = "QUẠT HÚT: SỰ CỐ / LỖI";
+                fanBadge.style.color = "var(--danger)";
+                fanBox.className = "fan-icon-box error";
+            } else if (data.fanState === 1) {
+                fanBadge.innerText = "QUẠT HÚT: ĐANG HOẠT ĐỘNG";
+                fanBadge.style.color = "var(--primary)";
+                fanBox.className = "fan-icon-box running";
             } else {
                 fanBadge.innerText = "QUẠT HÚT: TỰ ĐỘNG (TẮT)";
-                fanBadge.style.background = "#f1f5f9";
-                fanBadge.style.color = "#475569";
+                fanBadge.style.color = "var(--text-sub)";
+                fanBox.className = "fan-icon-box stopped";
             }
 
-            // TỰ ĐỘNG CẬP NHẬT TRẠNG THÁI LOA TRÊN WEB KHI ESP32 TỰ BẬT LẠI DO CÓ CẢNH BÁO MỚI
             const spkBadge = document.getElementById('speakerBadge');
             if (data.muteState === 1) {
                 spkBadge.className = "badge badge-spk-off";
-                spkBadge.innerText = "LOA BÁO ĐỘNG: ĐÃ TẮT";
+                spkBadge.innerHTML = `<i class="fa-solid fa-volume-xmark"></i> LOA BÁO ĐỘNG: ĐÃ TẮT`;
                 isSpeakerMuted = true;
             } else {
                 spkBadge.className = "badge badge-spk-on";
-                spkBadge.innerText = "LOA BÁO ĐỘNG: ĐANG BẬT";
+                spkBadge.innerHTML = `<i class="fa-solid fa-volume-high"></i> LOA BÁO ĐỘNG: ĐANG BẬT`;
                 isSpeakerMuted = false;
             }
         });
 
-        // 2. NHẬN LỊCH SỬ CLOUD
+        // 2. Nhận Lịch Sử từ Firebase Cloud
         database.ref('/history').limitToLast(200).on('value', (snapshot) => {
             logData = [];
             let totalAlarm = 0;
@@ -644,13 +986,13 @@
             records.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${row.fullTime}</td>
-                    <td>${row.curTemp.toFixed(1)}</td>
-                    <td>${row.curHum.toFixed(1)}</td>
-                    <td>${row.curGas}</td>
-                    <td>${row.curCo2}</td>
-                    <td>${row.curDust}</td>
-                    <td>${row.curAqi}</td>
+                    <td class="tech-data">${row.fullTime}</td>
+                    <td class="tech-data">${row.curTemp.toFixed(1)}</td>
+                    <td class="tech-data">${row.curHum.toFixed(1)}</td>
+                    <td class="tech-data">${row.curGas}</td>
+                    <td class="tech-data">${row.curCo2}</td>
+                    <td class="tech-data">${row.curDust}</td>
+                    <td class="tech-data">${row.curAqi}</td>
                     <td><span class="badge ${row.isDanger ? 'badge-danger' : 'badge-safe'}">${row.statusText}</span></td>
                 `;
                 tbody.appendChild(tr);
