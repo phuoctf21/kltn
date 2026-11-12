@@ -75,30 +75,18 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); }
         body { background-color: var(--bg); color: var(--text-main); min-height: 100vh; transition: background-color 0.3s ease, color 0.3s ease; display: flex; overflow-x: hidden; }
 
-        /* Font Mono cho các giá trị kỹ thuật */
-        .tech-data, .realtime-clock, .kpi-value, .card-value, table, .badge-tech {
-            font-family: var(--font-tech) !important;
-        }
+        .tech-data, .realtime-clock, .kpi-value, .card-value, table, .badge-tech { font-family: var(--font-tech) !important; }
 
-        /* Layout Tổng Thể Smart Factory */
         .app-layout { display: flex; width: 100vw; min-height: 100vh; }
 
-        /* Sidebar & Drawer */
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1900; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
         .sidebar { 
-            width: 260px; 
-            background: var(--sidebar-bg); 
-            border-right: 1px solid var(--border); 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            padding: 24px 16px; 
-            z-index: 2000; 
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: fixed;
-            top: 0; bottom: 0; left: 0;
+            width: 260px; background: var(--sidebar-bg); border-right: 1px solid var(--border); 
+            display: flex; flex-direction: column; justify-content: space-between; 
+            padding: 24px 16px; z-index: 2000; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: fixed; top: 0; bottom: 0; left: 0;
         }
 
         .main-wrapper { flex: 1; margin-left: 260px; padding: 20px 24px; display: flex; flex-direction: column; gap: 20px; max-width: calc(100vw - 260px); }
@@ -113,92 +101,46 @@
         .nav-item:hover, .nav-item.active { background: var(--primary-bg); color: var(--primary); }
         .nav-item i { font-size: 1.05rem; width: 20px; text-align: center; }
 
-        /* Quản lý các Tab Giao diện SPA */
         .app-page { display: none; }
         .app-page.active { display: flex; flex-direction: column; gap: 20px; animation: fadeIn 0.25s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Toast Notification */
         #toastContainer { position: fixed; top: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .toast { 
-            background: var(--card-bg); 
-            color: var(--text-main); 
-            padding: 14px 20px; 
-            border-radius: var(--radius-main); 
-            font-size: 0.88rem; 
-            font-weight: 600; 
-            box-shadow: var(--shadow-md); 
-            transform: translateX(120%); 
-            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); 
-            pointer-events: auto;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-left: 4px solid var(--primary);
-            border: 1px solid var(--border);
+            background: var(--card-bg); color: var(--text-main); padding: 14px 20px; 
+            border-radius: var(--radius-main); font-size: 0.88rem; font-weight: 600; 
+            box-shadow: var(--shadow-md); transform: translateX(120%); 
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: auto;
+            display: flex; align-items: center; gap: 12px; border-left: 4px solid var(--primary); border: 1px solid var(--border);
         }
         .toast.show { transform: translateX(0); }
 
-        /* Top Bar Header */
         .top-bar { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
         .mobile-toggle { display: none; background: var(--card-bg); border: 1px solid var(--border); width: 42px; height: 42px; border-radius: var(--radius-sub); color: var(--text-main); font-size: 1.1rem; cursor: pointer; }
 
         header { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: var(--card-bg); 
-            padding: 20px 24px; 
-            border-radius: var(--radius-xl); 
-            border: 1px solid var(--border); 
-            box-shadow: var(--shadow-sm);
-            flex-wrap: wrap; 
-            gap: 16px; 
-            width: 100%;
-            position: relative;
+            display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); 
+            padding: 20px 24px; border-radius: var(--radius-xl); border: 1px solid var(--border); 
+            box-shadow: var(--shadow-sm); flex-wrap: wrap; gap: 16px; width: 100%; position: relative;
         }
         .header-title h1 { font-size: 1.25rem; font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; }
-        .manager-info { display: flex; gap: 16px; font-size: 0.82rem; color: var(--text-sub); margin-top: 6px; flex-wrap: wrap; }
+        .manager-info { display: flex; gap: 16px; font-size: 0.82rem; color: var(--text-sub); margin-top: 6px; flex-wrap: wrap; align-items: center; }
         .realtime-clock { 
-            font-size: 0.92rem; 
-            font-weight: 700; 
-            color: var(--primary); 
-            background: var(--primary-bg); 
-            padding: 8px 16px; 
-            border-radius: 30px; 
-            border: 1px solid rgba(2, 132, 199, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-size: 0.92rem; font-weight: 700; color: var(--primary); background: var(--primary-bg); 
+            padding: 8px 16px; border-radius: 30px; border: 1px solid rgba(2, 132, 199, 0.2);
+            display: flex; align-items: center; gap: 8px;
         }
 
-        /* Banner & Status */
         .incident-banner { 
-            background: var(--card-bg); 
-            border: 1px solid var(--border); 
-            border-left: 5px solid #d97706; 
-            padding: 14px 20px; 
-            border-radius: var(--radius-main); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-wrap: wrap; 
-            gap: 12px; 
-            font-size: 0.88rem; 
-            box-shadow: var(--shadow-sm);
+            background: var(--card-bg); border: 1px solid var(--border); border-left: 5px solid #d97706; 
+            padding: 14px 20px; border-radius: var(--radius-main); display: flex; justify-content: space-between; 
+            align-items: center; flex-wrap: wrap; gap: 12px; font-size: 0.88rem; box-shadow: var(--shadow-sm);
         }
         
         .status-banner { 
-            background: var(--card-bg); 
-            padding: 16px 20px; 
-            border-radius: var(--radius-main); 
-            border: 1px solid var(--border); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            flex-wrap: wrap; 
-            gap: 14px; 
-            box-shadow: var(--shadow-sm);
+            background: var(--card-bg); padding: 16px 20px; border-radius: var(--radius-main); 
+            border: 1px solid var(--border); display: flex; justify-content: space-between; 
+            align-items: center; flex-wrap: wrap; gap: 14px; box-shadow: var(--shadow-sm);
         }
 
         .badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 30px; font-size: 0.8rem; font-weight: 700; }
@@ -208,65 +150,22 @@
         .badge-spk-on { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
         .badge-spk-off { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
 
-        /* Quạt Hút Công Nghiệp - Dynamic Visual Widget */
-        .fan-widget-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 6px 14px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 30px;
-        }
-        .fan-icon-box {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            transition: all 0.3s;
-        }
-        .fan-icon-box.running {
-            background: #dbeafe;
-            color: #0284c7;
-        }
-        .fan-icon-box.running i {
-            animation: spin 1s linear infinite;
-        }
-        .fan-icon-box.stopped {
-            background: rgba(148, 163, 184, 0.15);
-            color: var(--text-sub);
-        }
-        .fan-icon-box.error {
-            background: var(--danger-bg);
-            color: var(--danger);
-            animation: pulse 1s infinite;
-        }
+        .fan-widget-container { display: flex; align-items: center; gap: 12px; padding: 6px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 30px; }
+        .fan-icon-box { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: all 0.3s; }
+        .fan-icon-box.running { background: #dbeafe; color: #0284c7; }
+        .fan-icon-box.running i { animation: spin 1s linear infinite; }
+        .fan-icon-box.stopped { background: rgba(148, 163, 184, 0.15); color: var(--text-sub); }
+        .fan-icon-box.error { background: var(--danger-bg); color: var(--danger); animation: pulse 1s infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* Button Groups */
         .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
-        .btn-action { 
-            border: none; 
-            padding: 9px 16px; 
-            border-radius: 30px; 
-            font-weight: 700; 
-            font-size: 0.82rem; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .btn-action { border: none; padding: 9px 16px; border-radius: 30px; font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
         .btn-ack { background: #d97706; color: #fff; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25); }
         .btn-emergency { background: #dc2626; color: #fff; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); }
         .btn-mute { background: var(--danger); color: #fff; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25); }
         .btn-unmute { background: #10b981; color: #fff; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25); }
         .btn-action:hover { transform: translateY(-2px); filter: brightness(1.08); }
 
-        /* KPI & Sensor Cards */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
         .kpi-card { background: var(--card-bg); border-radius: var(--radius-main); padding: 18px 20px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px; box-shadow: var(--shadow-sm); }
         .kpi-title { font-size: 0.78rem; text-transform: uppercase; color: var(--text-sub); font-weight: 800; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
@@ -279,33 +178,21 @@
         .unit { font-size: 0.82rem; color: var(--text-sub); font-weight: 600; margin-left: 3px; }
         .card-sub { font-size: 0.75rem; color: var(--text-sub); margin-top: 6px; font-weight: 500; }
 
-        /* Module Boxes */
         .module-box { background: var(--card-bg); padding: 22px 24px; border-radius: var(--radius-xl); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 16px; box-shadow: var(--shadow-sm); }
         .section-title { font-size: 0.98rem; font-weight: 800; letter-spacing: -0.2px; display: flex; align-items: center; gap: 10px; }
         .section-title i { color: var(--primary); }
 
-        /* Input Controls & Settings */
         .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; align-items: flex-end; }
         .input-group { display: flex; flex-direction: column; gap: 6px; position: relative; }
         .input-group label { font-size: 0.78rem; color: var(--text-sub); font-weight: 700; }
         .input-group input, .input-group select { 
-            padding: 9px 14px; 
-            border: 1px solid var(--border); 
-            border-radius: var(--radius-sub); 
-            font-size: 0.88rem; 
-            outline: none; 
-            background: var(--card-bg); 
-            color: var(--text-main); 
-            transition: all 0.2s;
+            padding: 9px 14px; border: 1px solid var(--border); border-radius: var(--radius-sub); 
+            font-size: 0.88rem; outline: none; background: var(--card-bg); color: var(--text-main); transition: all 0.2s;
         }
-        .input-group input:focus, .input-group select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
-        }
+        .input-group input:focus, .input-group select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
         .btn-save { background: var(--primary-gradient); color: #fff; border: none; padding: 10px 20px; border-radius: var(--radius-sub); font-weight: 700; cursor: pointer; height: 40px; font-size: 0.88rem; transition: all 0.2s; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25); display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
         .btn-save:hover { opacity: 0.95; transform: translateY(-1px); }
 
-        /* Table & Logs */
         .filter-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         .search-box { position: relative; }
         .search-box i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-sub); font-size: 0.85rem; }
@@ -330,7 +217,6 @@
         .note-meta { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-sub); font-weight: 700; }
         .note-text { font-size: 0.88rem; color: var(--text-main); line-height: 1.45; word-break: break-word; }
 
-        /* Modal Overlay */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(6px); z-index: 99999; display: none; justify-content: center; align-items: center; padding: 20px; }
         .modal-card { background: var(--card-bg); border-radius: var(--radius-xl); padding: 26px; width: 100%; max-width: 460px; display: flex; flex-direction: column; gap: 18px; border: 1px solid var(--border); box-shadow: var(--shadow-md); animation: modalZoom 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
@@ -338,7 +224,6 @@
         .btn-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-sub); transition: color 0.2s; }
         .btn-close:hover { color: var(--danger); }
 
-        /* Responsive Mobile Breakpoints */
         @media (max-width: 992px) {
             .sidebar { transform: translateX(-100%); }
             .sidebar.active { transform: translateX(0); }
@@ -388,8 +273,25 @@
         </div>
     </div>
 
+    <!-- NÂNG CẤP: Modal Nhập Mật Khẩu Đẹp Mắt -->
+    <div id="passwordModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 360px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-lock text-primary"></i> Xác Thực Quản Trị</h3>
+                <button class="btn-close" onclick="cancelPassword()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="input-group">
+                <label>Nhập mật khẩu Quản đốc:</label>
+                <input type="password" id="adminPasswordInput" placeholder="Nhập mật khẩu (admin)..." onkeypress="handlePasswordEnter(event)">
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px;">
+                <button class="btn-export" onclick="cancelPassword()">HỦY BỎ</button>
+                <button class="btn-save" onclick="submitPassword()"><i class="fa-solid fa-check"></i> XÁC NHẬN</button>
+            </div>
+        </div>
+    </div>
+
     <div class="app-layout">
-        <!-- Sidebar Navigation Drawer -->
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
         <aside class="sidebar" id="sidebar">
             <div>
@@ -417,35 +319,39 @@
         </aside>
 
         <main class="main-wrapper">
-            <!-- Top Bar Header Dùng Chung -->
             <div class="top-bar">
                 <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
                 <header>
                     <div class="header-title">
                         <h1><i class="fa-solid fa-microchip text-primary"></i> <span id="headerProjectName">TRẠM ĐIỀU KHIỂN VÀ ĐO ĐẠC NHÀ XƯỞNG</span></h1>
                         <div class="manager-info">
-                            <span><i class="fa-solid fa-graduation-cap"></i> Trường: <strong id="dispUniv">Trường Đại học Công nghiệp TP.HCM</strong></span>
-                            <span><i class="fa-solid fa-user-gear"></i> Quản lý: <strong id="dispAuthor">Nguyễn Trọng Phước</strong></span>
-                            <span><i class="fa-solid fa-location-dot"></i> Vị trí: <strong id="dispLocation">Khu Nhà Xưởng - TP.HCM</strong></span>
+                            <span><i class="fa-solid fa-graduation-cap"></i> Trường: <strong id="dispUniv">ĐH Công nghiệp TP.HCM</strong></span>
+                            <span><i class="fa-solid fa-location-dot"></i> Vị trí: <strong id="dispLocation">Khu Nhà Xưởng</strong></span>
+                            
+                            <!-- BỘ CHỌN PHÂN QUYỀN (ROLE SELECTOR) -->
+                            <span style="margin-left: 10px; padding: 4px 12px; background: var(--primary-bg); border-radius: 20px; border: 1px solid rgba(2, 132, 199, 0.3);">
+                                <i class="fa-solid fa-user-shield" style="color: var(--primary);"></i> Chế độ: 
+                                <select id="roleSelector" onchange="switchRole()" style="background: transparent; border: none; font-weight: bold; color: var(--primary); outline: none; cursor: pointer;">
+                                    <option value="viewer">Kỹ sư trực ca (Chỉ xem)</option>
+                                    <option value="admin">Quản trị viên (Toàn quyền)</option>
+                                </select>
+                            </span>
+
                         </div>
                     </div>
                     <div id="realtimeClock" class="realtime-clock"><i class="fa-regular fa-clock"></i> --:--:-- --/--/----</div>
                 </header>
             </div>
 
-            <!-- TAB 1: DASHBOARD GIÁM SÁT THỜI GIAN THỰC -->
+            <!-- TAB 1: DASHBOARD -->
             <section id="view-dashboard" class="app-page active">
                 <div class="incident-banner">
                     <div>
                         <i class="fa-solid fa-triangle-exclamation" style="color:#d97706; margin-right:6px;"></i>
                         <strong>Sự Cố Gần Nhất:</strong> <span id="lastIncName" style="color:#d97706; font-weight:700;">Không có</span>
                     </div>
-                    <div>
-                        Trạng Thái: <span id="lastIncStatus" class="badge badge-safe">AN TOÀN</span>
-                    </div>
-                    <div>
-                        Thời Gian: <strong id="lastIncTime" class="tech-data">--:--:--</strong>
-                    </div>
+                    <div>Trạng Thái: <span id="lastIncStatus" class="badge badge-safe">AN TOÀN</span></div>
+                    <div>Thời Gian: <strong id="lastIncTime" class="tech-data">--:--:--</strong></div>
                 </div>
 
                 <div class="status-banner">
@@ -453,11 +359,8 @@
                         <span id="envBadge" class="badge badge-safe"><i class="fa-solid fa-shield-halved"></i> AN TOÀN</span>
                         <span id="speakerBadge" class="badge badge-spk-on"><i class="fa-solid fa-volume-high"></i> LOA BÁO ĐỘNG: ĐANG BẬT</span>
                         
-                        <!-- Quạt Hút Công Nghiệp Visual Widget -->
                         <div class="fan-widget-container">
-                            <div class="fan-icon-box stopped" id="fanIconBox">
-                                <i class="fa-solid fa-fan"></i>
-                            </div>
+                            <div class="fan-icon-box stopped" id="fanIconBox"><i class="fa-solid fa-fan"></i></div>
                             <span id="fanBadge" style="font-size:0.82rem; font-weight:700; color:var(--text-sub);">QUẠT HÚT: TỰ ĐỘNG (TẮT)</span>
                         </div>
                     </div>
@@ -521,14 +424,14 @@
                 </div>
 
                 <div class="module-box">
-                    <div class="section-title"><i class="fa-solid fa-chart-line"></i> BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC (DỮ LIỆU TỪ ESP32)</div>
+                    <div class="section-title"><i class="fa-solid fa-chart-line"></i> BIỂU ĐỒ DIỄN BIẾN THỜI GIAN THỰC</div>
                     <div style="position: relative; height: 320px; width: 100%;">
                         <canvas id="envChart"></canvas>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 2: CẤU HÌNH NGƯỠNG CẢNH BÁO -->
+            <!-- TAB 2: CẤU HÌNH NGƯỠNG -->
             <section id="view-settings" class="app-page">
                 <div class="module-box">
                     <div class="section-title"><i class="fa-solid fa-sliders"></i> THIẾT LẬP NGƯỠNG CẢNH BÁO TỪ XA</div>
@@ -537,7 +440,7 @@
                         <div class="input-group"><label>Ngưỡng Khí CO2 PPM</label><input type="number" id="setCo2" value="900"></div>
                         <div class="input-group"><label>Ngưỡng Bụi PM2.5 µg/m³</label><input type="number" id="setDust" value="150"></div>
                         <div class="input-group"><label>Ngưỡng Khí Gas PPM</label><input type="number" id="setGas" value="180"></div>
-                        <button class="btn-save" onclick="saveThresholds()"><i class="fa-solid fa-floppy-disk"></i> ÁP DỤNG NGƯỠNG</button>
+                        <button id="btnSaveThreshold" class="btn-save" onclick="saveThresholds()"><i class="fa-solid fa-floppy-disk"></i> ÁP DỤNG NGƯỠNG</button>
                     </div>
                 </div>
             </section>
@@ -547,7 +450,7 @@
                 <div class="module-box">
                     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
                         <div class="section-title"><i class="fa-solid fa-book"></i> SỔ NHẬT KÝ CA TRỰC NHÀ XƯỞNG</div>
-                        <button class="btn-clear-db" onclick="clearNoteLogs()"><i class="fa-solid fa-trash-can"></i> Xóa Nhật Ký</button>
+                        <button id="btnClearNotes" class="btn-clear-db" onclick="clearNoteLogs()"><i class="fa-solid fa-trash-can"></i> Xóa Nhật Ký</button>
                     </div>
                     
                     <div class="note-input-row">
@@ -568,7 +471,7 @@
                 </div>
             </section>
 
-            <!-- TAB 4: LỊCH SỬ ĐO ĐẠC CLOUD -->
+            <!-- TAB 4: LỊCH SỬ ĐO ĐẠC -->
             <section id="view-history" class="app-page">
                 <div class="module-box">
                     <div class="section-title"><i class="fa-solid fa-database"></i> LỊCH SỬ ĐO ĐẠC CLOUD</div>
@@ -585,7 +488,7 @@
                         </div>
                         
                         <button class="btn-export" onclick="openExportModal()"><i class="fa-solid fa-file-export"></i> Xuất Báo Cáo</button>
-                        <button class="btn-clear-db" onclick="clearDatabase()"><i class="fa-solid fa-trash-can"></i> Xóa Lịch Sử</button>
+                        <button id="btnClearHistory" class="btn-clear-db" onclick="clearDatabase()"><i class="fa-solid fa-trash-can"></i> Xóa Lịch Sử</button>
                     </div>
 
                     <div class="table-responsive">
@@ -610,7 +513,6 @@
         </main>
     </div>
 
-    <!-- SCRIPT CHUYỂN TAB VÀ ĐỒNG BỘ FIREBASE TỰ ĐỘNG -->
     <script>
         const firebaseConfig = {
             databaseURL: "https://giam-sat-moi-truong-nha-xuong-default-rtdb.asia-southeast1.firebasedatabase.app"
@@ -634,7 +536,6 @@
         let logData = [];
         let currentClockDate = null;
 
-        // Hàm Chuyển Tab Giao Diện Chuyên Nghiệp
         function switchTab(pageId, navElement) {
             document.querySelectorAll('.app-page').forEach(page => page.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
@@ -645,7 +546,6 @@
 
             closeSidebar();
 
-            // Căn chỉnh lại kích thước biểu đồ khi quay lại Dashboard
             if (pageId === 'view-dashboard' && typeof chart !== 'undefined') {
                 setTimeout(() => chart.resize(), 50);
             }
@@ -675,7 +575,6 @@
             setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 350); }, 2500);
         }
 
-        // Tự động đồng bộ ngưỡng từ Firebase
         database.ref('/thresholds').once('value').then((snapshot) => {
             const th = snapshot.val();
             if (th) {
@@ -686,7 +585,6 @@
             }
         });
 
-        // Đồng hồ thời gian thực
         setInterval(() => {
             if (currentClockDate) {
                 currentClockDate.setSeconds(currentClockDate.getSeconds() + 1);
@@ -804,7 +702,6 @@
             renderNotesUI(cachedNoteList);
         });
 
-        // Biểu đồ Real-time Nâng Cấp với Hai Trục Tung Y & Legend Tương Tác
         const ctx = document.getElementById('envChart').getContext('2d');
         const chart = new Chart(ctx, {
             type: 'line',
@@ -821,16 +718,8 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: { font: { family: 'Plus Jakarta Sans', weight: '700' }, usePointStyle: true }
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        bodyFont: { family: 'JetBrains Mono' }
-                    }
+                    legend: { display: true, position: 'top', labels: { font: { family: 'Plus Jakarta Sans', weight: '700' }, usePointStyle: true } },
+                    tooltip: { mode: 'index', intersect: false, bodyFont: { family: 'JetBrains Mono' } }
                 },
                 scales: {
                     x: {
@@ -848,21 +737,12 @@
                         },
                         grid: { display: false }
                     },
-                    yTemp: { 
-                        type: 'linear', position: 'left', 
-                        title: { display: true, text: 'Nhiệt độ & Độ ẩm', font: { weight: 'bold' } },
-                        suggestedMin: 15, suggestedMax: 100 
-                    },
-                    yGas: { 
-                        type: 'linear', position: 'right', 
-                        title: { display: true, text: 'Gas / CO2 / Bụi (PPM & µg/m³)', font: { weight: 'bold' } },
-                        grid: { drawOnChartArea: false }, suggestedMin: 0, suggestedMax: 1200 
-                    }
+                    yTemp: { type: 'linear', position: 'left', title: { display: true, text: 'Nhiệt độ & Độ ẩm', font: { weight: 'bold' } }, suggestedMin: 15, suggestedMax: 100 },
+                    yGas: { type: 'linear', position: 'right', title: { display: true, text: 'Gas / CO2 / Bụi (PPM & µg/m³)', font: { weight: 'bold' } }, grid: { drawOnChartArea: false }, suggestedMin: 0, suggestedMax: 1200 }
                 }
             }
         });
 
-        // 1. Nhận Dữ Liệu Tức Thời & Trạng Thái Quạt Hút Từ Firebase ESP32
         database.ref('/current').on('value', (snapshot) => {
             const data = snapshot.val();
             if (!data) return;
@@ -909,7 +789,6 @@
                 document.getElementById('aqiDesc').innerText = "Đánh giá: CHẤT LƯỢNG TỐT";
             }
 
-            // Cập nhật trạng thái Quạt Hút Công Nghiệp (Đang Chạy / Tắt / Lỗi)
             const fanBadge = document.getElementById('fanBadge');
             const fanBox = document.getElementById('fanIconBox');
 
@@ -939,7 +818,6 @@
             }
         });
 
-        // 2. Nhận Lịch Sử từ Firebase Cloud
         database.ref('/history').limitToLast(200).on('value', (snapshot) => {
             logData = [];
             let totalAlarm = 0;
@@ -977,7 +855,6 @@
                     lastDangerTime = record.timeStr;
                     lastDangerStatus = "CANH BAO";
                 }
-
                 logData.unshift(record);
             });
 
@@ -1047,7 +924,6 @@
                     return fullText.indexOf(input) > -1;
                 });
             }
-
             renderTableRows(filtered.slice(0, 100));
         }
 
@@ -1130,6 +1006,88 @@
         function REPORT_NAME_FORMAT(str) {
             return `"${(str || '').replace(/"/g, '""')}"`;
         }
+
+        // ==========================================
+        // TÍNH NĂNG PHÂN QUYỀN VÀ MODAL XÁC THỰC
+        // ==========================================
+        let currentRole = "viewer"; 
+        const ADMIN_PASSWORD = "admin"; // <--- BẠN CÓ THỂ ĐỔI MẬT KHẨU Ở ĐÂY
+
+        function switchRole() {
+            const selector = document.getElementById("roleSelector");
+            
+            if (selector.value === "admin") {
+                // Hiển thị giao diện nhập mật khẩu đẹp mắt thay cho trình duyệt mặc định
+                document.getElementById('passwordModal').style.display = 'flex';
+                document.getElementById('adminPasswordInput').focus();
+            } else {
+                currentRole = "viewer";
+                showTopToast("Đã chuyển về chế độ Kỹ sư trực ca.");
+                applyRoleUI();
+            }
+        }
+
+        // Lắng nghe sự kiện bấm phím Enter khi đang gõ pass
+        function handlePasswordEnter(event) {
+            if (event.key === "Enter") {
+                submitPassword();
+            }
+        }
+
+        function submitPassword() {
+            const passInput = document.getElementById("adminPasswordInput");
+            const selector = document.getElementById("roleSelector");
+
+            if (passInput.value === ADMIN_PASSWORD) {
+                currentRole = "admin";
+                showTopToast("Đã cấp quyền Quản Trị Viên thành công!");
+                document.getElementById('passwordModal').style.display = 'none';
+                applyRoleUI();
+            } else {
+                showTopToast("Sai mật khẩu! Trở về chế độ Trực ca.");
+                selector.value = "viewer";
+                currentRole = "viewer";
+                document.getElementById('passwordModal').style.display = 'none';
+                applyRoleUI();
+            }
+            passInput.value = ""; // Xóa trắng mật khẩu sau khi nhập
+        }
+
+        function cancelPassword() {
+            document.getElementById('passwordModal').style.display = 'none';
+            document.getElementById("roleSelector").value = "viewer";
+            document.getElementById("adminPasswordInput").value = "";
+        }
+
+        function applyRoleUI() {
+            // Xác định hiển thị hay ẩn nút
+            const displayStyle = (currentRole === "admin") ? "inline-flex" : "none";
+            
+            // Ẩn/Hiện nút áp dụng và nút xóa
+            const btnSave = document.getElementById("btnSaveThreshold");
+            const btnClearNotes = document.getElementById("btnClearNotes");
+            const btnClearHistory = document.getElementById("btnClearHistory");
+
+            if (btnSave) btnSave.style.display = displayStyle;
+            if (btnClearNotes) btnClearNotes.style.display = displayStyle;
+            if (btnClearHistory) btnClearHistory.style.display = displayStyle;
+
+            // Khóa/Mở các input nhập ngưỡng
+            const isViewer = (currentRole === "viewer");
+            const bgStyle = isViewer ? "var(--bg)" : "var(--card-bg)";
+            const inputIds = ["setTemp", "setCo2", "setDust", "setGas"];
+            
+            inputIds.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.disabled = isViewer;
+                    el.style.background = bgStyle;
+                }
+            });
+        }
+
+        // Áp dụng tính năng phân quyền ngay khi tải trang xong
+        applyRoleUI();
     </script>
 </body>
 </html>
